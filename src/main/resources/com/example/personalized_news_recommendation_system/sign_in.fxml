@@ -39,7 +39,7 @@
             <Font name="System Bold" size="72.0" />
          </font>
       </Text>
-      <Label fx:id="username" layoutX="342.0" layoutY="187.0" prefHeight="18.0" prefWidth="117.0" text="  Username -:">
+      <Label layoutX="342.0" layoutY="187.0" prefHeight="18.0" prefWidth="117.0" text="  Username -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
@@ -56,7 +56,7 @@
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="userSignInMainMenu" defaultButton="true" layoutX="316.0" layoutY="344.0" mnemonicParsing="false" onAction="#userSignInMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+      <Button fx:id="userSignHome" defaultButton="true" layoutX="316.0" layoutY="344.0" mnemonicParsing="false" onAction="#userSignHome" prefHeight="51.0" prefWidth="118.0" style="-fx-background-color: grey;" text="Home">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>

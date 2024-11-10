@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.add_article">
+    <children>
+        <!-- Header Text for Admin Add Article -->
+        <Label layoutX="311.0" layoutY="14.0" text="Add Article">
+            <font>
+                <Font name="System Bold" size="72.0" />
+            </font>
+        </Label>
+
+        <!-- Article Name Field -->
+        <Label layoutX="248.0" layoutY="130.0" prefHeight="35.0" prefWidth="168.0" text="Article Name -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <TextField fx:id="articleNameField" layoutX="427.0" layoutY="135.0" prefWidth="400.0" />
+
+        <!-- Category Field -->
+        <Label layoutX="246.0" layoutY="183.0" text="Category -: ">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <TextField fx:id="categoryField" layoutX="427.0" layoutY="184.0" prefWidth="400.0" />
+
+        <!-- Author Field -->
+        <Label layoutX="246.0" layoutY="234.0" prefHeight="27.0" prefWidth="90.0" text="Author -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <TextField fx:id="authorField" layoutX="427.0" layoutY="235.0" prefWidth="400.0" />
+
+        <!-- Published Date Field -->
+        <Label layoutX="248.0" layoutY="291.0" text="Published Date -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <DatePicker fx:id="publishedDatePicker" layoutX="676.0" layoutY="292.0" prefWidth="150.0" />
+
+        <!-- Article Content Field -->
+        <Label layoutX="246.0" layoutY="367.0" text="Content -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+        <TextArea fx:id="contentArea" layoutX="427.0" layoutY="367.0" prefHeight="100.0" prefWidth="400.0" />
+
+        <!-- Submit Button -->
+        <Button fx:id="submitArticleButton" layoutX="248.0" layoutY="528.0" mnemonicParsing="false" onAction="#submitArticle" style="-fx-background-color: grey;" text="Submit Article">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Button>
+      <AnchorPane prefHeight="610.0" prefWidth="214.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="33.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutX="1.0" layoutY="349.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="214.39999999999998">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <Button fx:id="addMainMenu" layoutX="492.0" layoutY="528.0" mnemonicParsing="false" onAction="#addMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="exitArticle" layoutX="692.0" layoutY="528.0" mnemonicParsing="false" onAction="#exitArticle" prefHeight="51.0" prefWidth="150.0" style="-fx-background-color: grey;" text="Exit">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Button>
+    </children>
+</AnchorPane>

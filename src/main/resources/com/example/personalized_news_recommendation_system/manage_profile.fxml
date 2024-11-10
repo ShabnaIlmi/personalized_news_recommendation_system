@@ -7,7 +7,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
 <AnchorPane prefHeight="610.0" prefWidth="883.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.manage_profile">
    <children>
       <AnchorPane prefHeight="610.0" prefWidth="212.0" style="-fx-background-color: grey;">
@@ -17,7 +16,7 @@
                   <Image url="@../../../../../../../Downloads/interview_2450883.png" />
                </image>
             </ImageView>
-            <Text layoutX="4.0" layoutY="328.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="220.48126220703125">
+            <Text layoutX="2.0" layoutY="336.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="220.48126220703125">
                <font>
                   <Font name="System Bold Italic" size="64.0" />
                </font>
@@ -29,9 +28,22 @@
             <Font name="System Bold" size="72.0" />
          </font>
       </Text>
-      <Button layoutX="300.0" layoutY="200.0" mnemonicParsing="false" text="Button" />
-      <Button layoutX="701.0" layoutY="200.0" mnemonicParsing="false" text="Button" />
-      <Button layoutX="300.0" layoutY="305.0" mnemonicParsing="false" text="Button" />
-      <Button layoutX="707.0" layoutY="305.0" mnemonicParsing="false" text="Button" />
+      <Button fx:id="accountInformation" layoutX="271.0" layoutY="219.0" mnemonicParsing="false" onAction="#accountInformation" style="-fx-background-color: grey;" text="Account Information">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font></Button>
+      <Button fx:id="userPreferences" layoutX="618.0" layoutY="219.0" mnemonicParsing="false" onAction="#userPreferences" style="-fx-background-color: grey;" text="User Prefernces">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font></Button>
+      <Button fx:id="exitMainMenu" layoutX="271.0" layoutY="365.0" mnemonicParsing="false" onAction="#exitMainMenu" prefHeight="51.0" prefWidth="265.0" style="-fx-background-color: grey;" text="Main Menu">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font></Button>
+      <Button layoutX="618.0" layoutY="365.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="220.0" style="-fx-background-color: grey;" text="Exit">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

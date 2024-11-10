@@ -1,14 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.personalized_news_recommendation_system.view_articles"
-            prefHeight="400.0" prefWidth="600.0">
+<AnchorPane prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.view_articles">
+    <children>
+        <!-- Sidebar Section with Logo and Title -->
+        <AnchorPane prefHeight="610.0" prefWidth="206.0" style="-fx-background-color: grey;">
+            <children>
+                <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="3.0" layoutY="87.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+                    </image>
+                </ImageView>
+                <Text layoutX="5.0" layoutY="329.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="213.28118896484375">
+                    <font>
+                        <Font name="System Bold Italic" size="64.0" />
+                    </font>
+                </Text>
+            </children>
+        </AnchorPane>
 
+        <!-- Header Text for View Articles -->
+        <Text layoutX="342.0" layoutY="103.0" strokeType="OUTSIDE" strokeWidth="0.0" text="View Articles">
+            <font>
+                <Font name="System Bold" size="72.0" />
+            </font>
+        </Text>
+
+        <!-- Table for Article Details -->
+        <TableView fx:id="viewTable" layoutX="242.0" layoutY="158.0" prefHeight="200.0" prefWidth="606.0">
+            <columns>
+                <TableColumn fx:id="articleNameColumn" prefWidth="165.5999755859375" text="Article Name" />
+                <TableColumn fx:id="categoryColumn" prefWidth="172.00003051757812" text="Category" />
+                <TableColumn fx:id="authorColumn" prefWidth="143.99993896484375" text="Author" />
+                <TableColumn fx:id="publishedDateColumn" prefWidth="125.5999755859375" text="Published Date" />
+            </columns>
+        </TableView>
+
+        <!-- Get Recommendation Button -->
+        <Button fx:id="getRecommendation" layoutX="424.0" layoutY="416.0" mnemonicParsing="false" onAction="#getRecommendation" style="-fx-background-color: grey;" text="Get Recommendation">
+            <font>
+                <Font name="System Bold Italic" size="24.0" />
+            </font>
+        </Button>
+
+        <!-- Main Menu Button -->
+        <Button fx:id="viewMainMenu" layoutX="260.0" layoutY="524.0" mnemonicParsing="false" onAction="#viewMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+            <font>
+                <Font name="System Bold Italic" size="24.0" />
+            </font>
+        </Button>
+
+        <!-- Exit Button -->
+        <Button fx:id="viewExit" layoutX="698.0" layoutY="524.0" mnemonicParsing="false" onAction="#viewExit" prefHeight="51.0" prefWidth="136.0" style="-fx-background-color: grey;" text="Exit">
+            <font>
+                <Font name="System Bold Italic" size="24.0" />
+            </font>
+        </Button>
+    </children>
 </AnchorPane>

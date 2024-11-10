@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
@@ -31,17 +32,17 @@
             <Font name="System Bold" size="72.0" />
          </font>
       </Text>
-      <Label layoutX="315.0" layoutY="169.0" text="First Name -:">
+      <Label layoutX="315.0" layoutY="156.0" text="First Name -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label layoutX="316.0" layoutY="217.0" text="Last Name -:">
+      <Label layoutX="315.0" layoutY="195.0" text="Last Name -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label layoutX="315.0" layoutY="263.0" text="Email -:">
+      <Label layoutX="315.0" layoutY="270.0" text="Email -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
@@ -51,25 +52,49 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label layoutX="315.0" layoutY="364.0" text="Verify Password -:">
+      <Label layoutX="317.0" layoutY="356.0" text="Verify Password -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Button fx:id="register" layoutX="681.0" layoutY="489.0" mnemonicParsing="false" onAction="#register" style="-fx-background-color: grey;" text="Register">
+      <Button fx:id="register" layoutX="682.0" layoutY="531.0" mnemonicParsing="false" onAction="#register" style="-fx-background-color: grey;" text="Register">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="registerMainMenu" layoutX="306.0" layoutY="489.0" mnemonicParsing="false" onAction="#registerMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+      <Button fx:id="registerMainMenu" layoutX="307.0" layoutY="532.0" mnemonicParsing="false" onAction="#registerMainMenu" style="-fx-background-color: grey;" text="Main Menu">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Button>
       <PasswordField fx:id="createPassword" layoutX="532.0" layoutY="314.0" prefHeight="26.0" prefWidth="247.0" />
-      <PasswordField fx:id="verifyPassword" layoutX="532.0" layoutY="365.0" prefHeight="26.0" prefWidth="247.0" />
-      <TextField fx:id="email" layoutX="532.0" layoutY="264.0" prefHeight="26.0" prefWidth="247.0" />
-      <TextField fx:id="secondName" layoutX="532.0" layoutY="218.0" prefHeight="26.0" prefWidth="247.0" />
-      <TextField fx:id="firstName" layoutX="532.0" layoutY="170.0" prefHeight="26.0" prefWidth="247.0" />
+      <PasswordField fx:id="verifyPassword" layoutX="532.0" layoutY="357.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="email" layoutX="532.0" layoutY="278.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="secondName" layoutX="532.0" layoutY="195.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="firstName" layoutX="532.0" layoutY="156.0" prefHeight="26.0" prefWidth="247.0" />
+      <ChoiceBox fx:id="category1" layoutX="532.0" layoutY="396.0" onDragDetected="#category1" prefHeight="26.0" prefWidth="247.0" />
+      <Label layoutX="314.0" layoutY="395.0" text="Category 1 -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="314.0" layoutY="435.0" text="Category 2 -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ChoiceBox fx:id="category2" layoutX="532.0" layoutY="436.0" onDragDetected="#category2" prefHeight="26.0" prefWidth="247.0" />
+      <Label layoutX="314.0" layoutY="230.0" text="Age -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="age" layoutX="532.0" layoutY="236.0" prefHeight="26.0" prefWidth="247.0" />
+      <Label layoutX="314.0" layoutY="472.0" text="Category 3 -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ChoiceBox fx:id="category3" layoutX="532.0" layoutY="474.0" onDragDetected="#category3" prefHeight="26.0" prefWidth="247.0" />
    </children>
 </AnchorPane>
