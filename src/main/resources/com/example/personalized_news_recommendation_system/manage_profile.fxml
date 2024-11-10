@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane prefHeight="610.0" prefWidth="883.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.manage_profile">
+   <children>
+      <AnchorPane prefHeight="610.0" prefWidth="212.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="30.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutX="4.0" layoutY="328.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="220.48126220703125">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <Text layoutX="300.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Manage Profile">
+         <font>
+            <Font name="System Bold" size="72.0" />
+         </font>
+      </Text>
+      <Button layoutX="300.0" layoutY="200.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="701.0" layoutY="200.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="300.0" layoutY="305.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="707.0" layoutY="305.0" mnemonicParsing="false" text="Button" />
+   </children>
+</AnchorPane>

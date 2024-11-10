@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.register">
+   <children>
+      <AnchorPane prefHeight="610.0" prefWidth="211.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="198.0" fitWidth="132.0" layoutX="38.0" layoutY="97.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutX="10.0" layoutY="320.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="215.6812744140625">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <Text layoutX="434.0" layoutY="95.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Register">
+         <font>
+            <Font name="System Bold" size="72.0" />
+         </font>
+      </Text>
+      <Label layoutX="315.0" layoutY="169.0" text="First Name -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="316.0" layoutY="217.0" text="Last Name -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="315.0" layoutY="263.0" text="Email -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="315.0" layoutY="313.0" text="Create Password -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="315.0" layoutY="364.0" text="Verify Password -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="register" layoutX="681.0" layoutY="489.0" mnemonicParsing="false" onAction="#register" style="-fx-background-color: grey;" text="Register">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="registerMainMenu" layoutX="306.0" layoutY="489.0" mnemonicParsing="false" onAction="#registerMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Button>
+      <PasswordField fx:id="createPassword" layoutX="532.0" layoutY="314.0" prefHeight="26.0" prefWidth="247.0" />
+      <PasswordField fx:id="verifyPassword" layoutX="532.0" layoutY="365.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="email" layoutX="532.0" layoutY="264.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="secondName" layoutX="532.0" layoutY="218.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="firstName" layoutX="532.0" layoutY="170.0" prefHeight="26.0" prefWidth="247.0" />
+   </children>
+</AnchorPane>

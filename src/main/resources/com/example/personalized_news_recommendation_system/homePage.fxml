@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.homePage">
+   <children>
+      <AnchorPane prefHeight="610.0" prefWidth="234.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="77.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutX="3.0" layoutY="326.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="227.68121337890625">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <Text layoutX="389.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome !">
+         <font>
+            <Font name="System Bold" size="72.0" />
+         </font>
+      </Text>
+      <Button fx:id="homeSignIn" layoutX="546.0" layoutY="236.0" mnemonicParsing="false" onAction="#homeSignIn" style="-fx-background-color: grey;" text="Sign-in">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="homeRegister" layoutX="728.0" layoutY="236.0" mnemonicParsing="false" onAction="#homeRegister" style="-fx-background-color: grey;" text="Register">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Label layoutX="500.0" layoutY="196.0" text="For existing customers">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="710.0" layoutY="196.0" text="For new customers">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Text layoutX="602.0" layoutY="161.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Login">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Text>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="277.0" layoutY="177.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../../../../../Downloads/rating_3201521.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="307.0" layoutY="395.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../../../../../Downloads/settings_2622309.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="600.0" layoutY="377.0" text="Administrator Login">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="homeAdminsterSignIn" layoutX="659.0" layoutY="439.0" mnemonicParsing="false" onAction="#homeAdminsterSignIn" style="-fx-background-color: grey;" text="Sign-in">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

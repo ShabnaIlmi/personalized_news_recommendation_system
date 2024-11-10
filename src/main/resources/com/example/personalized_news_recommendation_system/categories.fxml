@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.categories">
+   <children>
+      <AnchorPane prefHeight="610.0" prefWidth="205.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="41.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutX="1.0" layoutY="333.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="230.08123779296875">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <Text layoutX="376.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Categories">
+         <font>
+            <Font name="System Bold" size="72.0" />
+         </font>
+      </Text>
+      <Button fx:id="technology" layoutX="327.0" layoutY="166.0" mnemonicParsing="false" onAction="#technology" style="-fx-background-color: grey;" text="Technology">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="health" layoutX="628.0" layoutY="166.0" mnemonicParsing="false" onAction="#health" prefHeight="51.0" prefWidth="178.0" style="-fx-background-color: grey;" text="Health">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="sports" layoutX="324.0" layoutY="279.0" mnemonicParsing="false" onAction="#sports" prefHeight="51.0" prefWidth="167.0" style="-fx-background-color: grey;" text="Sports">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="AI" layoutX="628.0" layoutY="279.0" mnemonicParsing="false" onAction="#AI" prefHeight="51.0" prefWidth="178.0" style="-fx-background-color: grey;" text="AI">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="Education" layoutX="324.0" layoutY="392.0" mnemonicParsing="false" onAction="#Education" prefHeight="51.0" prefWidth="167.0" style="-fx-background-color: grey;" text="Education">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="social" layoutX="628.0" layoutY="392.0" mnemonicParsing="false" onAction="#social" prefHeight="51.0" prefWidth="178.0" style="-fx-background-color: grey;" text="Social">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="userCategoryMainMenu" layoutX="476.0" layoutY="514.0" mnemonicParsing="false" onAction="#userCategoryMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

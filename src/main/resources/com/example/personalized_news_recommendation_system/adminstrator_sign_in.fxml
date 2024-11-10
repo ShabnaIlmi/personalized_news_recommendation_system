@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.adminstrator_sign_in">
+   <children>
+      <AnchorPane prefHeight="610.0" prefWidth="223.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="37.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutX="9.0" layoutY="331.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="210.39999999999998">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <Text layoutX="409.0" layoutY="107.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sign_in">
+         <font>
+            <Font name="System Bold" size="72.0" />
+         </font>
+      </Text>
+      <Label layoutX="298.0" layoutY="197.0" text="Username -:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Text layoutX="298.0" layoutY="289.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password -:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Text>
+      <Button fx:id="adminstratorSignIn" layoutX="298.0" layoutY="381.0" mnemonicParsing="false" onAction="#adminstratorSignIn" style="-fx-background-color: grey;" text="Sign-in">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="adminstratorMainMenu" cancelButton="true" layoutX="659.0" layoutY="381.0" mnemonicParsing="false" onAction="#adminstratorMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <TextField fx:id="adminstratorPassword" layoutX="503.0" layoutY="202.0" onAction="#adminstratorPassword" prefHeight="26.0" prefWidth="322.0" />
+      <TextField layoutX="503.0" layoutY="267.0" prefHeight="26.0" prefWidth="322.0" />
+   </children>
+</AnchorPane>
