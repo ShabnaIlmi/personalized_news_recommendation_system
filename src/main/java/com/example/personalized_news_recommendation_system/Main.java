@@ -10,29 +10,33 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    // MongoDB connection string and database name
     private static final String CONNECTION_STRING = "mongodb://localhost:27017";
     private static final String DATABASE_NAME = "News_Recommendation";
 
     @Override
     public void start(Stage stage) throws Exception {
-        // Connect to MongoDB
+        // Connect to MongoDB server
         MongoClient mongoClient = MongoClients.create(CONNECTION_STRING);
         MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
 
-        // Load the FXML file
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("sign_in.fxml"));
+        // Load the home page (home.fxml file path)
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
         Scene scene = new Scene(loader.load());
 
-        // Access the controller and inject the database
-        sign_in controller = loader.getController();
-        controller.setDatabase(database);
+        // Access the homePage controller
+        homePage homeController = loader.getController();
 
-        // Set up the stage
+        // Set up the MongoDB client and database in case needed
+        homeController.setMongoClient(mongoClient);
+        homeController.setDatabase(database);
+
+        // Set up the stage and scene
         stage.setScene(scene);
-        stage.setTitle("Personalized News Recommendation System - Sign In");
+        stage.setTitle("Personalized News Recommendation System - Home");
         stage.show();
 
-        // Close MongoDB connection on exit
+        // Ensure MongoClient is closed when the application exits
         stage.setOnCloseRequest(event -> mongoClient.close());
     }
 

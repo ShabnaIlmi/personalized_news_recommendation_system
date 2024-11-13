@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.sign_up">
+   <children>
+      <AnchorPane prefHeight="610.0" prefWidth="211.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="198.0" fitWidth="132.0" layoutX="38.0" layoutY="97.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutX="10.0" layoutY="320.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="215.6812744140625">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <Text layoutX="434.0" layoutY="95.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sign-up">
+         <font>
+            <Font name="System Bold" size="72.0" />
+         </font>
+      </Text>
+      <Label layoutX="315.0" layoutY="156.0" text="First Name -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="315.0" layoutY="195.0" text="Last Name -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="315.0" layoutY="270.0" text="Email -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="315.0" layoutY="313.0" text="Create Password -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="317.0" layoutY="356.0" text="Verify Password -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="signUp" layoutX="682.0" layoutY="531.0" mnemonicParsing="false" onAction="#signUp" style="-fx-background-color: grey;" text="Register">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="homeSignUp" layoutX="307.0" layoutY="532.0" mnemonicParsing="false" onAction="#homeSignUp" prefHeight="51.0" prefWidth="132.0" style="-fx-background-color: grey;" text="Home">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Button>
+      <PasswordField fx:id="createPassword" layoutX="532.0" layoutY="314.0" prefHeight="26.0" prefWidth="247.0" />
+      <PasswordField fx:id="verifyPassword" layoutX="532.0" layoutY="357.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="email" layoutX="532.0" layoutY="278.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="secondName" layoutX="532.0" layoutY="195.0" prefHeight="26.0" prefWidth="247.0" />
+      <TextField fx:id="firstName" layoutX="532.0" layoutY="156.0" prefHeight="26.0" prefWidth="247.0" />
+      <ChoiceBox fx:id="category1" layoutX="532.0" layoutY="396.0" onDragDetected="#category1" prefHeight="26.0" prefWidth="247.0" />
+      <Label layoutX="314.0" layoutY="395.0" text="Category 1 -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="314.0" layoutY="435.0" text="Category 2 -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ChoiceBox fx:id="category2" layoutX="532.0" layoutY="436.0" onDragDetected="#category2" prefHeight="26.0" prefWidth="247.0" />
+      <Label layoutX="314.0" layoutY="230.0" text="Age -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="age" layoutX="532.0" layoutY="236.0" prefHeight="26.0" prefWidth="247.0" />
+      <Label layoutX="314.0" layoutY="472.0" text="Category 3 -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <ChoiceBox fx:id="category3" layoutX="532.0" layoutY="474.0" onDragDetected="#category3" prefHeight="26.0" prefWidth="247.0" />
+   </children>
+</AnchorPane>

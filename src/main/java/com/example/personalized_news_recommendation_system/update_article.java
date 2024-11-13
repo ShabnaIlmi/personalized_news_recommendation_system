@@ -1,5 +1,6 @@
 package com.example.personalized_news_recommendation_system;
 
+import com.mongodb.client.MongoDatabase;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -42,5 +43,9 @@ public class update_article {
     }
     @FXML
     public void deleteArticle(ActionEvent actionEvent) {
+    }
+
+    public void setDatabase(MongoDatabase database) {
+
     }
 }

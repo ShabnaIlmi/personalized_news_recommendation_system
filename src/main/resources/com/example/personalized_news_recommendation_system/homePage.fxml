@@ -14,7 +14,7 @@
          <children>
             <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="77.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+                  <Image url="@interview_2450883.png" />
                </image>
             </ImageView>
             <Text layoutX="3.0" layoutY="326.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="227.68121337890625">
@@ -56,12 +56,12 @@
       </Text>
       <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="277.0" layoutY="177.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../../../../Downloads/rating_3201521.png" />
+            <Image url="@rating_3201521.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="307.0" layoutY="395.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../../../../Downloads/settings_2622309.png" />
+            <Image url="@settings_2622309.png" />
          </image>
       </ImageView>
       <Label layoutX="600.0" layoutY="377.0" text="Administrator Login">

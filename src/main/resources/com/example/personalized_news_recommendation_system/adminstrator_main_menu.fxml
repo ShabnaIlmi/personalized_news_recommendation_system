@@ -13,7 +13,7 @@
          <children>
             <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="38.0" layoutY="87.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+                  <Image url="@interview_2450883.png" />
                </image>
             </ImageView>
             <Text layoutX="4.0" layoutY="348.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="217.28118896484375">

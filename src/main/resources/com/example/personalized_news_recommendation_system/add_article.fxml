@@ -27,36 +27,29 @@
          </font></Label>
         <TextField fx:id="articleNameField" layoutX="427.0" layoutY="135.0" prefWidth="400.0" />
 
-        <!-- Category Field -->
-        <Label layoutX="246.0" layoutY="183.0" text="Category -: ">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font></Label>
-        <TextField fx:id="categoryField" layoutX="427.0" layoutY="184.0" prefWidth="400.0" />
-
         <!-- Author Field -->
-        <Label layoutX="246.0" layoutY="234.0" prefHeight="27.0" prefWidth="90.0" text="Author -:">
+        <Label layoutX="248.0" layoutY="188.0" prefHeight="27.0" prefWidth="90.0" text="Author -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font></Label>
-        <TextField fx:id="authorField" layoutX="427.0" layoutY="235.0" prefWidth="400.0" />
+        <TextField fx:id="authorField" layoutX="427.0" layoutY="189.0" prefWidth="400.0" />
 
         <!-- Published Date Field -->
-        <Label layoutX="248.0" layoutY="291.0" text="Published Date -:">
+        <Label layoutX="248.0" layoutY="241.0" text="Published Date -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font></Label>
-        <DatePicker fx:id="publishedDatePicker" layoutX="676.0" layoutY="292.0" prefWidth="150.0" />
+        <DatePicker fx:id="publishedDatePicker" layoutX="676.0" layoutY="242.0" prefWidth="150.0" />
 
         <!-- Article Content Field -->
-        <Label layoutX="246.0" layoutY="367.0" text="Content -:">
+        <Label layoutX="248.0" layoutY="291.0" text="Content -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font></Label>
-        <TextArea fx:id="contentArea" layoutX="427.0" layoutY="367.0" prefHeight="100.0" prefWidth="400.0" />
+        <TextArea fx:id="contentArea" layoutX="427.0" layoutY="298.0" prefHeight="127.0" prefWidth="400.0" />
 
         <!-- Submit Button -->
-        <Button fx:id="submitArticleButton" layoutX="248.0" layoutY="528.0" mnemonicParsing="false" onAction="#submitArticle" style="-fx-background-color: grey;" text="Submit Article">
+        <Button fx:id="submitArticleButton" layoutX="248.0" layoutY="490.0" mnemonicParsing="false" onAction="#submitArticle" style="-fx-background-color: grey;" text="Submit Article">
             <font>
                 <Font name="System Bold" size="24.0" />
             </font>
@@ -65,7 +58,7 @@
          <children>
             <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="33.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+                  <Image url="@interview_2450883.png" />
                </image>
             </ImageView>
             <Text layoutX="1.0" layoutY="349.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="214.39999999999998">
@@ -75,12 +68,12 @@
             </Text>
          </children>
       </AnchorPane>
-      <Button fx:id="addMainMenu" layoutX="492.0" layoutY="528.0" mnemonicParsing="false" onAction="#addMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+      <Button fx:id="addMainMenu" layoutX="488.0" layoutY="490.0" mnemonicParsing="false" onAction="#addMainMenu" style="-fx-background-color: grey;" text="Main Menu">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="exitArticle" layoutX="692.0" layoutY="528.0" mnemonicParsing="false" onAction="#exitArticle" prefHeight="51.0" prefWidth="150.0" style="-fx-background-color: grey;" text="Exit">
+      <Button fx:id="exitArticle" layoutX="693.0" layoutY="490.0" mnemonicParsing="false" onAction="#exitArticle" prefHeight="51.0" prefWidth="150.0" style="-fx-background-color: grey;" text="Exit">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
