@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 public class database_connection {
     private static final Logger logger = LoggerFactory.getLogger(database_connection.class);
     private static final String CONNECTION_STRING = "mongodb://localhost:27017";
-    private static final String DATABASE_NAME = "User";
+    private static final String DATABASE_NAME = "News_Recommendation";
 
     private MongoClient mongoClient;
     private MongoDatabase database;

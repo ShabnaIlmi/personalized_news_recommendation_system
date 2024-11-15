@@ -14,6 +14,8 @@ public class view_articles {
     public Button viewMainMenu;
     @FXML
     public Button viewExit;
+    @FXML
+    public Button readArtcles;
 
     @FXML
     public void getRecommendation(ActionEvent actionEvent) {
@@ -23,5 +25,8 @@ public class view_articles {
     }
     @FXML
     public void viewExit(ActionEvent actionEvent) {
+    }
+    @FXML
+    public void readArticles(ActionEvent actionEvent) {
     }
 }

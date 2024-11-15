@@ -6,6 +6,7 @@ module com.example.personalized_news_recommendation_system {
     requires org.mongodb.driver.core;
     requires org.slf4j;
     requires org.apache.opennlp.tools;
+    requires java.logging;
 
 
     opens com.example.personalized_news_recommendation_system to javafx.fxml;

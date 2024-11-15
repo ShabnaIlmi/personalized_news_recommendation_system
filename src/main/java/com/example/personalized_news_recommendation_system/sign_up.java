@@ -3,6 +3,7 @@ package com.example.personalized_news_recommendation_system;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +18,7 @@ import org.bson.Document;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class sign_up implements Initializable {
@@ -59,9 +61,9 @@ public class sign_up implements Initializable {
         String confirmPassword = verifyPassword.getText();
         String ageValue = age.getText().trim();
 
-        Set<String> selectedCategories = new HashSet<>(Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()));
-
-        if (selectedCategories.contains(null) || selectedCategories.size() < 3) {
+        // Ensure each category is selected
+        if (category1.getValue() == null || category2.getValue() == null || category3.getValue() == null ||
+                new HashSet<>(Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue())).size() < 3) {
             showAlert("Registration Failed", "Please select three distinct categories.", Alert.AlertType.ERROR);
             return;
         }
@@ -78,11 +80,18 @@ public class sign_up implements Initializable {
                 .append("last_name", sName)
                 .append("email", userEmail)
                 .append("age", userAge)
-                .append("category", new ArrayList<>(selectedCategories))
-                .append("username", username);
+                .append("categories", Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()))
+                .append("username", username)
+                .append("password", password); // Consider hashing passwords for security
 
         try {
             userCollection.insertOne(newUser);
+
+            // Show alert with the username and password
+            showAlert("Registration Successful",
+                    "Your account has been created!\nUsername: " + username + "\nPassword: " + password,
+                    Alert.AlertType.INFORMATION);
+
             navigateToMainMenu(actionEvent);
         } catch (Exception e) {
             showAlert("Database Error", "An error occurred while saving to the database.", Alert.AlertType.ERROR);
@@ -91,9 +100,35 @@ public class sign_up implements Initializable {
     }
 
     private String generateUsername(String firstName, String lastName) {
-        if (firstName.isEmpty() || lastName.isEmpty())
-            return "user";
-        return " ";
+        // Combine first and last names in CamelCase
+        String baseUsername = firstName.toLowerCase() + capitalize(lastName);
+
+        // Regex pattern to match existing usernames in the form <baseUsername>###@swiftly.com
+        String regex = "^" + Pattern.quote(baseUsername) + "(\\d{3})@swiftly\\.com$";
+        Pattern usernamePattern = Pattern.compile(regex);
+
+        // Query existing usernames that match the base pattern
+        List<Integer> suffixNumbers = new ArrayList<>();
+        for (Document user : userCollection.find(new Document("username", new Document("$regex", regex)))) {
+            String username = user.getString("username");
+            Matcher matcher = usernamePattern.matcher(username);
+
+            // Extract the numeric suffix and add to list
+            if (matcher.find()) {
+                suffixNumbers.add(Integer.parseInt(matcher.group(1)));
+            }
+        }
+
+        // Determine the next unique suffix number
+        int uniqueNumber = suffixNumbers.isEmpty() ? 1 : Collections.max(suffixNumbers) + 1;
+
+        // Generate the unique username with the next number, formatted as 3 digits
+        return baseUsername + String.format("%03d", uniqueNumber) + "@swiftly.com";
+    }
+
+    private String capitalize(String name) {
+        if (name == null || name.isEmpty()) return "";
+        return Character.toUpperCase(name.charAt(0)) + name.substring(1).toLowerCase();
     }
 
     private boolean validateInput(String fName, String sName, String userEmail, String password, String confirmPassword, String ageValue) {
@@ -126,24 +161,14 @@ public class sign_up implements Initializable {
         return true;
     }
 
-    @FXML
-    public void category1(MouseEvent mouseEvent) {
-    }
-
-    @FXML
-    public void category2(MouseEvent mouseEvent) {
-    }
-
-    @FXML
-    public void category3(MouseEvent mouseEvent) {
-    }
-
     private void showAlert(String title, String content, Alert.AlertType alertType) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        Platform.runLater(() -> {
+            Alert alert = new Alert(alertType);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(content);
+            alert.showAndWait();
+        });
     }
 
     private void navigateToMainMenu(ActionEvent actionEvent) {
@@ -168,10 +193,6 @@ public class sign_up implements Initializable {
         category3.getItems().addAll(categories);
     }
 
-    private String hashPassword(String password) {
-        return password;
-    }
-
     @FXML
     public void homeSignUp(ActionEvent actionEvent) {
         try {
@@ -184,11 +205,26 @@ public class sign_up implements Initializable {
 
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             currentStage.setScene(homeScene);
-            currentStage.setTitle("Home");
+            currentStage.setTitle("Personalized News Recommendation System - Home");
             currentStage.show();
         } catch (IOException e) {
             showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    public void category1(MouseEvent mouseEvent) {
+        // Event handling code if needed
+    }
+
+    @FXML
+    public void category2(MouseEvent mouseEvent) {
+        // Event handling code if needed
+    }
+
+    @FXML
+    public void category3(MouseEvent mouseEvent) {
+        // Event handling code if needed
     }
 }

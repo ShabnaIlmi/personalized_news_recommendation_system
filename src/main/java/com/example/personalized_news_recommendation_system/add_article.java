@@ -6,11 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.bson.Document;
 import opennlp.tools.util.Span;
@@ -19,10 +15,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 public class add_article {
+
     @FXML
-    public Button addMainMenu;
+    private Button addMainMenu;
     @FXML
-    public Button exitArticle;
+    private Button exitArticle;
     @FXML
     private TextField articleNameField;
     @FXML
@@ -32,104 +29,161 @@ public class add_article {
     @FXML
     private TextArea contentArea;
     @FXML
-    private Button submitArticleButton;
+    private Button submitArticle;
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     private MongoDatabase database;
-
-    // OpenNLP objects for tokenization, POS tagging, and NER
     private OpenNLPExample openNLPExample;
 
-    // Setter for MongoDatabase
     public void setDatabase(MongoDatabase database) {
         this.database = database;
     }
 
-    // Initialize OpenNLP objects
-    public void initOpenNLP() throws Exception {
-        openNLPExample = new OpenNLPExample();
+    // Initialize OpenNLP
+    public void initOpenNLP() {
+        try {
+            openNLPExample = new OpenNLPExample();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to initialize OpenNLP. Entity recognition will be disabled.");
+        }
     }
 
-    // Method to handle the submit button click
+    @FXML
+    public void initialize() {
+        // If the database is not yet set, show an error
+        if (database == null) {
+            showAlert("Database Error", "Database connection failed. Please ensure MongoDB is running.");
+            return;
+        }
+        initOpenNLP();
+        progressIndicator.setVisible(false); // Hide the progress indicator initially
+    }
+
+    // Submit article and save to MongoDB
     @FXML
     public void submitArticle(ActionEvent event) {
-        // Get values from the fields
-        String articleName = articleNameField.getText();
-        String author = authorField.getText();
-        String content = contentArea.getText();
+        // Show the progress indicator while processing
+        progressIndicator.setVisible(true);
+
+        if (database == null) {
+            showAlert("Database Error", "Database is not connected.");
+            progressIndicator.setVisible(false);
+            return;
+        }
+
+        String articleName = articleNameField.getText().trim();
+        String author = authorField.getText().trim();
+        String content = contentArea.getText().trim();
         LocalDate publishedDate = publishedDatePicker.getValue();
 
-        // Validate input fields
-        if (articleName == null || articleName.trim().isEmpty()) {
+        // Validate inputs
+        if (articleName.isEmpty()) {
             showAlert("Input Error", "Article name cannot be empty.");
+            progressIndicator.setVisible(false);
             return;
         }
-        if (author == null || author.trim().isEmpty()) {
+        if (author.isEmpty()) {
             showAlert("Input Error", "Author name cannot be empty.");
+            progressIndicator.setVisible(false);
             return;
         }
-        if (content == null || content.trim().isEmpty()) {
+        if (content.isEmpty()) {
             showAlert("Input Error", "Content cannot be empty.");
+            progressIndicator.setVisible(false);
             return;
         }
         if (publishedDate == null) {
             showAlert("Input Error", "Please select a published date.");
+            progressIndicator.setVisible(false);
             return;
         }
 
-        // Categorize the article using OpenNLP (integration will go here)
+        // Categorize article
         String category = categorizeArticle(content);
 
-        // Create a new article document
+        // Prepare the document to insert into MongoDB
         Document article = new Document("article_name", articleName)
                 .append("author", author)
                 .append("published_date", publishedDate.toString())
                 .append("content", content)
                 .append("category", category);
 
-        // Insert the article into the MongoDB "Articles" collection
-        MongoCollection<Document> articlesCollection = database.getCollection("Articles");
-        articlesCollection.insertOne(article);
-
-        // Show a success message
-        showAlert("Success", "Article submitted successfully!");
-
-        // Clear the form fields
-        articleNameField.clear();
-        authorField.clear();
-        contentArea.clear();
-        publishedDatePicker.setValue(null);
-    }
-
-    // Method to categorize article using OpenNLP models
-    private String categorizeArticle(String content) {
         try {
-            // Tokenize the content
-            String[] tokens = openNLPExample.tokenizer.tokenize(content);
-
-            // Perform NER to identify entities
-            Span[] nameSpans = openNLPExample.nameFinder.find(tokens);
-
-            // If we found any entities, we can categorize based on them
-            if (nameSpans.length > 0) {
-                StringBuilder categories = new StringBuilder();
-                for (Span span : nameSpans) {
-                    categories.append(tokens[span.getStart()]).append(", "); // Collect names/entities
-                }
-                return "Entities found: " + categories.toString(); // Use found entities as category
+            // Get or create Articles collection
+            MongoCollection<Document> articlesCollection = database.getCollection("Articles");
+            if (articlesCollection == null) {
+                database.createCollection("Articles");
+                articlesCollection = database.getCollection("Articles");
             }
 
-            // If no entities found, categorize as general topic
-            return "General";
+            // Insert the article into the collection
+            articlesCollection.insertOne(article);
+
+            // Show success message
+            showAlert("Success", "Article submitted successfully!");
+            clearFields();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Database Error", "Failed to save the article to the database. Please check the connection and retry.");
+        } finally {
+            progressIndicator.setVisible(false); // Hide the progress indicator after the process is done
+        }
+    }
+
+    // Categorize the article based on content
+    private String categorizeArticle(String content) {
+        if (openNLPExample == null) {
+            return "Uncategorized";
+        }
+
+        try {
+            String[] tokens = openNLPExample.getTokenizer().tokenize(content);
+            Span[] personSpans = openNLPExample.getPersonNameFinder().find(tokens);
+            Span[] locationSpans = openNLPExample.getLocationNameFinder().find(tokens);
+            Span[] organizationSpans = openNLPExample.getOrganizationNameFinder().find(tokens);
+
+            StringBuilder categories = new StringBuilder();
+
+            if (personSpans.length > 0) {
+                categories.append("Persons: ");
+                for (Span span : personSpans) {
+                    categories.append(joinTokens(tokens, span)).append(", ");
+                }
+            }
+            if (locationSpans.length > 0) {
+                categories.append("Locations: ");
+                for (Span span : locationSpans) {
+                    categories.append(joinTokens(tokens, span)).append(", ");
+                }
+            }
+            if (organizationSpans.length > 0) {
+                categories.append("Organizations: ");
+                for (Span span : organizationSpans) {
+                    categories.append(joinTokens(tokens, span)).append(", ");
+                }
+            }
+
+            return categories.length() > 0 ? categories.toString().replaceAll(", $", "") : "General";
 
         } catch (Exception e) {
-            // In case of error, categorize as Uncategorized
             e.printStackTrace();
-            showAlert("Error", "Error during categorization. Using default category.");
+            showAlert("Error", "Error during categorization. Using 'Uncategorized'.");
             return "Uncategorized";
         }
     }
 
-    // Method to display an alert with a custom title and message
+    // Helper method to join tokens from OpenNLP spans
+    private String joinTokens(String[] tokens, Span span) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = span.getStart(); i < span.getEnd(); i++) {
+            sb.append(tokens[i]).append(" ");
+        }
+        return sb.toString().trim();
+    }
+
+    // Show alert dialog
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -138,30 +192,32 @@ public class add_article {
         alert.showAndWait();
     }
 
-    // Navigate to the Main Menu page
+    // Clear input fields
+    private void clearFields() {
+        articleNameField.clear();
+        authorField.clear();
+        contentArea.clear();
+        publishedDatePicker.setValue(null);
+    }
+
+    // Navigate to main menu
     @FXML
     public void addMainMenu(ActionEvent actionEvent) {
         try {
-            // Load the main menu scene
             FXMLLoader loader = new FXMLLoader(getClass().getResource("adminstrator_main_menu.fxml"));
-            Scene mainMenuScene = new Scene(loader.load());
-
-            // Get the current stage and set the main menu scene
-            Stage currentStage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-            currentStage.setScene(mainMenuScene);
-            currentStage.setTitle("Administrator Main Menu");
-            currentStage.show();
+            Stage stage = (Stage) addMainMenu.getScene().getWindow();
+            Scene scene = new Scene(loader.load());
+            stage.setScene(scene);
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the Administrator Main Menu.");
             e.printStackTrace();
+            showAlert("Error", "Failed to load the main menu.");
         }
     }
 
-    // Close the current article page
+    // Exit the article form
     @FXML
     public void exitArticle(ActionEvent actionEvent) {
-        // Close the current stage (article page)
-        Stage currentStage = (Stage) ((Button) actionEvent.getSource()).getScene().getWindow();
-        currentStage.close();
+        Stage stage = (Stage) exitArticle.getScene().getWindow();
+        stage.close();
     }
 }
