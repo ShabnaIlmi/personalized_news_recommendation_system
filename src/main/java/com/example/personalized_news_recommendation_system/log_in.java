@@ -84,24 +84,16 @@ public class log_in {
                 } else {
                     System.out.println("Password entered does not match stored password.");
                     showAlert("Sign-In Failed", "Invalid password.");
-                    clearFields();
                 }
             } else {
                 System.out.println("No user found for username: " + username);
                 showAlert("Sign-In Failed", "User not found.");
-                clearFields();
             }
         } catch (Exception e) {
             System.out.println("Database query failed: " + e.getMessage());
             e.printStackTrace();
             showAlert("Database Error", "An error occurred while accessing the database.");
         }
-    }
-
-    // Method to clear the username and password fields
-    private void clearFields() {
-        userSignUsername.clear();
-        userSignPassword.clear();
     }
 
     private void navigateToMainMenu(ActionEvent actionEvent) {

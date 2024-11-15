@@ -79,12 +79,10 @@ public class sign_up implements Initializable {
                 .append("email", userEmail)
                 .append("age", userAge)
                 .append("category", new ArrayList<>(selectedCategories))
-                .append("username", username)
-                .append("password", hashPassword(password));
+                .append("username", username);
 
         try {
             userCollection.insertOne(newUser);
-            showAlert("Registration Success", "Your username is: " + username + "\nYour password is: " + password, Alert.AlertType.INFORMATION);
             navigateToMainMenu(actionEvent);
         } catch (Exception e) {
             showAlert("Database Error", "An error occurred while saving to the database.", Alert.AlertType.ERROR);
@@ -93,8 +91,9 @@ public class sign_up implements Initializable {
     }
 
     private String generateUsername(String firstName, String lastName) {
-        if (firstName.isEmpty() || lastName.isEmpty()) return "user";
-        return firstName.toLowerCase() + lastName.substring(0, 1).toUpperCase() + lastName.substring(1).toLowerCase() + "@swiftly.com";
+        if (firstName.isEmpty() || lastName.isEmpty())
+            return "user";
+        return " ";
     }
 
     private boolean validateInput(String fName, String sName, String userEmail, String password, String confirmPassword, String ageValue) {
