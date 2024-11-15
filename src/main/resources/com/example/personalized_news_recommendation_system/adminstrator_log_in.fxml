@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -15,42 +16,42 @@
          <children>
             <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="37.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+                  <Image url="@interview_2450883.png" />
                </image>
             </ImageView>
-            <Text layoutX="9.0" layoutY="331.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="210.39999999999998">
+            <Text layoutX="9.0" layoutY="331.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="210.4">
                <font>
                   <Font name="System Bold Italic" size="64.0" />
                </font>
             </Text>
          </children>
       </AnchorPane>
-      <Text layoutX="409.0" layoutY="107.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sign_in">
+      <Text layoutX="409.0" layoutY="107.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sign In">
          <font>
             <Font name="System Bold" size="72.0" />
          </font>
       </Text>
-      <Label layoutX="298.0" layoutY="197.0" text="Username -:">
+      <Label layoutX="298.0" layoutY="197.0" text="Username:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Text layoutX="298.0" layoutY="289.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password -:">
+      <Label layoutX="298.0" layoutY="289.0" text="Password:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
-      </Text>
-      <Button fx:id="adminstratorSignIn" layoutX="298.0" layoutY="381.0" mnemonicParsing="false" onAction="#adminstratorSignIn" style="-fx-background-color: grey;" text="Sign-in">
+      </Label>
+      <Button fx:id="adminstratorSignIn" layoutX="714.0" layoutY="383.0" mnemonicParsing="false" onAction="#adminstratorSignIn" style="-fx-background-color: grey;" text="Sign In">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="adminstratorMainMenu" cancelButton="true" layoutX="659.0" layoutY="381.0" mnemonicParsing="false" onAction="#adminstratorMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+      <TextField fx:id="adminstratorUsername" layoutX="503.0" layoutY="202.0" prefHeight="26.0" prefWidth="322.0" />
+      <PasswordField fx:id="adminstratorPassword" layoutX="503.0" layoutY="267.0" prefHeight="26.0" prefWidth="322.0" />
+      <Button fx:id="adminLogInHome" layoutX="298.0" layoutY="383.0" mnemonicParsing="false" onAction="#adminLogInInHome" style="-fx-background-color: grey;" text="Home">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <TextField fx:id="adminstratorPassword" layoutX="503.0" layoutY="202.0" onAction="#adminstratorPassword" prefHeight="26.0" prefWidth="322.0" />
-      <TextField layoutX="503.0" layoutY="267.0" prefHeight="26.0" prefWidth="322.0" />
    </children>
 </AnchorPane>

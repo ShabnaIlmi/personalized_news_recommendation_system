@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -17,7 +18,10 @@ import org.bson.Document;
 import java.io.IOException;
 
 public class adminstrator_log_in {
-
+    @FXML
+    public Button adminstratorSignIn;
+    @FXML
+    public Button adminLogInHome;
     @FXML
     private TextField adminstratorUsername;
     @FXML
@@ -83,7 +87,7 @@ public class adminstrator_log_in {
     private void openAdminMainMenu(ActionEvent actionEvent) {
         try {
             // Load the administrator main menu FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("AdminMainMenu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("adminstrator_main_menu.fxml"));
             Scene adminMainScene = new Scene(loader.load());
 
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
@@ -103,5 +107,29 @@ public class adminstrator_log_in {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    @FXML
+    public void adminLogInInHome(ActionEvent actionEvent) {
+        try {
+            // Load the home page FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
+            Scene homeScene = new Scene(loader.load());
+
+            // Pass the MongoClient and MongoDatabase to the home page controller
+            homePage homeController = loader.getController();
+            homeController.setMongoClient(mongoClient);
+            homeController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+
+            // Get the current stage and set the home scene
+            Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            currentStage.setScene(homeScene);
+            currentStage.setTitle("Personalized News Recommendation System - Home");
+            currentStage.show();
+
+        } catch (IOException e) {
+            showAlert("Navigation Error", "Failed to load the home page.");
+            e.printStackTrace();
+        }
     }
 }
