@@ -17,7 +17,7 @@ import org.bson.Document;
 
 import java.io.IOException;
 
-public class adminstrator_log_in {
+public class administrator_log_in {
     @FXML
     public Button adminstratorSignIn;
     @FXML
@@ -87,7 +87,7 @@ public class adminstrator_log_in {
     private void openAdminMainMenu(ActionEvent actionEvent) {
         try {
             // Load the administrator main menu FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("adminstrator_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
             Scene adminMainScene = new Scene(loader.load());
 
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();

@@ -204,7 +204,7 @@ public class add_article {
     @FXML
     public void addMainMenu(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("adminstrator_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
             Stage stage = (Stage) addMainMenu.getScene().getWindow();
             Scene scene = new Scene(loader.load());
             stage.setScene(scene);

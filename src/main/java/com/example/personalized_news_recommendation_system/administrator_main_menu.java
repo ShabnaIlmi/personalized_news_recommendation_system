@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class adminstrator_main_menu {
+public class administrator_main_menu {
 
     @FXML
     public Button addArticles;

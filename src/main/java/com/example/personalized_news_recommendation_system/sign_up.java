@@ -61,7 +61,6 @@ public class sign_up implements Initializable {
         String confirmPassword = verifyPassword.getText();
         String ageValue = age.getText().trim();
 
-        // Ensure each category is selected
         if (category1.getValue() == null || category2.getValue() == null || category3.getValue() == null ||
                 new HashSet<>(Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue())).size() < 3) {
             showAlert("Registration Failed", "Please select three distinct categories.", Alert.AlertType.ERROR);
@@ -87,7 +86,6 @@ public class sign_up implements Initializable {
         try {
             userCollection.insertOne(newUser);
 
-            // Show alert with the username and password
             showAlert("Registration Successful",
                     "Your account has been created!\nUsername: " + username + "\nPassword: " + password,
                     Alert.AlertType.INFORMATION);
@@ -100,30 +98,27 @@ public class sign_up implements Initializable {
     }
 
     private String generateUsername(String firstName, String lastName) {
-        // Combine first and last names in CamelCase
         String baseUsername = firstName.toLowerCase() + capitalize(lastName);
 
-        // Regex pattern to match existing usernames in the form <baseUsername>###@swiftly.com
         String regex = "^" + Pattern.quote(baseUsername) + "(\\d{3})@swiftly\\.com$";
         Pattern usernamePattern = Pattern.compile(regex);
 
-        // Query existing usernames that match the base pattern
-        List<Integer> suffixNumbers = new ArrayList<>();
+        int maxSuffix = 0;
+
         for (Document user : userCollection.find(new Document("username", new Document("$regex", regex)))) {
             String username = user.getString("username");
             Matcher matcher = usernamePattern.matcher(username);
 
-            // Extract the numeric suffix and add to list
             if (matcher.find()) {
-                suffixNumbers.add(Integer.parseInt(matcher.group(1)));
+                int suffix = Integer.parseInt(matcher.group(1));
+                if (suffix > maxSuffix) {
+                    maxSuffix = suffix;
+                }
             }
         }
 
-        // Determine the next unique suffix number
-        int uniqueNumber = suffixNumbers.isEmpty() ? 1 : Collections.max(suffixNumbers) + 1;
-
-        // Generate the unique username with the next number, formatted as 3 digits
-        return baseUsername + String.format("%03d", uniqueNumber) + "@swiftly.com";
+        int newSuffix = maxSuffix + 1;
+        return baseUsername + String.format("%03d", newSuffix) + "@swiftly.com";
     }
 
     private String capitalize(String name) {
@@ -215,16 +210,13 @@ public class sign_up implements Initializable {
 
     @FXML
     public void category1(MouseEvent mouseEvent) {
-        // Event handling code if needed
     }
 
     @FXML
     public void category2(MouseEvent mouseEvent) {
-        // Event handling code if needed
     }
 
     @FXML
     public void category3(MouseEvent mouseEvent) {
-        // Event handling code if needed
     }
 }

@@ -89,11 +89,11 @@ public class homePage {
     public void adminsterLogIn(ActionEvent actionEvent) {
         try {
             // Load the admin login page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("adminstrator_log_in.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_log_in.fxml"));
             Scene adminLoginScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
-            adminstrator_log_in adminstratorLogInController = loader.getController();
+            administrator_log_in adminstratorLogInController = loader.getController();
             adminstratorLogInController.setMongoClient(mongoClient);
             adminstratorLogInController.setDatabase(database);
 
