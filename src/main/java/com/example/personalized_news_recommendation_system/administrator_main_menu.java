@@ -1,6 +1,5 @@
 package com.example.personalized_news_recommendation_system;
 
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,11 +15,11 @@ import java.io.IOException;
 public class administrator_main_menu {
 
     @FXML
-    public Button addArticles;
+    private Button addArticles;
     @FXML
-    public Button updateArticles;
+    private Button updateArticles;
     @FXML
-    public Button Exit;
+    private Button Exit;
 
     private MongoDatabase database;
 
@@ -90,8 +89,4 @@ public class administrator_main_menu {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    public void setMongoClient(MongoClient mongoClient) {
-    }
-
 }

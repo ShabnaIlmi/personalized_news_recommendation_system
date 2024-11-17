@@ -41,13 +41,13 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Button fx:id="adminstratorSignIn" layoutX="714.0" layoutY="383.0" mnemonicParsing="false" onAction="#adminstratorSignIn" style="-fx-background-color: grey;" text="Sign In">
+      <Button fx:id="administratorSignIn" layoutX="714.0" layoutY="383.0" mnemonicParsing="false" onAction="#administratorSignIn" style="-fx-background-color: grey;" text="Sign In">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <TextField fx:id="adminstratorUsername" layoutX="503.0" layoutY="202.0" prefHeight="26.0" prefWidth="322.0" />
-      <PasswordField fx:id="adminstratorPassword" layoutX="503.0" layoutY="267.0" prefHeight="26.0" prefWidth="322.0" />
+      <TextField fx:id="administratorUsername" layoutX="503.0" layoutY="202.0" prefHeight="26.0" prefWidth="322.0" />
+      <PasswordField fx:id="administratorPassword" layoutX="503.0" layoutY="267.0" prefHeight="26.0" prefWidth="322.0" />
       <Button fx:id="adminLogInHome" layoutX="298.0" layoutY="383.0" mnemonicParsing="false" onAction="#adminLogInInHome" style="-fx-background-color: grey;" text="Home">
          <font>
             <Font name="System Bold Italic" size="24.0" />

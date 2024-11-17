@@ -19,13 +19,13 @@ import java.io.IOException;
 
 public class administrator_log_in {
     @FXML
-    public Button adminstratorSignIn;
+    public Button administratorSignIn;
     @FXML
     public Button adminLogInHome;
     @FXML
-    private TextField adminstratorUsername;
+    private TextField administratorUsername;
     @FXML
-    private PasswordField adminstratorPassword;
+    private PasswordField administratorPassword;
 
     private MongoClient mongoClient;
     private MongoCollection<Document> adminCollection;
@@ -46,9 +46,9 @@ public class administrator_log_in {
 
     // Sign-In Method for Administrator
     @FXML
-    void adminstratorSignIn(ActionEvent event) {
-        String username = adminstratorUsername.getText();
-        String password = adminstratorPassword.getText();
+    void administratorSignIn(ActionEvent event) {
+        String username = administratorUsername.getText();
+        String password = administratorPassword.getText();
 
         try {
             // Check if the admin with the given username exists in the database
@@ -72,11 +72,11 @@ public class administrator_log_in {
                     openAdminMainMenu(event);
                 } else {
                     showAlert("Sign-In Failed", "Invalid password.");
-                    adminstratorPassword.clear();
+                    administratorPassword.clear();
                 }
             } else {
                 showAlert("Sign-In Failed", "Administrator not found.");
-                adminstratorPassword.clear();
+                administratorPassword.clear();
             }
         } catch (Exception e) {
             e.printStackTrace();
