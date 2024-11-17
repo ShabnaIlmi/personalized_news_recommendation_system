@@ -1,5 +1,6 @@
 package com.example.personalized_news_recommendation_system;
 
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.event.ActionEvent;
@@ -33,9 +34,18 @@ public class add_article {
     @FXML
     private ProgressIndicator progressIndicator;
 
-    private MongoDatabase database;
+    private MongoClient mongoClient;  // Added MongoClient
+    private MongoDatabase database;  // MongoDatabase remains the same
     private OpenNLPExample openNLPExample;
 
+    // Setter for MongoClient (added MongoClient passing)
+    public void setMongoClient(MongoClient mongoClient) {
+        this.mongoClient = mongoClient;
+        // Optionally, set the database from MongoClient here
+        this.database = mongoClient.getDatabase("News_Recommendation");
+    }
+
+    // Setter for MongoDatabase (keeps existing functionality)
     public void setDatabase(MongoDatabase database) {
         this.database = database;
     }
