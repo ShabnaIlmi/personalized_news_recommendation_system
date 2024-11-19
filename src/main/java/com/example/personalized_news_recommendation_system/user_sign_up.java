@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class sign_up implements Initializable {
+public class user_sign_up implements Initializable {
     @FXML
     private Button homeSignUp, signUp;
     @FXML

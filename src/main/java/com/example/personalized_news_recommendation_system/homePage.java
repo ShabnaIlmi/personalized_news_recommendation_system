@@ -45,7 +45,7 @@ public class homePage {
             Scene signInScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
-            log_in signInController = loader.getController();
+            user_log_in signInController = loader.getController();
             signInController.setMongoClient(mongoClient);
             signInController.setDatabase(database);
 
@@ -61,6 +61,7 @@ public class homePage {
         }
     }
 
+    // Method to handle the Sign Up button click and navigate to sign_up.fxml
     @FXML
     public void homeSignUp(ActionEvent actionEvent) {
         try {
@@ -69,7 +70,7 @@ public class homePage {
             Scene signUpScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
-            sign_up signUpController = loader.getController();
+            user_sign_up signUpController = loader.getController();
             signUpController.setMongoClient(mongoClient);
             signUpController.setDatabase(database);
 

@@ -14,7 +14,7 @@ import org.bson.Document;
 import java.time.LocalDate;
 import java.util.Optional;
 
-public class update_article {
+public class manage_articles {
 
     @FXML
     public Button manageMainMenu;

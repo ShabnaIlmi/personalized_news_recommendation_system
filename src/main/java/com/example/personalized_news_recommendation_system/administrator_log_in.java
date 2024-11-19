@@ -28,6 +28,7 @@ public class administrator_log_in {
     private PasswordField administratorPassword;
 
     private MongoClient mongoClient;
+    private MongoDatabase database;
     private MongoCollection<Document> adminCollection;
 
     public void setMongoClient(MongoClient mongoClient) {

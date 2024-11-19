@@ -1,12 +1,10 @@
 package com.example.personalized_news_recommendation_system;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoDatabase;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
-public class mainMenu {
+public class user_main_menu {
     @FXML
     public Button categories;
     @FXML

@@ -18,7 +18,7 @@ import org.bson.Document;
 
 import java.io.IOException;
 
-public class log_in {
+public class user_log_in {
 
     @FXML
     public Button signIn;
