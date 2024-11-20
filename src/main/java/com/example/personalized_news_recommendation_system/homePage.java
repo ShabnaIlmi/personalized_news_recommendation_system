@@ -20,7 +20,7 @@ public class homePage {
     @FXML
     public Button homeLogIn;
     @FXML
-    public Button adminsterLogIn;
+    public Button administerLogIn;
 
     private MongoClient mongoClient;
     private MongoDatabase database;
@@ -41,7 +41,7 @@ public class homePage {
     public void homeLogIn(ActionEvent actionEvent) {
         try {
             // Load the sign_in page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("log_in.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_log_in.fxml"));
             Scene signInScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
@@ -66,7 +66,7 @@ public class homePage {
     public void homeSignUp(ActionEvent actionEvent) {
         try {
             // Load the sign-up page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("sign_up.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("_user_sign_up.fxml"));
             Scene signUpScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
@@ -87,16 +87,16 @@ public class homePage {
     }
 
     @FXML
-    public void adminsterLogIn(ActionEvent actionEvent) {
+    public void administerLogIn(ActionEvent actionEvent) {
         try {
             // Load the admin login page
             FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_log_in.fxml"));
             Scene adminLoginScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
-            administrator_log_in adminstratorLogInController = loader.getController();
-            adminstratorLogInController.setMongoClient(mongoClient);
-            adminstratorLogInController.setDatabase(database);
+            administrator_log_in administratorLogInController = loader.getController();
+            administratorLogInController.setMongoClient(mongoClient);
+            administratorLogInController.setDatabase(database);
 
             // Get the current stage and set the new scene
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();

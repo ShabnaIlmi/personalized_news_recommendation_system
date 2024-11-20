@@ -69,7 +69,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Button fx:id="adminsterLogIn" layoutX="659.0" layoutY="439.0" mnemonicParsing="false" onAction="#adminsterLogIn" style="-fx-background-color: grey;" text="Log-in">
+      <Button fx:id="administerLogIn" layoutX="659.0" layoutY="439.0" mnemonicParsing="false" onAction="#administerLogIn" style="-fx-background-color: grey;" text="Log-in">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>

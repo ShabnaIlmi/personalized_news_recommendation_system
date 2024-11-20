@@ -168,7 +168,7 @@ public class user_sign_up implements Initializable {
 
     private void navigateToMainMenu(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("mainMenu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
             Scene mainMenuScene = new Scene(loader.load());
 
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();

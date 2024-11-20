@@ -52,6 +52,12 @@ public class user_log_in {
         String username = userSignUsername.getText();
         String password = userSignPassword.getText();
 
+        // Check if the username or password fields are empty
+        if (username.isEmpty() || password.isEmpty()) {
+            showAlert("Input Error", "Please enter both username and password.");
+            return;
+        }
+
         System.out.println("Username entered: " + username);
         System.out.println("Password entered: " + password);
 
@@ -98,7 +104,7 @@ public class user_log_in {
 
     private void navigateToMainMenu(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("mainMenu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_log_in.fxml"));
             Scene mainMenuScene = new Scene(loader.load());
 
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();

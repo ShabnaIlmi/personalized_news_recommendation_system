@@ -18,6 +18,7 @@ import org.bson.Document;
 import java.io.IOException;
 
 public class administrator_log_in {
+
     @FXML
     public Button administratorSignIn;
     @FXML
@@ -31,11 +32,13 @@ public class administrator_log_in {
     private MongoDatabase database;
     private MongoCollection<Document> adminCollection;
 
+    // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
         System.out.println("MongoClient set successfully in AdministratorLogIn controller.");
     }
 
+    // Setter for MongoDatabase
     public void setDatabase(MongoDatabase database) {
         if (database != null) {
             this.adminCollection = database.getCollection("Admin");
@@ -51,6 +54,12 @@ public class administrator_log_in {
         String username = administratorUsername.getText();
         String password = administratorPassword.getText();
 
+        // Check if the username or password fields are empty
+        if (username.isEmpty() || password.isEmpty()) {
+            showAlert("Input Error", "Please enter both username and password.");
+            return;
+        }
+
         try {
             // Check if the admin with the given username exists in the database
             Document usernameQuery = new Document("username", username);
@@ -63,6 +72,7 @@ public class administrator_log_in {
                     String firstName = adminDoc.getString("first_name");
                     String lastName = adminDoc.getString("last_name");
 
+                    // Show success message
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Admin Sign-In Success");
                     alert.setHeaderText(null);
@@ -85,23 +95,31 @@ public class administrator_log_in {
         }
     }
 
-    private void openAdminMainMenu(ActionEvent actionEvent) {
+    // Method to open the Admin Main Menu page
+    public void openAdminMainMenu(ActionEvent actionEvent) {
         try {
-            // Load the administrator main menu FXML
+            // Load the Admin Main Menu page
             FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
-            Scene adminMainScene = new Scene(loader.load());
+            Scene adminMainMenuScene = new Scene(loader.load());
 
+            // Get the controller for the Admin Main Menu and pass the MongoClient and MongoDatabase
+            administrator_main_menu adminMainMenuController = loader.getController();
+            adminMainMenuController.setMongoClient(mongoClient);
+            adminMainMenuController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+
+            // Get the current stage and set the new scene
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            currentStage.setScene(adminMainScene);
-            currentStage.setTitle("Administrator Main Menu");
+            currentStage.setScene(adminMainMenuScene);
+            currentStage.setTitle("Personalized News Recommendation System - Administrator Main Menu");
             currentStage.show();
 
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the administrator main menu.");
+            showAlert("Navigation Error", "Failed to load the Admin Main Menu page.");
             e.printStackTrace();
         }
     }
 
+    // Method to show a simple alert with a message
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -110,6 +128,7 @@ public class administrator_log_in {
         alert.showAndWait();
     }
 
+    // Method to navigate to the home page from the admin login
     @FXML
     public void adminLogInInHome(ActionEvent actionEvent) {
         try {

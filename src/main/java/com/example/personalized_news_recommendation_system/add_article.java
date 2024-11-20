@@ -3,196 +3,135 @@ package com.example.personalized_news_recommendation_system;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.bson.Document;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
-
 public class add_article {
+
     @FXML
-    public TextField articleNameField;
+    private TextField articleNameField;
     @FXML
-    public TextField authorField;
+    private TextField authorField;
     @FXML
-    public DatePicker publishedDatePicker;
+    private DatePicker publishedDatePicker;
     @FXML
-    public TextArea contentArea;
-    @FXML
-    public Button addMainMenu;
-    @FXML
-    public Button exitArticle;
+    private TextArea contentArea;
 
     private MongoClient mongoClient;
-    private MongoDatabase database;
+    private MongoCollection<Document> articlesCollection;
 
-    // Setter for MongoClient
+    // Set the MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        System.out.println("MongoClient successfully set in add_article.");
+        System.out.println("MongoClient set successfully in Add Article.");
     }
 
-    // Setter for MongoDatabase
+    // Set the MongoDatabase and initialize the articles collection
     public void setDatabase(MongoDatabase database) {
-        this.database = database;
         if (database != null) {
-            System.out.println("Connected to database: " + database.getName());
+            this.articlesCollection = database.getCollection("Articles");
+            System.out.println("Articles collection initialized: " + articlesCollection.getNamespace());
         } else {
-            System.out.println("Database is not set in add_article.");
+            System.err.println("Database is null. Cannot initialize articles collection.");
         }
     }
 
+    // Handle the submit button action
     @FXML
-    public void addMainMenu(ActionEvent actionEvent) {
+    public void submitArticle() {
         try {
-            // Load the Main Menu page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
-            Scene mainMenuScene = new Scene(loader.load());
+            // Ensure the collection is initialized
+            if (articlesCollection == null) {
+                throw new IllegalStateException("Articles collection not initialized.");
+            }
 
-            // Get the Main Menu controller
-            administrator_main_menu mainMenuController = loader.getController();
+            // Get data from the input fields
+            String title = articleNameField.getText();
+            String author = authorField.getText();
+            String publishedDate = (publishedDatePicker.getValue() != null) ? publishedDatePicker.getValue().toString() : "";
+            String content = contentArea.getText();
+            String category = "General"; // Default category or retrieve from UI
 
-            // Pass MongoDB objects to the Main Menu controller
-            if (mongoClient != null && database != null) {
-                mainMenuController.setMongoClient(mongoClient);
-                mainMenuController.setDatabase(database);
-            } else {
-                System.out.println("MongoClient or database is null when navigating to Main Menu.");
-                showError("Error", "Database connection is not established. Please contact the administrator.");
+
+            // Validate input fields
+            if (title.isEmpty() || author.isEmpty() || content.isEmpty() || publishedDate.isEmpty()) {
+                showAlert("Validation Error", "Please fill all fields before submitting.");
                 return;
             }
 
-            // Set the new scene
-            Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            currentStage.setScene(mainMenuScene);
-            currentStage.setTitle("Main Menu - Personalized News Recommendation System");
-            currentStage.show();
+            // Create the MongoDB document
+            Document article = new Document("articleName", title)
+                    .append("category", category)
+                    .append("author", author)
+                    .append("publishedDate", publishedDate)
+                    .append("content", content);
 
-        } catch (IOException e) {
-            showError("Navigation Error", "Failed to load the Main Menu page.");
+            // Insert the document into the database
+            articlesCollection.insertOne(article);
+
+            // Show success message
+            showAlert("Success", "Article added successfully.");
+
+            // Clear input fields after submission
+            clearFields();
+        } catch (Exception e) {
+            // Handle any errors
+            showAlert("Error", "Failed to submit the article: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    @FXML
-    public void exitArticle(ActionEvent actionEvent) {
-        // Close the application
-        showConfirmation("Exit", "Are you sure you want to exit?");
-        Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        currentStage.close();
-    }
-
-    @FXML
-    public void submitArticle(ActionEvent actionEvent) {
-        String articleName = articleNameField.getText();
-        String author = authorField.getText();
-        LocalDate publishedDate = publishedDatePicker.getValue();
-        String content = contentArea.getText();
-
-        if (articleName.isEmpty() || author.isEmpty() || publishedDate == null || content.isEmpty()) {
-            showError("Error", "All fields must be filled out.");
-            return;
-        }
-
-        List<String> categories = categorizeArticle(content);
-
-        if (database == null) {
-            showError("Error", "Database is not set.");
-            return;
-        }
-
-        MongoCollection<Document> articlesCollection = database.getCollection("Articles");
-        Document article = new Document()
-                .append("articleName", articleName)
-                .append("author", author)
-                .append("publishedDate", publishedDate.toString())
-                .append("content", content)
-                .append("categories", categories);
-
-        articlesCollection.insertOne(article);
-
-        showSuccess("Success", "Article added successfully!");
-        clearFields();
-    }
-
-    // Utility method to show error alerts
-    private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    // Utility method to show success alerts
-    private void showSuccess(String title, String message) {
+    // Helper method to show an alert dialog
+    private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(message);
+        alert.setContentText(content);
         alert.showAndWait();
     }
 
-    // Utility method to show confirmation alerts
-    private void showConfirmation(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    // Method to categorize article based on content keywords
-    private List<String> categorizeArticle(String content) {
-        Map<String, String> keywordCategoryMap = new HashMap<>();
-        keywordCategoryMap.put("ai", "AI");
-        keywordCategoryMap.put("artificial", "AI");
-        keywordCategoryMap.put("intelligence", "AI");
-        keywordCategoryMap.put("technology", "Technology");
-        keywordCategoryMap.put("innovation", "Technology");
-        keywordCategoryMap.put("health", "Health");
-        keywordCategoryMap.put("fitness", "Health");
-        keywordCategoryMap.put("medicine", "Health");
-        keywordCategoryMap.put("education", "Education");
-        keywordCategoryMap.put("school", "Education");
-        keywordCategoryMap.put("learning", "Education");
-        keywordCategoryMap.put("fashion", "Fashion");
-        keywordCategoryMap.put("style", "Fashion");
-        keywordCategoryMap.put("clothing", "Fashion");
-        keywordCategoryMap.put("sports", "Sports");
-        keywordCategoryMap.put("football", "Sports");
-        keywordCategoryMap.put("cricket", "Sports");
-        keywordCategoryMap.put("entertainment", "Entertainment");
-        keywordCategoryMap.put("movie", "Entertainment");
-        keywordCategoryMap.put("music", "Entertainment");
-
-        Set<String> categories = new HashSet<>();
-        String[] words = content.toLowerCase().split("\\W+");
-        for (String word : words) {
-            if (keywordCategoryMap.containsKey(word)) {
-                categories.add(keywordCategoryMap.get(word));
-            }
-        }
-
-        return new ArrayList<>(categories);
-    }
-
-    // Clears the fields after article submission
+    // Helper method to clear input fields
     private void clearFields() {
         articleNameField.clear();
         authorField.clear();
-        publishedDatePicker.setValue(null);
         contentArea.clear();
+        publishedDatePicker.setValue(null);
+    }
+
+    // Handle the "Main Menu" button action
+    @FXML
+    public void addMainMenu() {
+        try {
+            // Close the current window
+            Stage stage = (Stage) articleNameField.getScene().getWindow();
+            stage.close();
+
+            // Open the main menu window
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
+            Parent root = loader.load();
+            Stage mainMenuStage = new Stage();
+            mainMenuStage.setScene(new Scene(root));
+            mainMenuStage.setTitle("Main Menu");
+            mainMenuStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to open the Main Menu: " + e.getMessage());
+        }
+    }
+
+    // Handle the "Exit" button action
+    @FXML
+    public void exitArticle() {
+        // Close the current window
+        Stage stage = (Stage) articleNameField.getScene().getWindow();
+        stage.close();
     }
 }
