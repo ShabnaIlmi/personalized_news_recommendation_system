@@ -21,32 +21,32 @@
         </Label>
 
         <!-- Article Name Field -->
-        <Label layoutX="248.0" layoutY="130.0" prefHeight="35.0" prefWidth="168.0" text="Article Name -:">
+        <Label layoutX="248.0" layoutY="161.0" prefHeight="35.0" prefWidth="168.0" text="Article Name -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font></Label>
-        <TextField fx:id="articleNameField" layoutX="427.0" layoutY="135.0" prefWidth="400.0" />
+        <TextField fx:id="articleNameField" layoutX="427.0" layoutY="166.0" prefWidth="400.0" />
 
         <!-- Author Field -->
-        <Label layoutX="248.0" layoutY="188.0" prefHeight="27.0" prefWidth="90.0" text="Author -:">
+        <Label layoutX="248.0" layoutY="215.0" prefHeight="27.0" prefWidth="90.0" text="Author -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font></Label>
-        <TextField fx:id="authorField" layoutX="427.0" layoutY="189.0" prefWidth="400.0" />
+        <TextField fx:id="authorField" layoutX="427.0" layoutY="216.0" prefWidth="400.0" />
 
         <!-- Published Date Field -->
-        <Label layoutX="248.0" layoutY="241.0" text="Published Date -:">
+        <Label layoutX="248.0" layoutY="268.0" text="Published Date -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font></Label>
-        <DatePicker fx:id="publishedDatePicker" layoutX="676.0" layoutY="242.0" prefWidth="150.0" />
+        <DatePicker fx:id="publishedDatePicker" layoutX="676.0" layoutY="269.0" prefWidth="150.0" />
 
         <!-- Article Content Field -->
-        <Label layoutX="248.0" layoutY="291.0" text="Content -:">
+        <Label layoutX="248.0" layoutY="334.0" text="Content -:">
          <font>
             <Font name="System Bold" size="18.0" />
          </font></Label>
-        <TextArea fx:id="contentArea" layoutX="427.0" layoutY="298.0" prefHeight="127.0" prefWidth="400.0" />
+        <TextArea fx:id="contentArea" layoutX="427.0" layoutY="327.0" prefHeight="127.0" prefWidth="400.0" />
 
         <!-- Submit Button -->
         <Button fx:id="submitArticle" layoutX="248.0" layoutY="490.0" mnemonicParsing="false" onAction="#submitArticle" style="-fx-background-color: grey;" text="Submit Article">
@@ -78,5 +78,11 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Button>
+      <TextField fx:id="articleID" layoutX="428.0" layoutY="120.0" prefHeight="26.0" prefWidth="400.0" />
+      <Label layoutX="248.0" layoutY="119.0" prefHeight="27.0" prefWidth="110.0" text="Article ID -:">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>

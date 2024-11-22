@@ -15,7 +15,8 @@ import javafx.stage.Stage;
 import org.bson.Document;
 
 public class add_article {
-
+    @FXML
+    public TextField articleID;
     @FXML
     private TextField articleNameField;
     @FXML
@@ -54,6 +55,7 @@ public class add_article {
             }
 
             // Get data from the input fields
+            String id = articleID.getText();
             String title = articleNameField.getText();
             String author = authorField.getText();
             String publishedDate = (publishedDatePicker.getValue() != null) ? publishedDatePicker.getValue().toString() : "";
@@ -68,7 +70,8 @@ public class add_article {
             }
 
             // Create the MongoDB document
-            Document article = new Document("articleName", title)
+            Document article = new Document("articleID",id)
+                    .append("articleName", title)
                     .append("category", category)
                     .append("author", author)
                     .append("publishedDate", publishedDate)
