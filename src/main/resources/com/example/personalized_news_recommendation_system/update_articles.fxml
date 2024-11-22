@@ -15,19 +15,20 @@
 <AnchorPane prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.update_articles">
     <children>
         <!-- Header Label for Update/Delete Article -->
-        <Label layoutX="298.0" text="Manage Article">
+        <Label layoutX="296.0" layoutY="-10.0" text="Manage Article">
             <font>
                 <Font name="System Bold" size="72.0" />
             </font>
         </Label>
 
         <!-- Table to Display Existing Articles -->
-        <TableView fx:id="articleTable" layoutX="196.0" layoutY="122.0" prefHeight="197.0" prefWidth="678.0">
+        <TableView fx:id="articleTable" layoutX="191.0" layoutY="96.0" prefHeight="230.0" prefWidth="682.0">
             <columns>
-                <TableColumn fx:id="articleNameColumn" prefWidth="182.4" text="Article Name" />
-                <TableColumn fx:id="categoryColumn" prefWidth="168.0" text="Category" />
-                <TableColumn fx:id="authorColumn" prefWidth="170.4" text="Author" />
-                <TableColumn fx:id="dateColumn" prefWidth="179.2" text="Published Date" />
+                <TableColumn fx:id="articleIDColumn" prefWidth="130.39996337890625" text="Article ID" />
+                <TableColumn fx:id="articleNameColumn" prefWidth="184.79998779296875" text="Article Name" />
+                <TableColumn fx:id="categoryColumn" prefWidth="118.40005493164062" text="Category" />
+                <TableColumn fx:id="authorColumn" prefWidth="133.60006713867188" text="Author" />
+                <TableColumn fx:id="dateColumn" prefWidth="112.0" text="Published Date" />
             </columns>
         </TableView>
 
