@@ -96,7 +96,7 @@ public class homePage {
             // Get the sign_in controller and set the MongoDB dependencies
             administrator_log_in administratorLogInController = loader.getController();
             administratorLogInController.setMongoClient(mongoClient);
-            administratorLogInController.setDatabase(database);
+            administratorLogInController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
             // Get the current stage and set the new scene
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();

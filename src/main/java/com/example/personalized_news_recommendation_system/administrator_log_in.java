@@ -3,6 +3,7 @@ package com.example.personalized_news_recommendation_system;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 import org.bson.Document;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 public class administrator_log_in {
 
@@ -48,7 +50,7 @@ public class administrator_log_in {
         }
     }
 
-    // Sign-In Method for Administrator
+    // Sign-In Method for Administrator with concurrency
     @FXML
     void administratorSignIn(ActionEvent event) {
         String username = administratorUsername.getText();
@@ -56,46 +58,51 @@ public class administrator_log_in {
 
         // Check if the username or password fields are empty
         if (username.isEmpty() || password.isEmpty()) {
-            showAlert("Input Error", "Please enter both username and password.");
+            showAlert("Input Error", "Please enter both username and password.", Alert.AlertType.ERROR);
             return;
         }
 
-        try {
-            // Check if the admin with the given username exists in the database
-            Document usernameQuery = new Document("username", username);
-            Document adminDoc = adminCollection.find(usernameQuery).first();
-
-            if (adminDoc != null) {
-                String storedPassword = adminDoc.getString("password");
-
-                if (storedPassword != null && storedPassword.equals(password)) {
-                    String firstName = adminDoc.getString("first_name");
-                    String lastName = adminDoc.getString("last_name");
-
-                    // Show success message
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Admin Sign-In Success");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Welcome, Administrator " + firstName + " " + lastName + "!");
-                    alert.showAndWait();
-
-                    // Redirect to Administrator Main Menu
-                    openAdminMainMenu(event);
-                } else {
-                    showAlert("Sign-In Failed", "Invalid password.");
-                    administratorPassword.clear();
-                }
-            } else {
-                showAlert("Sign-In Failed", "Administrator not found.");
-                administratorPassword.clear();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Database Error", "An error occurred while accessing the database.");
-        }
+        // Submit a background task to check admin credentials in the MongoDB collection
+        CompletableFuture.supplyAsync(() -> authenticateAdmin(username, password), Main.executorService)
+                .thenAccept(authenticated -> {
+                    if (authenticated) {
+                        Platform.runLater(() -> {
+                            showAlert("Sign-In Success", "Welcome, Administrator!", Alert.AlertType.INFORMATION);
+                            openAdminMainMenu(event);
+                        });
+                    } else {
+                        Platform.runLater(() -> {
+                            showAlert("Sign-In Failed", "Invalid credentials.", Alert.AlertType.ERROR);
+                            administratorPassword.clear();
+                        });
+                    }
+                })
+                .exceptionally(e -> {
+                    Platform.runLater(() -> showAlert("Error", "An error occurred during authentication.", Alert.AlertType.ERROR));
+                    return null;
+                });
     }
 
-    // Method to open the Admin Main Menu page
+    // Method to authenticate admin
+    private Boolean authenticateAdmin(String username, String password) {
+        Document usernameQuery = new Document("username", username);
+        Document adminDoc = adminCollection.find(usernameQuery).first();
+        if (adminDoc != null) {
+            String storedPassword = adminDoc.getString("password");
+            return storedPassword != null && storedPassword.equals(password);
+        }
+        return false;
+    }
+
+    // Method to show a simple alert with a message
+    private void showAlert(String title, String content, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    // Navigate to Admin main menu
     public void openAdminMainMenu(ActionEvent actionEvent) {
         try {
             // Load the Admin Main Menu page
@@ -114,41 +121,33 @@ public class administrator_log_in {
             currentStage.show();
 
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the Admin Main Menu page.");
+            showAlert("Navigation Error", "Failed to load the Admin Main Menu page.", Alert.AlertType.ERROR);
+            e.printStackTrace();
+        } catch (Exception e) {
+            showAlert("Error", "An unexpected error occurred while navigating.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
 
-    // Method to show a simple alert with a message
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    // Method to navigate to the home page from the admin login
     @FXML
-    public void adminLogInInHome(ActionEvent actionEvent) {
+    public void adminLogInHome(ActionEvent actionEvent) {
         try {
-            // Load the home page FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
             Scene homeScene = new Scene(loader.load());
 
-            // Pass the MongoClient and MongoDatabase to the home page controller
             homePage homeController = loader.getController();
             homeController.setMongoClient(mongoClient);
             homeController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
-            // Get the current stage and set the home scene
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             currentStage.setScene(homeScene);
             currentStage.setTitle("Personalized News Recommendation System - Home");
             currentStage.show();
-
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the home page.");
+            showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
+            e.printStackTrace();
+        } catch (Exception e) {
+            showAlert("Error", "An unexpected error occurred while navigating to the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }

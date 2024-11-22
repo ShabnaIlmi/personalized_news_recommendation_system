@@ -48,7 +48,7 @@
       </Button>
       <TextField fx:id="administratorUsername" layoutX="503.0" layoutY="202.0" prefHeight="26.0" prefWidth="322.0" />
       <PasswordField fx:id="administratorPassword" layoutX="503.0" layoutY="267.0" prefHeight="26.0" prefWidth="322.0" />
-      <Button fx:id="adminLogInHome" layoutX="298.0" layoutY="383.0" mnemonicParsing="false" onAction="#adminLogInInHome" style="-fx-background-color: grey;" text="Home">
+      <Button fx:id="adminLogInHome" layoutX="298.0" layoutY="383.0" mnemonicParsing="false" onAction="#adminLogInHome" style="-fx-background-color: grey;" text="Home">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>

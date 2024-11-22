@@ -1,73 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.view_articles">
-    <children>
-        <!-- Sidebar Section with Logo and Title -->
-        <AnchorPane prefHeight="610.0" prefWidth="206.0" style="-fx-background-color: grey;">
-            <children>
-                <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="3.0" layoutY="87.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@../../../../../../../Downloads/interview_2450883.png" />
-                    </image>
-                </ImageView>
-                <Text layoutX="5.0" layoutY="329.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="213.28118896484375">
-                    <font>
-                        <Font name="System Bold Italic" size="64.0" />
-                    </font>
-                </Text>
-            </children>
-        </AnchorPane>
+<AnchorPane prefHeight="610.0" prefWidth="884.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.view_articles">
+   <children>
+      <AnchorPane prefHeight="610.0" prefWidth="204.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="41.0" layoutY="99.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutX="7.0" layoutY="339.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="224.48126220703125">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
 
-        <!-- Header Text for View Articles -->
-        <Text layoutX="342.0" layoutY="103.0" strokeType="OUTSIDE" strokeWidth="0.0" text="View Articles">
-            <font>
-                <Font name="System Bold" size="72.0" />
-            </font>
-        </Text>
+      <Text layoutX="359.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="View Articles">
+         <font>
+            <Font name="System Bold" size="72.0" />
+         </font>
+      </Text>
 
-        <!-- Table for Article Details -->
-        <TableView fx:id="viewTable" layoutX="242.0" layoutY="158.0" prefHeight="200.0" prefWidth="606.0">
-            <columns>
-                <TableColumn fx:id="articleNameColumn" prefWidth="165.5999755859375" text="Article Name" />
-                <TableColumn fx:id="categoryColumn" prefWidth="172.00003051757812" text="Category" />
-                <TableColumn fx:id="authorColumn" prefWidth="143.99993896484375" text="Author" />
-                <TableColumn fx:id="publishedDateColumn" prefWidth="125.5999755859375" text="Published Date" />
-            </columns>
-        </TableView>
+      <!-- Article Details Section -->
+      <Label fx:id="articleNameLabel" layoutX="250.0" layoutY="150.0" style="-fx-font-size: 20px;" text="Article Name -: ">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Label>
+      <Label fx:id="authorLabel" layoutX="250.0" layoutY="200.0" style="-fx-font-size: 20px;" text="Author -: ">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Label>
+      <Label fx:id="categoryLabel" layoutX="250.0" layoutY="250.0" style="-fx-font-size: 20px;" text="Category -: ">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Label>
+      <Label fx:id="publishedDateLabel" layoutX="250.0" layoutY="300.0" style="-fx-font-size: 20px;" text="Published Date -: ">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Label>
+      <Label fx:id="descriptionLabel" layoutX="250.0" layoutY="350.0" maxWidth="600.0" style="-fx-font-size: 20px;" text="Description -: " wrapText="true">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Label>
 
-        <!-- Get Recommendation Button -->
-        <Button fx:id="getRecommendation" layoutX="424.0" layoutY="416.0" mnemonicParsing="false" onAction="#getRecommendation" style="-fx-background-color: grey;" text="Get Recommendation">
-            <font>
-                <Font name="System Bold Italic" size="24.0" />
-            </font>
-        </Button>
-
-        <!-- Main Menu Button -->
-        <Button fx:id="viewMainMenu" layoutX="260.0" layoutY="524.0" mnemonicParsing="false" onAction="#viewMainMenu" style="-fx-background-color: grey;" text="Main Menu">
-            <font>
-                <Font name="System Bold Italic" size="24.0" />
-            </font>
-        </Button>
-
-        <!-- Exit Button -->
-        <Button fx:id="viewExit" layoutX="698.0" layoutY="524.0" mnemonicParsing="false" onAction="#viewExit" prefHeight="51.0" prefWidth="136.0" style="-fx-background-color: grey;" text="Exit">
-            <font>
-                <Font name="System Bold Italic" size="24.0" />
-            </font>
-        </Button>
-      <Button fx:id="readArtcles" layoutX="476.0" layoutY="524.0" mnemonicParsing="false" onAction="#readArticles" style="-fx-background-color: grey;" text="Read Article">
+      <!-- Buttons -->
+      <Button fx:id="viewBack" layoutX="262.0" layoutY="516.0" mnemonicParsing="false" onAction="#viewBack" prefHeight="51.0" prefWidth="117.0" style="-fx-background-color: grey;" text="Back">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-    </children>
+      <Button fx:id="read" layoutX="417.0" layoutY="516.0" mnemonicParsing="false" onAction="#read" prefHeight="51.0" prefWidth="150.0" style="-fx-background-color: grey;" text="Read">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="skip" layoutX="606.0" layoutY="516.0" mnemonicParsing="false" onAction="#skip" prefHeight="51.0" prefWidth="106.0" style="-fx-background-color: grey;" text="Skip">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="viewExit" layoutX="745.0" layoutY="516.0" mnemonicParsing="false" onAction="#viewExit" prefHeight="51.0" prefWidth="106.0" style="-fx-background-color: grey;" text="Exit">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+   </children>
 </AnchorPane>

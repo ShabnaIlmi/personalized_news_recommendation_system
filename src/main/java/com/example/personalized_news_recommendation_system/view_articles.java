@@ -2,31 +2,43 @@ package com.example.personalized_news_recommendation_system;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 
 public class view_articles {
     @FXML
-    public TableView viewTable;
+    public Button rateExit;
     @FXML
-    public Button getRecommendation;
+    public Button rateSubmit;
     @FXML
-    public Button viewMainMenu;
+    public Label articleNameLabel;
+    @FXML
+    public Label authorLabel;
+    @FXML
+    public Label categoryLabel;
+    @FXML
+    public Label publishedDateLabel;
+    @FXML
+    public Label descriptionLabel;
+    @FXML
+    public Button viewBack;
+    @FXML
+    public Button read;
+    @FXML
+    public Button skip;
     @FXML
     public Button viewExit;
-    @FXML
-    public Button readArtcles;
 
     @FXML
-    public void getRecommendation(ActionEvent actionEvent) {
+    public void viewBack(ActionEvent actionEvent) {
     }
     @FXML
-    public void viewMainMenu(ActionEvent actionEvent) {
+    public void read(ActionEvent actionEvent) {
+    }
+    @FXML
+    public void skip(ActionEvent actionEvent) {
     }
     @FXML
     public void viewExit(ActionEvent actionEvent) {
-    }
-    @FXML
-    public void readArticles(ActionEvent actionEvent) {
     }
 }
