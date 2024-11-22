@@ -1,27 +1,24 @@
 package com.example.personalized_news_recommendation_system;
 
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.bson.Document;
-
-import java.time.LocalDate;
-import java.util.Optional;
+import org.bson.types.ObjectId;
 
 public class manage_articles {
 
     @FXML
-    public Button manageMainMenu;
-    @FXML
-    public Button manageExit;
-    @FXML
     private TableView<Document> articleTable;
+    @FXML
+    private TableColumn<Document, String> articleIDColumn;
     @FXML
     private TableColumn<Document, String> articleNameColumn;
     @FXML
@@ -40,132 +37,181 @@ public class manage_articles {
     @FXML
     private DatePicker publishedDatePicker;
 
-    @FXML
-    private Button updateArticleButton;
-    @FXML
-    private Button deleteArticleButton;
-
+    private MongoClient mongoClient;
     private MongoDatabase database;
     private MongoCollection<Document> articlesCollection;
-    private ObservableList<Document> articles = FXCollections.observableArrayList();
 
-    // Setter for MongoDatabase to initialize the database instance
+    // Set the MongoClient
+    public void setMongoClient(MongoClient mongoClient) {
+        this.mongoClient = mongoClient;
+        System.out.println("MongoClient set successfully in Update Articles.");
+    }
+
+    // Set the MongoDatabase and initialize the articles collection
     public void setDatabase(MongoDatabase database) {
-        if (database == null) {
-            throw new IllegalArgumentException("MongoDatabase cannot be null.");
-        }
         this.database = database;
         this.articlesCollection = database.getCollection("Articles");
-        loadArticles();
+        populateArticleTable();
     }
 
-    private void loadArticles() {
-        articles.clear();
-        if (articlesCollection != null) {
-            for (Document doc : articlesCollection.find()) {
-                articles.add(doc);
-            }
-            articleTable.setItems(articles);
-        } else {
-            showAlert("Database Error", "Failed to load articles from the database.");
+    // Populate the article table with documents from MongoDB
+    private void populateArticleTable() {
+        articleTable.getItems().clear();
+        for (Document doc : articlesCollection.find()) {
+            articleTable.getItems().add(doc);
         }
-    }
 
-    @FXML
-    public void initialize() {
+        // Set up the table columns with appropriate getters
+        articleIDColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getString("article_id")) // Extract ObjectId and convert to String
+        );
         articleNameColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getString("article_name")));
+                new SimpleStringProperty(cellData.getValue().getString("article_name"))
+        );
         categoryColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getString("category")));
+                new SimpleStringProperty(cellData.getValue().getString("category"))
+        );
         authorColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getString("author")));
+                new SimpleStringProperty(cellData.getValue().getString("author"))
+        );
         dateColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getString("published_date")));
-
-        articleTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                articleNameField.setText(newSelection.getString("article_name"));
-                categoryField.setText(newSelection.getString("category"));
-                authorField.setText(newSelection.getString("author"));
-                publishedDatePicker.setValue(LocalDate.parse(newSelection.getString("published_date")));
-            }
-        });
+                new SimpleStringProperty(cellData.getValue().getString("published_date"))
+        );
     }
 
+    // Handle the update button action
     @FXML
-    public void updateArticle(ActionEvent actionEvent) {
-        Document selectedArticle = articleTable.getSelectionModel().getSelectedItem();
-        if (selectedArticle == null) {
-            showAlert("Update Error", "Please select an article to update.");
-            return;
-        }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm Update");
-        alert.setHeaderText("Are you sure you want to update this article?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                Document updatedArticle = new Document("article_name", articleNameField.getText())
-                        .append("author", authorField.getText())
-                        .append("category", categoryField.getText())
-                        .append("published_date", publishedDatePicker.getValue().toString())
-                        .append("content", selectedArticle.getString("content"));
-
-                articlesCollection.updateOne(
-                        new Document("article_name", selectedArticle.getString("article_name")),
-                        new Document("$set", updatedArticle));
-
-                showAlert("Success", "Article updated successfully!");
-                loadArticles();
-            } catch (Exception e) {
-                e.printStackTrace();
-                showAlert("Database Error", "Failed to update the article.");
+    public void updateArticle() {
+        try {
+            Document selectedArticle = articleTable.getSelectionModel().getSelectedItem();
+            if (selectedArticle == null) {
+                showAlert("Selection Error", "Please select an article to update.");
+                return;
             }
+
+            // Get data from the input fields
+            String articleName = articleNameField.getText();
+            String category = categoryField.getText();
+            String author = authorField.getText();
+            String publishedDate = (publishedDatePicker.getValue() != null) ?
+                    publishedDatePicker.getValue().toString() : "";
+
+            // Validate input fields
+            if (articleName.isEmpty() || category.isEmpty() || author.isEmpty() || publishedDate.isEmpty()) {
+                showAlert("Validation Error", "Please fill all fields before updating.");
+                return;
+            }
+
+            // Create the update document
+            Document updatedArticle = new Document("article_name", articleName)
+                    .append("category", category)
+                    .append("author", author)
+                    .append("published_date", publishedDate);
+
+            // Update the article in the collection
+            ObjectId articleId = selectedArticle.getObjectId("_id"); // Retrieve ID from selected row
+            articlesCollection.updateOne(new Document("_id", articleId),
+                    new Document("$set", updatedArticle));
+
+            // Show success message
+            showAlert("Success", "Article updated successfully.");
+
+            // Refresh the table
+            populateArticleTable();
+
+            // Clear input fields
+            clearFields();
+
+        } catch (Exception e) {
+            showAlert("Error", "Failed to update the article: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
+    // Handle the delete button action
     @FXML
-    public void deleteArticle(ActionEvent actionEvent) {
-        Document selectedArticle = articleTable.getSelectionModel().getSelectedItem();
-        if (selectedArticle == null) {
-            showAlert("Delete Error", "Please select an article to delete.");
-            return;
-        }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm Deletion");
-        alert.setHeaderText("Are you sure you want to delete this article?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                articlesCollection.deleteOne(new Document("article_name", selectedArticle.getString("article_name")));
-                showAlert("Success", "Article deleted successfully!");
-                loadArticles();
-            } catch (Exception e) {
-                e.printStackTrace();
-                showAlert("Database Error", "Failed to delete the article.");
+    public void deleteArticle() {
+        try {
+            Document selectedArticle = articleTable.getSelectionModel().getSelectedItem();
+            if (selectedArticle == null) {
+                showAlert("Selection Error", "Please select an article to delete.");
+                return;
             }
+
+            // Confirm deletion
+            boolean confirmDeletion = showConfirmationAlert("Delete Article", "Are you sure you want to delete this article?");
+            if (!confirmDeletion) {
+                return;
+            }
+
+            // Delete the article from the collection
+            ObjectId articleId = selectedArticle.getObjectId("_id");
+            articlesCollection.deleteOne(new Document("_id", articleId));
+
+            // Show success message
+            showAlert("Success", "Article deleted successfully.");
+
+            // Refresh the table
+            populateArticleTable();
+
+        } catch (Exception e) {
+            showAlert("Error", "Failed to delete the article: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void showAlert(String title, String message) {
+    // Helper method to show an alert dialog
+    private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(message);
+        alert.setContentText(content);
         alert.showAndWait();
     }
 
-    @FXML
-    public void manageMainMenu(ActionEvent actionEvent) {
-        // Navigate to main menu or close this window
+    // Helper method to show a confirmation alert
+    private boolean showConfirmationAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        return alert.showAndWait().get() == ButtonType.OK;
     }
 
+    // Helper method to clear input fields
+    private void clearFields() {
+        articleNameField.clear();
+        categoryField.clear();
+        authorField.clear();
+        publishedDatePicker.setValue(null);
+    }
+
+    // Handle the "Main Menu" button action
     @FXML
-    public void manageExit(ActionEvent actionEvent) {
-        // Close the update article window
-        Stage stage = (Stage) manageExit.getScene().getWindow();
+    public void manageMainMenu() {
+        try {
+            // Close the current window
+            Stage stage = (Stage) articleNameField.getScene().getWindow();
+            stage.close();
+
+            // Open the main menu window
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
+            Parent root = loader.load();
+            Stage mainMenuStage = new Stage();
+            mainMenuStage.setScene(new Scene(root));
+            mainMenuStage.setTitle("Main Menu");
+            mainMenuStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to open the Main Menu: " + e.getMessage());
+        }
+    }
+
+    // Handle the "Exit" button action
+    @FXML
+    public void manageExit() {
+        // Close the current window
+        Stage stage = (Stage) articleNameField.getScene().getWindow();
         stage.close();
     }
 }

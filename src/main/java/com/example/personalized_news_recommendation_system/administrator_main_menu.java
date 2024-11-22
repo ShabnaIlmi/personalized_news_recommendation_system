@@ -69,11 +69,11 @@ public class administrator_main_menu {
     public void updateArticles(ActionEvent event) {
         try {
             // Load the Update Article page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("update_articles.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("manage_articles.fxml"));
             Scene updateArticleScene = new Scene(loader.load());
 
             // Get the controller of the Update Article page and pass MongoDB dependencies
-            update_articles updateArticleController = loader.getController();
+            manage_articles updateArticleController = loader.getController();
             updateArticleController.setMongoClient(mongoClient);
             updateArticleController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
