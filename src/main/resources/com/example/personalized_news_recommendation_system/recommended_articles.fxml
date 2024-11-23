@@ -15,9 +15,9 @@
         <!-- Sidebar Section with Logo and Title -->
         <AnchorPane prefHeight="610.0" prefWidth="206.0" style="-fx-background-color: grey;">
             <children>
-                <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="3.0" layoutY="87.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="35.0" layoutY="92.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../../../../Downloads/interview_2450883.png" />
+                        <Image url="@interview_2450883.png" />
                     </image>
                 </ImageView>
                 <Text layoutX="5.0" layoutY="329.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="213.28118896484375">
@@ -36,7 +36,7 @@
         </Text>
 
         <!-- Table for Article Details -->
-        <TableView fx:id="viewTable" layoutX="219.0" layoutY="195.0" prefHeight="200.0" prefWidth="656.0">
+        <TableView fx:id="recommendedTable" layoutX="225.0" layoutY="195.0" prefHeight="200.0" prefWidth="651.0">
             <columns>
                 <TableColumn fx:id="articleNameColumn" prefWidth="233.5999755859375" text="Article Name" />
                 <TableColumn fx:id="categoryColumn" prefWidth="149.60000610351562" text="Category" />

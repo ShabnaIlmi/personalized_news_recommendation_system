@@ -36,7 +36,7 @@ public class homePage {
         System.out.println("Connected to database: " + database.getName());
     }
 
-    // Method to handle the Log In button click and navigate to log_in.fxml
+    // Method to handle the Log In button click and navigate to user_log_in.fxml
     @FXML
     public void homeLogIn(ActionEvent actionEvent) {
         try {
@@ -61,7 +61,7 @@ public class homePage {
         }
     }
 
-    // Method to handle the Sign Up button click and navigate to sign_up.fxml
+    // Method to handle the Sign Up button click and navigate to user_sign_up.fxml
     @FXML
     public void homeSignUp(ActionEvent actionEvent) {
         try {

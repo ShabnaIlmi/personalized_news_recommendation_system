@@ -54,7 +54,7 @@ public class administrator_main_menu {
                 // Get the controller of the Add Article page and pass MongoDB dependencies
                 add_article addArticleController = loader.getController();
                 addArticleController.setMongoClient(mongoClient);
-                addArticleController.setDatabase(database);
+                addArticleController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
                 // Set the new scene to the current stage
                 Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();

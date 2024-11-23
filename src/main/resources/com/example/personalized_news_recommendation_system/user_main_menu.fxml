@@ -28,27 +28,27 @@
             <Font name="System Bold" size="72.0" />
          </font>
       </Text>
-      <Button fx:id="categories" layoutX="544.0" layoutY="298.0" mnemonicParsing="false" onAction="#categories" prefHeight="51.0" prefWidth="318.0" style="-fx-background-color: grey;" text="Sign-out">
+      <Button fx:id="manageArticles" layoutX="626.0" layoutY="272.0" mnemonicParsing="false" onAction="#manageArticles" prefHeight="51.0" prefWidth="242.0" style="-fx-background-color: grey;" text="Manage Articles">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="readArtcles" layoutX="278.0" layoutY="166.0" mnemonicParsing="false" onAction="#readArticles" prefHeight="51.0" prefWidth="214.0" style="-fx-background-color: grey;" text="View Articles">
+      <Button fx:id="recommendedArticles" layoutX="258.0" layoutY="166.0" mnemonicParsing="false" onAction="#recommendedArticles" prefHeight="51.0" prefWidth="292.0" style="-fx-background-color: grey;" text="Recommended Articles">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="recommendedArtcles" layoutX="278.0" layoutY="305.0" mnemonicParsing="false" onAction="#recommendedArtcles" prefHeight="51.0" prefWidth="214.0" style="-fx-background-color: grey;" text="Manage Articles">
+      <Button fx:id="readArticles" layoutX="258.0" layoutY="272.0" mnemonicParsing="false" onAction="#readArticles" prefHeight="51.0" prefWidth="280.0" style="-fx-background-color: grey;" text="Read Articles">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button layoutX="544.0" layoutY="166.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="318.0" style="-fx-background-color: grey;" text="Rate Articles">
+      <Button fx:id="viewArticles" layoutX="627.0" layoutY="166.0" mnemonicParsing="false" onAction="#viewArticles" prefHeight="51.0" prefWidth="242.0" style="-fx-background-color: grey;" text="View Articles">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button layoutX="405.0" layoutY="448.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="318.0" style="-fx-background-color: grey;" text="Exit">
+      <Button fx:id="mainMenuExit" layoutX="405.0" layoutY="392.0" mnemonicParsing="false" onAction="#mainMenuExit" prefHeight="26.0" prefWidth="318.0" style="-fx-background-color: grey;" text="Exit">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>

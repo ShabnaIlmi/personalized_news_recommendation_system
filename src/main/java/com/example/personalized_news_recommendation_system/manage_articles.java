@@ -4,6 +4,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,11 +25,21 @@ import java.util.concurrent.Executors;
 
 public class manage_articles {
     @FXML
-    public Button manageMainMenu;
+    private Button manageMainMenu;
     @FXML
-    public Button manageExit;
+    private Button manageExit;
     @FXML
     private TableView<Document> articleTable;
+    @FXML
+    private TableColumn<Document, String> articleIDColumn;
+    @FXML
+    private TableColumn<Document, String> articleNameColumn;
+    @FXML
+    private TableColumn<Document, String> categoryColumn;
+    @FXML
+    private TableColumn<Document, String> authorColumn;
+    @FXML
+    private TableColumn<Document, String> dateColumn;
     @FXML
     private TextField articleNameField;
     @FXML
@@ -47,7 +58,7 @@ public class manage_articles {
     private MongoCollection<Document> updatedArticlesCollection;
     private MongoCollection<Document> deletedArticlesCollection;
 
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
@@ -60,12 +71,53 @@ public class manage_articles {
             this.articlesCollection = database.getCollection("Articles");
             this.updatedArticlesCollection = database.getCollection("Updated_Articles");
             this.deletedArticlesCollection = database.getCollection("Deleted_Articles");
-
-            // If the collection doesn't exist yet, it will be created when a document is inserted
-            if (this.deletedArticlesCollection == null) {
-                this.deletedArticlesCollection = database.getCollection("Deleted_Articles");
-            }
         }
+    }
+
+    // Method to populate the article table
+    private void populateArticleTable() {
+        Platform.runLater(() -> {
+            try {
+                if (articlesCollection == null) {
+                    showAlert("Error", "Articles collection is not initialized.");
+                    return;
+                }
+
+                List<Document> articles = articlesCollection.find().into(new ArrayList<>());
+                if (articles.isEmpty()) {
+                    showAlert("Information", "No articles found in the database.");
+                }
+
+                // Bind columns to data
+                articleIDColumn.setCellValueFactory(cellData -> {
+                    Document doc = cellData.getValue();
+                    return new SimpleStringProperty(doc.getObjectId("article_id").toString());
+                });
+                articleNameColumn.setCellValueFactory(cellData -> {
+                    Document doc = cellData.getValue();
+                    return new SimpleStringProperty(doc.getString("article_name"));
+                });
+                categoryColumn.setCellValueFactory(cellData -> {
+                    Document doc = cellData.getValue();
+                    return new SimpleStringProperty(doc.getString("category"));
+                });
+                authorColumn.setCellValueFactory(cellData -> {
+                    Document doc = cellData.getValue();
+                    return new SimpleStringProperty(doc.getString("author"));
+                });
+                dateColumn.setCellValueFactory(cellData -> {
+                    Document doc = cellData.getValue();
+                    return new SimpleStringProperty(doc.getString("published_date"));
+                });
+
+                // Set data to the table
+                articleTable.getItems().setAll(articles);
+
+            } catch (Exception e) {
+                showAlert("Error", "Failed to populate article table: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
 
     // Method to update an article
@@ -91,7 +143,6 @@ public class manage_articles {
                     return;
                 }
 
-                // Prepare the updated article document
                 Document updatedArticle = new Document("article_name", articleName)
                         .append("category", category)
                         .append("author", author)
@@ -103,11 +154,10 @@ public class manage_articles {
                 articlesCollection.updateOne(new Document("_id", articleId),
                         new Document("$set", updatedArticle));
 
-                // Log the update in Updated_Articles collection
                 String updatedAt = Instant.now()
                         .atZone(ZoneId.of("UTC"))
                         .format(DateTimeFormatter.ISO_INSTANT);
-                Document updateLog = new Document("article_id", selectedArticle.getString("article_id"))
+                Document updateLog = new Document("article_id", articleId.toString())
                         .append("article_name", articleName)
                         .append("author", author)
                         .append("published_date", publishedDate)
@@ -146,17 +196,10 @@ public class manage_articles {
                     return;
                 }
 
-                // Check if the Deleted_Articles collection exists
-                if (deletedArticlesCollection == null) {
-                    showAlert("Error", "The Deleted_Articles collection does not exist.");
-                    return;
-                }
-
-                // Log the deletion in Deleted_Articles collection
                 String deletedAt = Instant.now()
                         .atZone(ZoneId.of("UTC"))
                         .format(DateTimeFormatter.ISO_INSTANT);
-                Document deletedArticleLog = new Document("article_id", selectedArticle.getString("article_id"))
+                Document deletedArticleLog = new Document("article_id", selectedArticle.getObjectId("_id").toString())
                         .append("article_name", selectedArticle.getString("article_name"))
                         .append("author", selectedArticle.getString("author"))
                         .append("published_date", selectedArticle.getString("published_date"))
@@ -182,9 +225,9 @@ public class manage_articles {
         });
     }
 
-    // Helper method to show a simple alert
+    // Helper method to show an alert
     private void showAlert(String title, String content) {
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle(title);
             alert.setHeaderText(null);
@@ -195,9 +238,7 @@ public class manage_articles {
 
     // Helper method to show a confirmation alert
     private boolean showConfirmationAlert(String title, String content) {
-        // For simplicity, returning true as if the user confirms the action.
-        // You can add actual dialog logic here if needed (like a Yes/No dialog).
-        return true;
+        return true; // Simulated confirmation for simplicity
     }
 
     // Helper method to clear fields
@@ -210,34 +251,14 @@ public class manage_articles {
         publishedDateField.clear();
     }
 
-    // Helper method to populate the article table
-    private void populateArticleTable() {
-        try {
-            List<Document> articles = articlesCollection.find().into(new ArrayList<>());
-
-            // Assuming your TableView has columns for these fields
-            articleTable.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("article_name"));
-            articleTable.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("category"));
-            articleTable.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("author"));
-            articleTable.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("published_date"));
-
-            articleTable.getItems().setAll(articles);
-
-        } catch (Exception e) {
-            showAlert("Error", "Failed to populate article table: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
+    // Main menu navigation
     @FXML
     public void manageMainMenu(ActionEvent actionEvent) {
         executorService.submit(() -> {
             try {
-                // Close the current window
                 Stage stage = (Stage) articleNameField.getScene().getWindow();
                 stage.close();
 
-                // Open the main menu window
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
                 Stage mainMenuStage = new Stage();
                 mainMenuStage.setScene(new Scene(loader.load()));
@@ -249,12 +270,18 @@ public class manage_articles {
             }
         });
     }
+
+    // Exit application
     @FXML
     public void manageExit(ActionEvent actionEvent) {
         executorService.submit(() -> {
-            // Close the current window
             Stage stage = (Stage) articleNameField.getScene().getWindow();
             stage.close();
         });
+    }
+
+    @FXML
+    public void initialize() {
+        populateArticleTable();
     }
 }

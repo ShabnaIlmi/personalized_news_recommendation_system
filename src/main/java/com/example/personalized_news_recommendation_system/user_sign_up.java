@@ -18,7 +18,7 @@ import org.bson.Document;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
 public class user_sign_up implements Initializable {
@@ -33,6 +33,7 @@ public class user_sign_up implements Initializable {
 
     private MongoClient mongoClient;
     private MongoCollection<Document> userCollection;
+    private ExecutorService executorService; // To handle background tasks
 
     private static final String[] categories = {"AI", "Technology", "Health", "Education", "Fashion", "Sports", "Entertainment"};
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
@@ -45,6 +46,10 @@ public class user_sign_up implements Initializable {
         if (database != null) {
             this.userCollection = database.getCollection("User");
         }
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
     }
 
     @FXML
@@ -61,12 +66,6 @@ public class user_sign_up implements Initializable {
         String confirmPassword = verifyPassword.getText();
         String ageValue = age.getText().trim();
 
-        if (category1.getValue() == null || category2.getValue() == null || category3.getValue() == null ||
-                new HashSet<>(Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue())).size() < 3) {
-            showAlert("Registration Failed", "Please select three distinct categories.", Alert.AlertType.ERROR);
-            return;
-        }
-
         if (!validateInput(fName, sName, userEmail, password, confirmPassword, ageValue)) {
             return;
         }
@@ -81,49 +80,30 @@ public class user_sign_up implements Initializable {
                 .append("age", userAge)
                 .append("categories", Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()))
                 .append("username", username)
-                .append("password", password); // Consider hashing passwords for security
+                .append("password", password);
 
-        try {
-            userCollection.insertOne(newUser);
+        // Insert new user into the database in a background thread
+        executorService.submit(() -> {
+            try {
+                userCollection.insertOne(newUser);
 
-            showAlert("Registration Successful",
-                    "Your account has been created!\nUsername: " + username + "\nPassword: " + password,
-                    Alert.AlertType.INFORMATION);
-
-            navigateToMainMenu(actionEvent);
-        } catch (Exception e) {
-            showAlert("Database Error", "An error occurred while saving to the database.", Alert.AlertType.ERROR);
-            e.printStackTrace();
-        }
+                Platform.runLater(() -> {
+                    showAlert("Registration Successful",
+                            "Your account has been created!\nUsername: " + username,
+                            Alert.AlertType.INFORMATION);
+                    navigateToMainMenu(actionEvent);
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    showAlert("Database Error", "An error occurred while saving to the database.", Alert.AlertType.ERROR);
+                    e.printStackTrace();
+                });
+            }
+        });
     }
 
     private String generateUsername(String firstName, String lastName) {
-        String baseUsername = firstName.toLowerCase() + capitalize(lastName);
-
-        String regex = "^" + Pattern.quote(baseUsername) + "(\\d{3})@swiftly\\.com$";
-        Pattern usernamePattern = Pattern.compile(regex);
-
-        int maxSuffix = 0;
-
-        for (Document user : userCollection.find(new Document("username", new Document("$regex", regex)))) {
-            String username = user.getString("username");
-            Matcher matcher = usernamePattern.matcher(username);
-
-            if (matcher.find()) {
-                int suffix = Integer.parseInt(matcher.group(1));
-                if (suffix > maxSuffix) {
-                    maxSuffix = suffix;
-                }
-            }
-        }
-
-        int newSuffix = maxSuffix + 1;
-        return baseUsername + String.format("%03d", newSuffix) + "@swiftly.com";
-    }
-
-    private String capitalize(String name) {
-        if (name == null || name.isEmpty()) return "";
-        return Character.toUpperCase(name.charAt(0)) + name.substring(1).toLowerCase();
+        return firstName.toLowerCase() + lastName.toLowerCase() + "@swiftly.com";
     }
 
     private boolean validateInput(String fName, String sName, String userEmail, String password, String confirmPassword, String ageValue) {
@@ -182,13 +162,12 @@ public class user_sign_up implements Initializable {
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public void initialize(URL location, ResourceBundle resources) {
         category1.getItems().addAll(categories);
         category2.getItems().addAll(categories);
         category3.getItems().addAll(categories);
     }
 
-    @FXML
     public void homeSignUp(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
@@ -205,18 +184,18 @@ public class user_sign_up implements Initializable {
         } catch (IOException e) {
             showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
+        } catch (Exception e) {
+            showAlert("Error", "An unexpected error occurred while navigating to the home page.", Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
 
-    @FXML
     public void category1(MouseEvent mouseEvent) {
     }
 
-    @FXML
     public void category2(MouseEvent mouseEvent) {
     }
 
-    @FXML
     public void category3(MouseEvent mouseEvent) {
     }
 }

@@ -33,7 +33,7 @@
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="updateArticles" layoutX="594.0" layoutY="241.0" mnemonicParsing="false" onAction="#updateArticles" prefHeight="51.0" prefWidth="240.0" style="-fx-background-color: grey;" text="Manage Articles">
+      <Button fx:id="updateArticles" layoutX="594.0" layoutY="241.0" mnemonicParsing="false" onAction="#updateArticles" prefHeight="51.0" prefWidth="240.0" style="-fx-background-color: grey;" text="Update Articles">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>

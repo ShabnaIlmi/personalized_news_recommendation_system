@@ -24,5 +24,7 @@ public class Article {
     public void setAuthor(String author) { this.author = author; }
     public LocalDate getPublishedDate() { return publishedDate; }
     public void setPublishedDate(LocalDate publishedDate) { this.publishedDate = publishedDate; }
+
+
 }
 
