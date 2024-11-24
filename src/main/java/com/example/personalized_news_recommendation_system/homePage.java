@@ -47,7 +47,7 @@ public class homePage {
             // Get the sign_in controller and set the MongoDB dependencies
             user_log_in signInController = loader.getController();
             signInController.setMongoClient(mongoClient);
-            signInController.setDatabase(database);
+            signInController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
             // Get the current stage and set the new scene
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
@@ -66,13 +66,13 @@ public class homePage {
     public void homeSignUp(ActionEvent actionEvent) {
         try {
             // Load the sign-up page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("_user_sign_up.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_sign_up.fxml"));
             Scene signUpScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
             user_sign_up signUpController = loader.getController();
             signUpController.setMongoClient(mongoClient);
-            signUpController.setDatabase(database);
+            signUpController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
             // Get the current stage and set the new scene
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();

@@ -3,7 +3,6 @@ package com.example.personalized_news_recommendation_system;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +16,6 @@ import javafx.stage.Stage;
 import org.bson.Document;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 
 public class administrator_log_in {
 
@@ -50,7 +48,7 @@ public class administrator_log_in {
         }
     }
 
-    // Sign-In Method for Administrator with concurrency
+    // Sign-In Method for Administrator
     @FXML
     void administratorSignIn(ActionEvent event) {
         String username = administratorUsername.getText();
@@ -62,25 +60,15 @@ public class administrator_log_in {
             return;
         }
 
-        // Submit a background task to check admin credentials in the MongoDB collection
-        CompletableFuture.supplyAsync(() -> authenticateAdmin(username, password), Main.executorService)
-                .thenAccept(authenticated -> {
-                    if (authenticated) {
-                        Platform.runLater(() -> {
-                            showAlert("Sign-In Success", "Welcome, Administrator!", Alert.AlertType.INFORMATION);
-                            openAdminMainMenu(event);
-                        });
-                    } else {
-                        Platform.runLater(() -> {
-                            showAlert("Sign-In Failed", "Invalid credentials.", Alert.AlertType.ERROR);
-                            administratorPassword.clear();
-                        });
-                    }
-                })
-                .exceptionally(e -> {
-                    Platform.runLater(() -> showAlert("Error", "An error occurred during authentication.", Alert.AlertType.ERROR));
-                    return null;
-                });
+        // Authenticate admin synchronously in the UI thread
+        boolean authenticated = authenticateAdmin(username, password);
+        if (authenticated) {
+            showAlert("Sign-In Success", "Welcome, Administrator!", Alert.AlertType.INFORMATION);
+            openAdminMainMenu(event);
+        } else {
+            showAlert("Sign-In Failed", "Invalid credentials.", Alert.AlertType.ERROR);
+            administratorPassword.clear();
+        }
     }
 
     // Method to authenticate admin
@@ -143,11 +131,9 @@ public class administrator_log_in {
             currentStage.setScene(homeScene);
             currentStage.setTitle("Personalized News Recommendation System - Home");
             currentStage.show();
+
         } catch (IOException e) {
             showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
-            e.printStackTrace();
-        } catch (Exception e) {
-            showAlert("Error", "An unexpected error occurred while navigating to the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }

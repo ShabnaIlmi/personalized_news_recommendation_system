@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class recommended_articles {
+
     @FXML
     private Button recommendedMainMenu;
     @FXML
@@ -28,15 +29,15 @@ public class recommended_articles {
     @FXML
     private Button getRecommendation;
     @FXML
-    private TableView<Document> recommendedTable;
+    private TableView<Article> recommendedTable; // Updated to Article class
     @FXML
-    private TableColumn<Document, String> articleNameColumn;
+    private TableColumn<Article, String> articleNameColumn;
     @FXML
-    private TableColumn<Document, String> categoryColumn;
+    private TableColumn<Article, String> categoryColumn;
     @FXML
-    private TableColumn<Document, String> authorColumn;
+    private TableColumn<Article, String> authorColumn;
     @FXML
-    private TableColumn<Document, String> publishedDateColumn;
+    private TableColumn<Article, String> publishedDateColumn;
 
     private MongoClient mongoClient;
     private MongoCollection<Document> articlesCollection;
@@ -68,29 +69,30 @@ public class recommended_articles {
                     return;
                 }
 
-                List<Document> articles = articlesCollection.find().into(new ArrayList<>());
-                if (articles.isEmpty()) {
+                List<Document> documents = articlesCollection.find().into(new ArrayList<>());
+                if (documents.isEmpty()) {
                     Platform.runLater(() -> showAlert("Information", "No recommended articles found."));
                     return;
                 }
 
+                List<Article> articles = new ArrayList<>();
+                for (Document doc : documents) {
+                    String name = doc.getString("article_name");
+                    String category = doc.getString("category");
+                    String author = doc.getString("author");
+                    String publishedDate = doc.getString("published_date");
+                    String description = doc.getString("description");
+                    String content = doc.getString("content");
+
+                    // Create an Article object and add to the list
+                    articles.add(new Article(name, category, author, publishedDate, description, content));
+                }
+
                 // Configure table columns
-                articleNameColumn.setCellValueFactory(cellData -> {
-                    Document doc = cellData.getValue();
-                    return new SimpleStringProperty(doc.getString("article_name"));
-                });
-                categoryColumn.setCellValueFactory(cellData -> {
-                    Document doc = cellData.getValue();
-                    return new SimpleStringProperty(doc.getString("category"));
-                });
-                authorColumn.setCellValueFactory(cellData -> {
-                    Document doc = cellData.getValue();
-                    return new SimpleStringProperty(doc.getString("author"));
-                });
-                publishedDateColumn.setCellValueFactory(cellData -> {
-                    Document doc = cellData.getValue();
-                    return new SimpleStringProperty(doc.getString("published_date"));
-                });
+                articleNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
+                categoryColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCategory()));
+                authorColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAuthor()));
+                publishedDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPublishedDate().toString()));
 
                 // Populate the table
                 Platform.runLater(() -> recommendedTable.getItems().setAll(articles));
@@ -122,16 +124,30 @@ public class recommended_articles {
     // Navigate to the main menu
     @FXML
     public void recommendedMainMenu(ActionEvent actionEvent) {
-        executorService.submit(() -> {
+        Platform.runLater(() -> {
             try {
+                // Close current stage
                 Stage stage = (Stage) recommendedMainMenu.getScene().getWindow();
                 stage.close();
 
+                // Load the Main Menu scene
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
                 Stage mainMenuStage = new Stage();
                 mainMenuStage.setScene(new Scene(loader.load()));
                 mainMenuStage.setTitle("Main Menu");
                 mainMenuStage.show();
+
+                // Pass MongoClient and set database when returning
+                mainMenuStage.setOnCloseRequest(e -> {
+                    // Ensure database is reinitialized when coming back to recommended_articles
+                    if (mongoClient != null) {
+                        setDatabase(mongoClient.getDatabase("News_Recommendation")); // Repass the MongoDatabase
+                        populateArticleTableSafely(); // Refresh the table
+                    } else {
+                        System.out.println("MongoClient is null when returning from main menu.");
+                    }
+                });
+
             } catch (Exception e) {
                 e.printStackTrace();
                 showAlert("Error", "Failed to open the Main Menu: " + e.getMessage());
@@ -163,7 +179,6 @@ public class recommended_articles {
     @FXML
     public void initialize() {
         System.out.println("Controller initialized.");
-
         // Attempt to populate the table; this will only succeed if articlesCollection is already initialized
         populateArticleTableSafely();
     }
@@ -171,7 +186,7 @@ public class recommended_articles {
     @FXML
     public void viewArticle(ActionEvent actionEvent) {
         // Get the selected article from the table
-        Document selectedArticle = recommendedTable.getSelectionModel().getSelectedItem();
+        Article selectedArticle = recommendedTable.getSelectionModel().getSelectedItem();
 
         if (selectedArticle == null) {
             // If no article is selected, show an alert
@@ -179,35 +194,23 @@ public class recommended_articles {
             return;
         }
 
-        // Extract details of the selected article
-        String articleName = selectedArticle.getString("article_name");
-        String articleContent = selectedArticle.getString("article_content"); // Assuming article content exists
-        String category = selectedArticle.getString("category");
-        String author = selectedArticle.getString("author");
-        String publishedDate = selectedArticle.getString("published_date");
-
-        // Start the task on a background thread
-        executorService.submit(() -> {
+        // Pass the article to the view_article controller
+        Platform.runLater(() -> {
             try {
-                // Load the View Article FXML file and pass the selected article's data
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("view_article.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("view_articles.fxml"));
                 Stage viewArticleStage = new Stage();
                 Scene scene = new Scene(loader.load());
 
                 // Get the controller of the new scene
                 view_articles viewArticleController = loader.getController();
 
-                // Pass the article data to the controller of the new scene
-                Platform.runLater(() -> {
-                    viewArticleController.setArticleDetails(articleName, articleContent, category, author, publishedDate);
-                });
+                // Pass the article object to the view_article controller
+                viewArticleController.setArticleDetails(selectedArticle);
 
                 // Show the new scene on the FX application thread
-                Platform.runLater(() -> {
-                    viewArticleStage.setScene(scene);
-                    viewArticleStage.setTitle("View Article");
-                    viewArticleStage.show();
-                });
+                viewArticleStage.setScene(scene);
+                viewArticleStage.setTitle("View Article");
+                viewArticleStage.show();
 
             } catch (Exception e) {
                 e.printStackTrace();
