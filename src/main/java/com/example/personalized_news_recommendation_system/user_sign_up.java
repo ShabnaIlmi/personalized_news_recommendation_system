@@ -18,7 +18,6 @@ import org.bson.Document;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
 public class user_sign_up implements Initializable {
@@ -33,7 +32,6 @@ public class user_sign_up implements Initializable {
 
     private MongoClient mongoClient;
     private MongoCollection<Document> userCollection;
-    private ExecutorService executorService; // To handle background tasks
 
     private static final String[] categories = {"AI", "Technology", "Health", "Education", "Fashion", "Sports", "Entertainment"};
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
@@ -46,10 +44,6 @@ public class user_sign_up implements Initializable {
         if (database != null) {
             this.userCollection = database.getCollection("User");
         }
-    }
-
-    public void setExecutorService(ExecutorService executorService) {
-        this.executorService = executorService;
     }
 
     @FXML
@@ -82,24 +76,16 @@ public class user_sign_up implements Initializable {
                 .append("username", username)
                 .append("password", password);
 
-        // Insert new user into the database in a background thread
-        executorService.submit(() -> {
-            try {
-                userCollection.insertOne(newUser);
-
-                Platform.runLater(() -> {
-                    showAlert("Registration Successful",
-                            "Your account has been created!\nUsername: " + username,
-                            Alert.AlertType.INFORMATION);
-                    navigateToMainMenu(actionEvent);
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    showAlert("Database Error", "An error occurred while saving to the database.", Alert.AlertType.ERROR);
-                    e.printStackTrace();
-                });
-            }
-        });
+        try {
+            userCollection.insertOne(newUser);
+            showAlert("Registration Successful",
+                    "Your account has been created!\nUsername: " + username + "\nPassword: " + password,
+                    Alert.AlertType.INFORMATION);
+            navigateToMainMenu(actionEvent);
+        } catch (Exception e) {
+            showAlert("Database Error", "An error occurred while saving to the database.", Alert.AlertType.ERROR);
+            e.printStackTrace();
+        }
     }
 
     private String generateUsername(String firstName, String lastName) {
@@ -133,27 +119,45 @@ public class user_sign_up implements Initializable {
             return false;
         }
 
+        // Check for distinct categories
+        String cat1 = category1.getValue();
+        String cat2 = category2.getValue();
+        String cat3 = category3.getValue();
+
+        if (cat1 == null || cat2 == null || cat3 == null) {
+            showAlert("Invalid Categories", "Please select three categories.", Alert.AlertType.ERROR);
+            return false;
+        }
+
+        if (cat1.equals(cat2) || cat1.equals(cat3) || cat2.equals(cat3)) {
+            showAlert("Invalid Categories", "Please select three distinct categories.", Alert.AlertType.ERROR);
+            return false;
+        }
+
         return true;
     }
 
+
     private void showAlert(String title, String content, Alert.AlertType alertType) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(alertType);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(content);
-            alert.showAndWait();
-        });
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     private void navigateToMainMenu(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
-            Scene mainMenuScene = new Scene(loader.load());
+            Scene userMainMenuScene = new Scene(loader.load());
+
+            user_main_menu userMainMenuController = loader.getController();
+            userMainMenuController.setMongoClient(mongoClient);
+            userMainMenuController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            currentStage.setScene(mainMenuScene);
-            currentStage.setTitle("Main Menu");
+            currentStage.setScene(userMainMenuScene);
+            currentStage.setTitle("Personalized News Recommendation System - Main Menu");
             currentStage.show();
         } catch (IOException e) {
             showAlert("Navigation Error", "Failed to load the main menu.", Alert.AlertType.ERROR);
@@ -168,6 +172,7 @@ public class user_sign_up implements Initializable {
         category3.getItems().addAll(categories);
     }
 
+    @FXML
     public void homeSignUp(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
@@ -183,9 +188,6 @@ public class user_sign_up implements Initializable {
             currentStage.show();
         } catch (IOException e) {
             showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
-            e.printStackTrace();
-        } catch (Exception e) {
-            showAlert("Error", "An unexpected error occurred while navigating to the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }

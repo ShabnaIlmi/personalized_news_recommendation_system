@@ -13,8 +13,6 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class user_main_menu {
 
@@ -31,7 +29,6 @@ public class user_main_menu {
 
     private MongoClient mongoClient;
     private MongoDatabase database;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
@@ -72,7 +69,6 @@ public class user_main_menu {
     // Handle Exit Button Action
     @FXML
     public void mainMenuExit(ActionEvent event) {
-        executorService.shutdown();
         Platform.runLater(() -> {
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.close();
@@ -94,18 +90,19 @@ public class user_main_menu {
                     recommended_articles recommendedController = (recommended_articles) controller;
                     recommendedController.setMongoClient(mongoClient);
                     recommendedController.setDatabase(database);
+                    recommendedController.initialize();  // Ensure table is populated
                 } else if (controller instanceof manage_profile) {
                     manage_profile manageController = (manage_profile) controller;
-                    //manageController.setMongoClient(mongoClient);
-                    //manageController.setDatabase(database);
+                    // manageController.setMongoClient(mongoClient);  // Pass MongoDB if needed
+                    // manageController.setDatabase(database);     // Pass MongoDB if needed
                 } else if (controller instanceof read_articles) {
                     read_articles readController = (read_articles) controller;
-                    //readController.setMongoClient(mongoClient);
-                    //readController.setDatabase(database);
+                    // readController.setMongoClient(mongoClient);
+                    // readController.setDatabase(database);
                 } else if (controller instanceof view_articles) {
                     view_articles viewController = (view_articles) controller;
-                    //viewController.setMongoClient(mongoClient);
-                    //viewController.setDatabase(database);
+                    viewController.setMongoClient(mongoClient);
+                    viewController.setDatabase(database);
                 }
 
                 // Set the new scene to the current stage
