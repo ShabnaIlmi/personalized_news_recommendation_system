@@ -8,48 +8,81 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
 <AnchorPane prefHeight="610.0" prefWidth="883.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.read_articles">
-   <children>
-      <AnchorPane prefHeight="610.0" prefWidth="181.0" style="-fx-background-color: grey;">
-         <children>
-            <ImageView fitHeight="150.0" fitWidth="171.0" layoutX="40.0" layoutY="105.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@interview_2450883.png" />
-               </image>
-            </ImageView>
-            <Text layoutX="3.0" layoutY="333.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="243.1461181640625">
-               <font>
-                  <Font name="System Bold Italic" size="72.0" />
-               </font>
-            </Text>
-         </children>
-      </AnchorPane>
-      <Text layoutX="353.0" layoutY="99.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Read Articles">
-         <font>
-            <Font name="System Bold" size="72.0" />
-         </font>
-      </Text>
-      <Label layoutX="292.0" layoutY="146.0" prefHeight="254.0" prefWidth="540.0" />
-      <Button layoutX="292.0" layoutY="512.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="114.0" style="-fx-background-color: grey;" text="Back">
-         <font>
-            <Font name="System Bold Italic" size="24.0" />
-         </font>
-      </Button>
-      <Button layoutX="448.0" layoutY="512.0" mnemonicParsing="false" prefHeight="51.0" prefWidth="114.0" style="-fx-background-color: grey;" text="Like">
-         <font>
-            <Font name="System Bold Italic" size="24.0" />
-         </font>
-      </Button>
-      <Button layoutX="599.0" layoutY="512.0" mnemonicParsing="false" style="-fx-background-color: grey;" text="Dislike">
-         <font>
-            <Font name="System Bold Italic" size="24.0" />
-         </font>
-      </Button>
-      <Button layoutX="747.0" layoutY="512.0" mnemonicParsing="false" style="-fx-background-color: grey;" text="Exit">
-         <font>
-            <Font name="System Bold Italic" size="24.0" />
-         </font>
-      </Button>
-   </children>
+    <children>
+        <!-- Article Title -->
+        <Label fx:id="articleNameLabel" alignment="CENTER" layoutX="229.0" layoutY="110.0" prefHeight="70.0" prefWidth="645.0" text="The Role of VR in Modern Education">
+            <font>
+                <Font name="System Bold Italic" size="36.0" />
+            </font>
+        </Label>
+
+        <!-- Published Date -->
+        <Label fx:id="articlePublishedDateLabel" layoutX="250.0" layoutY="206.0" prefWidth="460.0" text="2024-11-12">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+
+        <!-- Author -->
+        <Label fx:id="articleAuthorLabel" layoutX="674.0" layoutY="206.0" prefHeight="18.0" prefWidth="194.0" text="Daniel Johnson">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+
+        <!-- Article Content -->
+        <Label fx:id="articleContentLabel" layoutX="250.0" layoutY="261.0" prefHeight="200.0" prefWidth="560.0" style="-fx-font-size: 14px;" text="Virtual Reality (VR) is opening new doors in education by offering immersive learning experiences that go beyond textbooks. Imagine students touring ancient ruins or exploring the human body in 3D without leaving the classroom. VR allows learners to grasp complex concepts through interactive simulations, fostering a deeper understanding of subjects like science and history. Educators, too, are leveraging VR to create customized lesson plans and engage students in innovative ways. While cost and accessibility remain challenges, the potential for VR to make education more inclusive and impactful is undeniable." wrapText="true" />
+
+        <!-- Like Button -->
+        <Button fx:id="likeButton" layoutX="428.0" layoutY="544.0" onAction="#handleLike" prefHeight="51.0" prefWidth="133.0" style="-fx-background-color: grey;" text="Like">
+            <font>
+                <Font name="System Bold Italic" size="24.0" />
+            </font>
+        </Button>
+
+        <!-- Dislike Button -->
+        <Button fx:id="dislikeButton" layoutX="595.0" layoutY="544.0" onAction="#handleDislike" prefHeight="51.0" prefWidth="116.0" style="-fx-background-color: grey;" text="Dislike">
+            <font>
+                <Font name="System Bold Italic" size="24.0" />
+            </font>
+        </Button>
+
+        <!-- Back Button -->
+        <Button fx:id="backButton" layoutX="250.0" layoutY="544.0" onAction="#handleBack" prefHeight="51.0" prefWidth="144.0" style="-fx-background-color: grey;" text="Back">
+            <font>
+                <Font name="System Bold Italic" size="24.0" />
+            </font>
+        </Button>
+
+        <!-- Exit Button -->
+        <Button fx:id="exitButton" layoutX="740.0" layoutY="544.0" onAction="#handleExit" prefHeight="30.0" prefWidth="116.0" style="-fx-background-color: grey;" text="Exit">
+            <font>
+                <Font name="System Bold Italic" size="24.0" />
+            </font>
+        </Button>
+
+        <!-- Sidebar with Logo -->
+        <AnchorPane prefHeight="610.0" prefWidth="200.0" style="-fx-background-color: grey;">
+            <children>
+                <ImageView fitHeight="163.0" fitWidth="173.0" layoutX="29.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@interview_2450883.png" />
+                    </image>
+                </ImageView>
+                <Text layoutX="1.0" layoutY="361.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="218.74151611328125">
+                    <font>
+                        <Font name="System Bold Italic" size="64.0" />
+                    </font>
+                </Text>
+            </children>
+        </AnchorPane>
+
+        <!-- Page Title -->
+        <Text layoutX="346.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Read Article">
+            <font>
+                <Font name="System Bold" size="72.0" />
+            </font>
+        </Text>
+    </children>
 </AnchorPane>

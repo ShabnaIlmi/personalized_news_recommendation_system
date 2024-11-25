@@ -13,105 +13,102 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="750.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.manage_articles">
+<AnchorPane prefHeight="822.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.manage_articles">
     <children>
-        <!-- Header Label for Update/Delete Article -->
-        <Label layoutX="296.0" layoutY="-10.0" text="Manage Article">
+        <!-- Header Label for Manage Articles -->
+        <Label layoutX="281.0" text="Manage Articles">
             <font>
                 <Font name="System Bold" size="72.0" />
             </font>
         </Label>
 
         <!-- Table to Display Existing Articles -->
-        <TableView fx:id="articleTable" layoutX="191.0" layoutY="96.0" prefHeight="230.0" prefWidth="682.0">
+        <TableView fx:id="articleTable" layoutX="213.0" layoutY="98.0" prefHeight="230.0" prefWidth="682.0">
             <columns>
-                <TableColumn fx:id="articleIDColumn" prefWidth="130.39996337890625" text="Article ID" />
-                <TableColumn fx:id="articleNameColumn" prefWidth="184.79998779296875" text="Article Name" />
-                <TableColumn fx:id="categoryColumn" prefWidth="118.40005493164062" text="Category" />
-                <TableColumn fx:id="authorColumn" prefWidth="133.60006713867188" text="Author" />
+                <TableColumn fx:id="articleIDColumn" prefWidth="130.4" text="Article ID" />
+                <TableColumn fx:id="articleNameColumn" prefWidth="184.8" text="Article Name" />
+                <TableColumn fx:id="categoryColumn" prefWidth="118.4" text="Category" />
+                <TableColumn fx:id="authorColumn" prefWidth="133.6" text="Author" />
                 <TableColumn fx:id="dateColumn" prefWidth="112.0" text="Published Date" />
             </columns>
         </TableView>
 
         <!-- Editable Fields for Selected Article -->
-        <Label layoutX="211.0" layoutY="345.0" text="Article Name -:">
+        <Label layoutX="217.0" layoutY="345.0" text="Article Name -:">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
         </Label>
         <TextField fx:id="articleNameField" layoutX="380.0" layoutY="346.0" prefHeight="26.0" prefWidth="490.0" />
 
-        <Label layoutX="211.0" layoutY="387.0" text="Category -:">
+        <Label layoutX="219.0" layoutY="387.0" text="Category -:">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
         </Label>
         <TextField fx:id="categoryField" layoutX="380.0" layoutY="387.0" prefHeight="27.0" prefWidth="490.0" />
 
-        <Label layoutX="211.0" layoutY="432.0" text="Author -:">
+        <Label layoutX="219.0" layoutY="432.0" text="Author -:">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
         </Label>
         <TextField fx:id="authorField" layoutX="380.0" layoutY="433.0" prefHeight="26.0" prefWidth="490.0" />
 
-        <Label layoutX="209.0" layoutY="480.0" text="Published Date -:">
+        <Label layoutX="217.0" layoutY="480.0" text="Published Date -:">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
         </Label>
         <DatePicker fx:id="publishedDatePicker" layoutX="378.0" layoutY="481.0" prefWidth="200.0" />
 
-        <!-- Buttons to Update or Delete Article -->
-        <Button fx:id="updateArticleButton" layoutX="223.0" layoutY="696.0" mnemonicParsing="false" onAction="#updateArticle" style="-fx-background-color: grey;" text="Update Article">
-        <font>
-                <Font name="System Bold" size="18.0" />
-            </font>
-        </Button>
-        <Button fx:id="deleteArticleButton" layoutX="408.0" layoutY="696.0" mnemonicParsing="false" onAction="#deleteArticle" style="-fx-background-color: grey;" text="Delete Article">
+        <!-- Text Areas for Description and Content -->
+        <Label layoutX="218.0" layoutY="527.0" text="Description -:">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
-        </Button>
+        </Label>
+        <TextArea fx:id="manageDescription" layoutX="380.0" layoutY="527.0" prefHeight="100.0" prefWidth="490.0" wrapText="true" />
 
-        <!-- Sidebar with Logo and Branding -->
-        <AnchorPane prefHeight="750.0" prefWidth="177.0" style="-fx-background-color: grey;">
-            <children>
-                <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="14.0" layoutY="225.0" pickOnBounds="true" preserveRatio="true">
-                    <image>
-                        <Image url="@interview_2450883.png" />
-                    </image>
-                </ImageView>
-                <Text layoutX="7.0" layoutY="434.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="163.7000244140625">
-                    <font>
-                        <Font name="System Bold Italic" size="48.0" />
-                    </font>
-                </Text>
-            </children>
-        </AnchorPane>
+        <Label layoutX="223.0" layoutY="635.0" text="Content -:">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+        <TextArea fx:id="manageContent" layoutX="380.0" layoutY="635.0" prefHeight="100.0" prefWidth="490.0" wrapText="true" />
 
-        <!-- Main Menu and Exit Buttons -->
-        <Button fx:id="manageMainMenu" layoutX="587.0" layoutY="696.0" mnemonicParsing="false" onAction="#manageMainMenu" style="-fx-background-color: grey;" text="Main Menu">
-            <font>
-                <Font name="System Bold" size="18.0" />
-            </font>
-        </Button>
-        <Button fx:id="manageExit" layoutX="746.0" layoutY="696.0" mnemonicParsing="false" onAction="#manageExit" prefHeight="40.0" prefWidth="94.0" style="-fx-background-color: grey;" text="Exit">
-            <font>
-                <Font name="System Bold" size="18.0" />
-            </font>
-        </Button>
-      <Label layoutX="209.0" layoutY="527.0" text="Description -:">
+        <!-- Buttons for Actions -->
+        <Button fx:id="updateButton" layoutX="383.0" layoutY="756.0" mnemonicParsing="false" onAction="#updateArticle" style="-fx-background-color: grey;" text="Update Article">
          <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <TextArea fx:id="manageDescription" layoutX="380.0" layoutY="527.0" prefHeight="62.0" prefWidth="490.0" />
-      <Label layoutX="209.0" layoutY="614.0" text="Content -:">
+            <Font name="System Bold Italic" size="24.0" />
+         </font></Button>
+        <Button fx:id="deleteButton" layoutX="605.0" layoutY="756.0" mnemonicParsing="false" onAction="#deleteArticle" style="-fx-background-color: grey;" text="Delete Article">
          <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <TextArea fx:id="manageContent" layoutX="380.0" layoutY="606.0" prefHeight="70.0" prefWidth="490.0" />
+            <Font name="System Bold Italic" size="24.0" />
+         </font></Button>
+
+        <!-- Navigation Buttons -->
+        <Button fx:id="manageMainMenu" layoutX="196.0" layoutY="756.0" mnemonicParsing="false" onAction="#manageMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font></Button>
+        <Button fx:id="manageExit" layoutX="809.0" layoutY="756.0" mnemonicParsing="false" onAction="#manageExit" style="-fx-background-color: grey;" text="Exit">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font></Button>
+      <AnchorPane layoutY="-2.0" prefHeight="822.0" prefWidth="186.0" style="-fx-background-color: grey;">
+         <children>
+            <ImageView fitHeight="179.0" fitWidth="176.0" layoutX="5.0" layoutY="144.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@interview_2450883.png" />
+               </image>
+            </ImageView>
+            <Text layoutY="437.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="208.79999999999995">
+               <font>
+                  <Font name="System Bold Italic" size="64.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
     </children>
 </AnchorPane>

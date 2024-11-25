@@ -28,6 +28,7 @@ public class administrator_main_menu {
     // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
+        this.database = mongoClient.getDatabase("News_Recommendation");
         System.out.println("MongoClient set successfully in AdministratorMainMenu controller.");
     }
 
@@ -48,7 +49,7 @@ public class administrator_main_menu {
             // Get the controller of the Add Article page and pass MongoDB dependencies
             add_article addArticleController = loader.getController();
             addArticleController.setMongoClient(mongoClient);
-            addArticleController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+            addArticleController.setDatabase(database);
 
             // Set the new scene to the current stage
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -66,26 +67,24 @@ public class administrator_main_menu {
     @FXML
     public void updateArticles(ActionEvent event) {
         try {
-            // Load the Update Article page
             FXMLLoader loader = new FXMLLoader(getClass().getResource("manage_articles.fxml"));
             Scene updateArticleScene = new Scene(loader.load());
 
-            // Get the controller of the Update Article page and pass MongoDB dependencies
-            manage_articles updateArticleController = loader.getController();
-            updateArticleController.setMongoClient(mongoClient);
-            updateArticleController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+            manage_articles manageArticleController = loader.getController();
+            manageArticleController.setMongoClient(mongoClient);
+            manageArticleController.setDatabase(database);
 
-            // Set the new scene to the current stage
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.setScene(updateArticleScene);
-            currentStage.setTitle("Update Article - Personalized News Recommendation System");
+            currentStage.setTitle("Manage Articles - Personalized News Recommendation System");
             currentStage.show();
 
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the Update Article page.");
+            showAlert("Navigation Error", "Failed to load the Manage Articles page.");
             e.printStackTrace();
         }
     }
+
 
     // Handle Exit Button Action
     @FXML

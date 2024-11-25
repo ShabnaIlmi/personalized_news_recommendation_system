@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -10,6 +9,7 @@
 
 <AnchorPane prefHeight="610.0" prefWidth="884.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.view_articles">
    <children>
+      <!-- Sidebar -->
       <AnchorPane prefHeight="610.0" prefWidth="204.0" style="-fx-background-color: grey;">
          <children>
             <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="41.0" layoutY="99.0" pickOnBounds="true" preserveRatio="true">
@@ -25,6 +25,7 @@
          </children>
       </AnchorPane>
 
+      <!-- Title -->
       <Text layoutX="359.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="View Articles">
          <font>
             <Font name="System Bold" size="72.0" />
@@ -32,31 +33,25 @@
       </Text>
 
       <!-- Article Details Section -->
-      <Label fx:id="articleNameLabel" layoutX="250.0" layoutY="150.0" style="-fx-font-size: 20px;" text="Article Name -: ">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <Label fx:id="articleAuthorLabel" layoutX="250.0" layoutY="200.0" style="-fx-font-size: 20px;" text="Author -: ">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <Label fx:id="articleCategoryLabel" layoutX="250.0" layoutY="250.0" style="-fx-font-size: 20px;" text="Category -: ">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <Label fx:id="articlePublishedDateLabel" layoutX="250.0" layoutY="300.0" style="-fx-font-size: 20px;" text="Published Date -: ">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <Label fx:id="descriptionLabel" layoutX="250.0" layoutY="350.0" maxWidth="600.0" style="-fx-font-size: 20px;" text="Description -: " wrapText="true">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
+      <AnchorPane layoutX="250.0" layoutY="150.0">
+         <Text style="-fx-font-size: 24; -fx-font-weight: bold;" text="Article Name -:" />
+      </AnchorPane>
+
+      <AnchorPane layoutX="250.0" layoutY="200.0">
+         <Text style="-fx-font-size: 24; -fx-font-weight: bold;" text="Author -:" />
+      </AnchorPane>
+
+      <AnchorPane layoutX="250.0" layoutY="250.0">
+         <Text style="-fx-font-size: 24; -fx-font-weight: bold;" text="Category -:" />
+      </AnchorPane>
+
+      <AnchorPane layoutX="250.0" layoutY="300.0">
+         <Text style="-fx-font-size: 24; -fx-font-weight: bold;" text="Published Date -:" />
+      </AnchorPane>
+
+      <AnchorPane layoutX="250.0" layoutY="350.0">
+         <Text style="-fx-font-size: 24; -fx-font-weight: bold;" text="Description -:" />
+      </AnchorPane>
 
       <!-- Buttons -->
       <Button fx:id="viewBack" layoutX="262.0" layoutY="516.0" mnemonicParsing="false" onAction="#goBack" prefHeight="51.0" prefWidth="117.0" style="-fx-background-color: grey;" text="Back">
@@ -79,5 +74,10 @@
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
+      <Text fx:id="articleAuthorValue" layoutX="363.0" layoutY="197.0" style="-fx-font-size: 18;" text="Sample Author" />
+      <Text fx:id="articleCategoryValue" layoutX="386.0" layoutY="249.0" style="-fx-font-size: 18;" text="Sample Category" />
+      <Text fx:id="articlePublishedDateValue" layoutX="461.0" layoutY="299.0" style="-fx-font-size: 18;" text="Sample Date" />
+      <Text fx:id="descriptionValue" layoutX="417.0" layoutY="349.0" style="-fx-font-size: 18;" text="Sample Description" wrappingWidth="400" />
+      <Text fx:id="articleName" layoutX="437.0" layoutY="149.0" style="-fx-font-size: 18;" text="Sample Article Name" />
    </children>
 </AnchorPane>
