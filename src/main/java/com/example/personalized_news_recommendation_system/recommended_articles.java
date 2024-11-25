@@ -29,7 +29,7 @@ public class recommended_articles {
     @FXML
     private Button getRecommendation;
     @FXML
-    private TableView<Article> recommendedTable; // Updated to Article class
+    private TableView<Article> recommendedTable;
     @FXML
     private TableColumn<Article, String> articleNameColumn;
     @FXML
@@ -40,41 +40,35 @@ public class recommended_articles {
     private TableColumn<Article, String> publishedDateColumn;
 
     private MongoClient mongoClient;
+    private MongoDatabase database;
     private MongoCollection<Document> articlesCollection;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
     }
 
-    // Setter for MongoDatabase
     public void setDatabase(MongoDatabase database) {
+        this.database = database;
+        reinitializeArticlesCollection();
+    }
+
+    private void reinitializeArticlesCollection() {
         if (database != null) {
             this.articlesCollection = database.getCollection("Articles");
-            System.out.println("Articles collection initialized successfully.");
-            populateArticleTableSafely(); // Populate the table after initialization
-        } else {
-            System.out.println("Database is null. Articles collection not initialized.");
         }
     }
 
-    // Method to populate the articles table
-    private void populateArticleTable() {
+    public void populateArticleTable() {
         executorService.submit(() -> {
             try {
                 if (articlesCollection == null) {
-                    Platform.runLater(() -> showAlert("Error", "Articles collection is not initialized."));
+                    //Platform.runLater(() -> showAlert("Error", "Articles collection is not initialized."));
                     return;
                 }
 
                 List<Document> documents = articlesCollection.find().into(new ArrayList<>());
-                if (documents.isEmpty()) {
-                    Platform.runLater(() -> showAlert("Information", "No recommended articles found."));
-                    return;
-                }
-
                 List<Article> articles = new ArrayList<>();
                 for (Document doc : documents) {
                     String name = doc.getString("article_name");
@@ -84,138 +78,93 @@ public class recommended_articles {
                     String description = doc.getString("description");
                     String content = doc.getString("content");
 
-                    // Create an Article object and add to the list
                     articles.add(new Article(name, category, author, publishedDate, description, content));
                 }
 
-                // Configure table columns
-                articleNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
-                categoryColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCategory()));
-                authorColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAuthor()));
-                publishedDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPublishedDate().toString()));
-
-                // Populate the table
-                Platform.runLater(() -> recommendedTable.getItems().setAll(articles));
-
-            } catch (Exception e) {
                 Platform.runLater(() -> {
-                    showAlert("Error", "Failed to populate articles table: " + e.getMessage());
-                    e.printStackTrace();
-                });
-            }
-        });
-    }
-
-    // Safely populate the article table after ensuring initialization
-    private void populateArticleTableSafely() {
-        if (articlesCollection != null) {
-            populateArticleTable();
-        } else {
-            System.out.println("Articles collection is not yet initialized.");
-        }
-    }
-
-    // Button action to fetch recommendations
-    @FXML
-    public void getRecommendation(ActionEvent actionEvent) {
-        populateArticleTableSafely();
-    }
-
-    // Navigate to the main menu
-    @FXML
-    public void recommendedMainMenu(ActionEvent actionEvent) {
-        Platform.runLater(() -> {
-            try {
-                // Close current stage
-                Stage stage = (Stage) recommendedMainMenu.getScene().getWindow();
-                stage.close();
-
-                // Load the Main Menu scene
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
-                Stage mainMenuStage = new Stage();
-                mainMenuStage.setScene(new Scene(loader.load()));
-                mainMenuStage.setTitle("Main Menu");
-                mainMenuStage.show();
-
-                // Pass MongoClient and set database when returning
-                mainMenuStage.setOnCloseRequest(e -> {
-                    // Ensure database is reinitialized when coming back to recommended_articles
-                    if (mongoClient != null) {
-                        setDatabase(mongoClient.getDatabase("News_Recommendation")); // Repass the MongoDatabase
-                        populateArticleTableSafely(); // Refresh the table
-                    } else {
-                        System.out.println("MongoClient is null when returning from main menu.");
-                    }
+                    articleNameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
+                    categoryColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCategory()));
+                    authorColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAuthor()));
+                    publishedDateColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                            cellData.getValue().getPublishedDate() != null
+                                    ? cellData.getValue().getPublishedDate().toString()
+                                    : "N/A"
+                    ));
+                    recommendedTable.getItems().setAll(articles);
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
-                showAlert("Error", "Failed to open the Main Menu: " + e.getMessage());
+                Platform.runLater(() -> showAlert("Error", "Failed to populate articles table: " + e.getMessage()));
             }
         });
     }
 
-    // Exit the application
-    @FXML
-    public void recommendedExit(ActionEvent actionEvent) {
-        executorService.submit(() -> {
-            Stage stage = (Stage) recommendedExit.getScene().getWindow();
-            stage.close();
-        });
-    }
-
-    // Show alert helper method
-    private void showAlert(String title, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(content);
-            alert.showAndWait();
-        });
-    }
-
-    // Initialize method to set up the UI when the scene is loaded
     @FXML
     public void initialize() {
-        System.out.println("Controller initialized.");
-        // Attempt to populate the table; this will only succeed if articlesCollection is already initialized
-        populateArticleTableSafely();
+        populateArticleTable();
+    }
+
+    @FXML
+    public void getRecommendation(ActionEvent actionEvent) {
+        populateArticleTable();
     }
 
     @FXML
     public void viewArticle(ActionEvent actionEvent) {
-        // Get the selected article from the table
         Article selectedArticle = recommendedTable.getSelectionModel().getSelectedItem();
-
         if (selectedArticle == null) {
-            // If no article is selected, show an alert
             showAlert("Error", "No article selected.");
             return;
         }
 
-        // Pass the article to the view_article controller
-        Platform.runLater(() -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("view_articles.fxml"));
-                Stage viewArticleStage = new Stage();
-                Scene scene = new Scene(loader.load());
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("view_articles.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage currentStage = (Stage) recommendedTable.getScene().getWindow();
 
-                // Get the controller of the new scene
-                view_articles viewArticleController = loader.getController();
+            view_articles viewController = loader.getController();
+            viewController.setMongoClient(mongoClient);
+            viewController.setDatabase(database);
+            viewController.setArticleDetails(selectedArticle);
 
-                // Pass the article object to the view_article controller
-                viewArticleController.setArticleDetails(selectedArticle);
+            currentStage.setScene(scene);
+            currentStage.setTitle("View Article");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to open the article view: " + e.getMessage());
+        }
+    }
 
-                // Show the new scene on the FX application thread
-                viewArticleStage.setScene(scene);
-                viewArticleStage.setTitle("View Article");
-                viewArticleStage.show();
+    @FXML
+    public void recommendedMainMenu(ActionEvent actionEvent) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage currentStage = (Stage) recommendedMainMenu.getScene().getWindow();
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                Platform.runLater(() -> showAlert("Error", "Failed to open the article view: " + e.getMessage()));
-            }
-        });
+            user_main_menu mainMenuController = loader.getController();
+            mainMenuController.setMongoClient(mongoClient);
+            mainMenuController.setDatabase(database);
+
+            currentStage.setScene(scene);
+            currentStage.setTitle("Main Menu");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Failed to open the Main Menu.");
+        }
+    }
+
+    @FXML
+    public void recommendedExit(ActionEvent actionEvent) {
+        Stage stage = (Stage) recommendedExit.getScene().getWindow();
+        stage.close();
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

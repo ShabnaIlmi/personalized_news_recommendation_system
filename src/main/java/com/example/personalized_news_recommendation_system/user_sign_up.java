@@ -3,140 +3,106 @@ package com.example.personalized_news_recommendation_system;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.bson.Document;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.time.LocalDateTime;
 
-public class user_sign_up implements Initializable {
+public class user_sign_up {
+
     @FXML
-    private Button homeSignUp, signUp;
+    private TextField usernameField;
     @FXML
-    private TextField firstName, secondName, email, age;
+    private PasswordField passwordField;
     @FXML
-    private PasswordField createPassword, verifyPassword;
+    private Button signUpButton;
     @FXML
-    private ChoiceBox<String> category1, category2, category3;
+    private Button signUpHomeButton;
 
     private MongoClient mongoClient;
+    private MongoDatabase database;
     private MongoCollection<Document> userCollection;
+    private MongoCollection<Document> userLogCollection;
 
-    private static final String[] categories = {"AI", "Technology", "Health", "Education", "Fashion", "Sports", "Entertainment"};
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
-
+    // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
     }
 
+    // Setter for MongoDatabase
     public void setDatabase(MongoDatabase database) {
         if (database != null) {
             this.userCollection = database.getCollection("User");
+            this.userLogCollection = database.getCollection("User_Logs");
         }
     }
 
     @FXML
-    private void signUp(ActionEvent actionEvent) {
-        if (mongoClient == null || userCollection == null) {
-            showAlert("Database Error", "The database is not connected. Please try again later.", Alert.AlertType.ERROR);
+    void handleSignUp(ActionEvent event) {
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            showAlert("Input Error", "Please enter both username and password.", Alert.AlertType.ERROR);
             return;
         }
 
-        String fName = firstName.getText().trim();
-        String sName = secondName.getText().trim();
-        String userEmail = email.getText().trim();
-        String password = createPassword.getText();
-        String confirmPassword = verifyPassword.getText();
-        String ageValue = age.getText().trim();
-
-        if (!validateInput(fName, sName, userEmail, password, confirmPassword, ageValue)) {
+        if (isUsernameTaken(username)) {
+            showAlert("Sign-Up Error", "Username already taken. Please choose another.", Alert.AlertType.ERROR);
             return;
         }
 
-        String username = generateUsername(fName, sName);
-        int userAge = Integer.parseInt(ageValue);
+        // Add user to the database
+        Document newUser = new Document("username", username)
+                .append("password", password)
+                .append("created_date_time", LocalDateTime.now().toString());
+        userCollection.insertOne(newUser);
 
-        Document newUser = new Document()
-                .append("first_name", fName)
-                .append("last_name", sName)
-                .append("email", userEmail)
-                .append("age", userAge)
-                .append("categories", Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()))
-                .append("username", username)
-                .append("password", password);
+        // Log the user sign-up action
+        logUserSignUp(username);
 
-        try {
-            userCollection.insertOne(newUser);
-            showAlert("Registration Successful",
-                    "Your account has been created!\nUsername: " + username + "\nPassword: " + password,
-                    Alert.AlertType.INFORMATION);
-            navigateToMainMenu(actionEvent);
-        } catch (Exception e) {
-            showAlert("Database Error", "An error occurred while saving to the database.", Alert.AlertType.ERROR);
-            e.printStackTrace();
-        }
+        showAlert("Sign-Up Success", "Account created successfully! You can now log in.", Alert.AlertType.INFORMATION);
+        navigateToLogIn(event);
     }
 
-    private String generateUsername(String firstName, String lastName) {
-        return firstName.toLowerCase() + lastName.toLowerCase() + "@swiftly.com";
+    private boolean isUsernameTaken(String username) {
+        return userCollection.find(new Document("username", username)).first() != null;
     }
 
-    private boolean validateInput(String fName, String sName, String userEmail, String password, String confirmPassword, String ageValue) {
-        if (fName.isEmpty() || sName.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || ageValue.isEmpty()) {
-            showAlert("Registration Failed", "All fields are required.", Alert.AlertType.ERROR);
-            return false;
-        }
+    private void logUserSignUp(String username) {
+        // Create the session ID (starting from "001" for new users)
+        String sessionId = generateSessionId(username);
 
-        if (!password.equals(confirmPassword)) {
-            showAlert("Registration Failed", "Passwords do not match.", Alert.AlertType.ERROR);
-            return false;
-        }
-
-        if (!EMAIL_PATTERN.matcher(userEmail).matches()) {
-            showAlert("Invalid Email", "Enter a valid email address.", Alert.AlertType.ERROR);
-            return false;
-        }
-
-        try {
-            int age = Integer.parseInt(ageValue);
-            if (age <= 0) {
-                showAlert("Invalid Age", "Enter a valid age.", Alert.AlertType.ERROR);
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Age", "Age must be a number.", Alert.AlertType.ERROR);
-            return false;
-        }
-
-        // Check for distinct categories
-        String cat1 = category1.getValue();
-        String cat2 = category2.getValue();
-        String cat3 = category3.getValue();
-
-        if (cat1 == null || cat2 == null || cat3 == null) {
-            showAlert("Invalid Categories", "Please select three categories.", Alert.AlertType.ERROR);
-            return false;
-        }
-
-        if (cat1.equals(cat2) || cat1.equals(cat3) || cat2.equals(cat3)) {
-            showAlert("Invalid Categories", "Please select three distinct categories.", Alert.AlertType.ERROR);
-            return false;
-        }
-
-        return true;
+        Document log = new Document("user_id", username)
+                .append("session_id", sessionId)  // Log the session ID
+                .append("action", "Sign-Up")
+                .append("logged_date_time", LocalDateTime.now().toString());
+        userLogCollection.insertOne(log);
     }
 
+    private String generateSessionId(String username) {
+        // Logic to generate a session ID (incremental, starting from "001")
+        Document lastSessionDoc = userLogCollection.find(new Document("user_id", username))
+                .sort(new Document("logged_date_time", -1)).first();
+
+        int lastSessionNumber = 0;
+        if (lastSessionDoc != null) {
+            String lastSessionId = lastSessionDoc.getString("session_id");
+            lastSessionNumber = Integer.parseInt(lastSessionId);
+        }
+
+        return String.format("%03d", lastSessionNumber + 1);  // Increment session number
+    }
 
     private void showAlert(String title, String content, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
@@ -146,34 +112,27 @@ public class user_sign_up implements Initializable {
         alert.showAndWait();
     }
 
-    private void navigateToMainMenu(ActionEvent actionEvent) {
+    private void navigateToLogIn(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
-            Scene userMainMenuScene = new Scene(loader.load());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_log_in.fxml"));
+            Scene logInScene = new Scene(loader.load());
 
-            user_main_menu userMainMenuController = loader.getController();
-            userMainMenuController.setMongoClient(mongoClient);
-            userMainMenuController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+            user_log_in logInController = loader.getController();
+            logInController.setMongoClient(mongoClient);
+            logInController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-            currentStage.setScene(userMainMenuScene);
-            currentStage.setTitle("Personalized News Recommendation System - Main Menu");
+            currentStage.setScene(logInScene);
+            currentStage.setTitle("User Log In");
             currentStage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the main menu.", Alert.AlertType.ERROR);
+            showAlert("Navigation Error", "Failed to load the log-in page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        category1.getItems().addAll(categories);
-        category2.getItems().addAll(categories);
-        category3.getItems().addAll(categories);
-    }
-
     @FXML
-    public void homeSignUp(ActionEvent actionEvent) {
+    public void handleHomeNavigation(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
             Scene homeScene = new Scene(loader.load());
@@ -184,20 +143,11 @@ public class user_sign_up implements Initializable {
 
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             currentStage.setScene(homeScene);
-            currentStage.setTitle("Personalized News Recommendation System - Home");
+            currentStage.setTitle("Home");
             currentStage.show();
         } catch (IOException e) {
             showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
-    }
-
-    public void category1(MouseEvent mouseEvent) {
-    }
-
-    public void category2(MouseEvent mouseEvent) {
-    }
-
-    public void category3(MouseEvent mouseEvent) {
     }
 }

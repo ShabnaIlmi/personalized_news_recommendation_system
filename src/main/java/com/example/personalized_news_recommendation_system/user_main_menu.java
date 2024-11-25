@@ -21,10 +21,6 @@ public class user_main_menu {
     @FXML
     private Button recommendedArticles;
     @FXML
-    private Button readArticles;
-    @FXML
-    private Button viewArticles;
-    @FXML
     private Button mainMenuExit;
 
     private MongoClient mongoClient;
@@ -54,18 +50,6 @@ public class user_main_menu {
         navigateToPage("recommended_articles.fxml", "Recommended Articles", event);
     }
 
-    // Handle Read Articles Button Action
-    @FXML
-    public void readArticles(ActionEvent event) {
-        navigateToPage("read_articles.fxml", "Read Articles", event);
-    }
-
-    // Handle View Articles Button Action
-    @FXML
-    public void viewArticles(ActionEvent event) {
-        navigateToPage("view_articles.fxml", "View Articles", event);
-    }
-
     // Handle Exit Button Action
     @FXML
     public void mainMenuExit(ActionEvent event) {
@@ -91,18 +75,10 @@ public class user_main_menu {
                     recommendedController.setMongoClient(mongoClient);
                     recommendedController.setDatabase(database);
                     recommendedController.initialize();  // Ensure table is populated
-                } else if (controller instanceof manage_profile) {
-                    manage_profile manageController = (manage_profile) controller;
-                    // manageController.setMongoClient(mongoClient);  // Pass MongoDB if needed
-                    // manageController.setDatabase(database);     // Pass MongoDB if needed
-                } else if (controller instanceof read_articles) {
-                    read_articles readController = (read_articles) controller;
-                    // readController.setMongoClient(mongoClient);
-                    // readController.setDatabase(database);
-                } else if (controller instanceof view_articles) {
-                    view_articles viewController = (view_articles) controller;
-                    viewController.setMongoClient(mongoClient);
-                    viewController.setDatabase(database);
+                } else if (controller instanceof manage_articles) {
+                    manage_articles manageController = (manage_articles) controller;
+                    manageController.setMongoClient(mongoClient);
+                    manageController.setDatabase(database);
                 }
 
                 // Set the new scene to the current stage
