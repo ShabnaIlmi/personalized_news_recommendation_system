@@ -68,10 +68,25 @@ public class recommended_articles {
     void populateRecommendedTable() {
         executorService.submit(() -> {
             try {
+                if (articlesCollection == null) {
+                    Platform.runLater(() -> showAlert("Error", "Articles collection is null.", Alert.AlertType.ERROR));
+                    return;
+                }
+
                 List<Document> articles = articlesCollection.find().into(new ArrayList<>());
+                if (articles.isEmpty()) {
+                    Platform.runLater(() -> showAlert("Error", "No articles found in the database.", Alert.AlertType.ERROR));
+                    return;
+                }
+
                 List<Article> articleList = convertDocumentsToArticles(articles);
-                Platform.runLater(() -> recommendedTable.getItems().setAll(articleList));
+
+                Platform.runLater(() -> {
+                    recommendedTable.getItems().setAll(articleList);
+                    System.out.println("Populated articles count: " + articleList.size()); // Debugging log
+                });
             } catch (Exception e) {
+                e.printStackTrace(); // Print the stack trace for debugging
                 Platform.runLater(() -> showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR));
             }
         });
@@ -80,6 +95,12 @@ public class recommended_articles {
     private List<Article> convertDocumentsToArticles(List<Document> documents) {
         List<Article> articles = new ArrayList<>();
         for (Document doc : documents) {
+            // Check if critical fields are missing
+            if (doc.getString("article_id") == null || doc.getString("article_name") == null) {
+                System.out.println("Warning: Missing article_id or article_name in document.");
+                continue; // Skip this document if it's missing critical fields
+            }
+
             articles.add(new Article(
                     doc.getString("article_id"),
                     doc.getString("article_name"),

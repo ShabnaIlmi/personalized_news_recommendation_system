@@ -3,6 +3,7 @@ package com.example.personalized_news_recommendation_system;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -12,7 +13,15 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.bson.Document;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -47,7 +56,7 @@ public class add_article {
             this.articlesCollection = database.getCollection("Articles");
             System.out.println("Articles collection initialized: " + articlesCollection.getNamespace());
         } else {
-            System.err.println("Database is null. Cannot initialize articles collection.");
+            showError("Database Initialization Error", "Database is null. Cannot initialize articles collection.");
         }
     }
 
@@ -55,10 +64,7 @@ public class add_article {
     @FXML
     public void submitArticle() {
         try {
-            // Ensure the collection is initialized
-            if (articlesCollection == null) {
-                throw new IllegalStateException("Articles collection not initialized.");
-            }
+            validateMongoCollection();
 
             // Get data from the input fields
             String id = articleID.getText();
@@ -67,53 +73,137 @@ public class add_article {
             String publishedDate = (publishedDatePicker.getValue() != null) ? publishedDatePicker.getValue().toString() : "";
             String articleDescription = description.getText();
             String content = contentArea.getText();
-            String category = "General"; // Default category or retrieve from UI
 
             // Validate input fields
-            if (id.isEmpty() || title.isEmpty() || author.isEmpty() || content.isEmpty() || publishedDate.isEmpty() || articleDescription.isEmpty()) {
-                showAlert("Validation Error", "Please fill all fields before submitting.");
-                return;
-            }
+            validateInputFields(id, title, author, publishedDate, articleDescription, content);
 
-            // Check if an article with the same articleID already exists
-            Document existingArticle = articlesCollection.find(new Document("articleID", id)).first();
-            if (existingArticle != null) {
+            // Check for duplicate articleID
+            if (isDuplicateArticle(id)) {
                 showAlert("Validation Error", "An article with the same Article ID already exists. Please use a unique ID.");
                 return;
             }
 
+            // Predict the category using Hugging Face
+            String category = predictCategory(content, labels);
+
             // Get the current timestamp in ISO 8601 format
-            String articleAddedTime = Instant.now()
-                    .atZone(ZoneId.of("UTC"))
-                    .format(DateTimeFormatter.ISO_INSTANT);
+            String articleAddedTime = getCurrentTimestamp();
 
-            // Create the MongoDB document
-            Document article = new Document("articleID", id)
-                    .append("articleName", title)
-                    .append("author", author)
-                    .append("publishedDate", publishedDate)
-                    .append("article_added_time", articleAddedTime)
-                    .append("description", articleDescription)
-                    .append("content", content)
-                    .append("category", category);
-
-            // Insert the document into the database
+            // Create and insert the article document into MongoDB
+            Document article = createArticleDocument(id, title, author, publishedDate, articleAddedTime, articleDescription, content, category);
             articlesCollection.insertOne(article);
 
             // Show success message
-            showAlert("Success", "Article added successfully.");
+            Platform.runLater(() -> showAlert("Success", "Article added successfully under category: " + category));
 
             // Clear input fields after submission
             clearFields();
-
+        } catch (IllegalStateException e) {
+            showError("Database Error", e.getMessage());
         } catch (Exception e) {
-            // Handle any errors
-            showAlert("Error", "Failed to submit the article: " + e.getMessage());
-            e.printStackTrace();
+            showError("Unexpected Error", e.getMessage());
         }
     }
 
-    // Helper method to show an alert dialog
+    // Validate the MongoDB collection
+    private void validateMongoCollection() {
+        if (articlesCollection == null) {
+            throw new IllegalStateException("Articles collection not initialized.");
+        }
+    }
+
+    // Validate input fields
+    private void validateInputFields(String... fields) {
+        for (String field : fields) {
+            if (field == null || field.isEmpty()) {
+                throw new IllegalArgumentException("All fields must be filled before submitting.");
+            }
+        }
+    }
+
+    // Check for duplicate articles by ID
+    private boolean isDuplicateArticle(String id) {
+        return articlesCollection.find(new Document("articleID", id)).first() != null;
+    }
+
+    private final String[] labels = {"politics", "technology", "health", "business", "education"};
+    // Predict the category using Hugging Face API
+    private String predictCategory(String content, String[] labels) throws Exception {
+        String apiUrl = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli";
+        String token = "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";
+
+        String payload = constructPayload(content, labels);
+
+        // Send request and parse response
+        return sendCategoryPredictionRequest(apiUrl, token, payload);
+    }
+
+    // Construct JSON payload for API request
+    private String constructPayload(String content, String[] labels) {
+        return String.format("{\"inputs\": \"%s\", \"parameters\": {\"candidate_labels\": [\"%s\"]}}",
+                content.replace("\"", "\\\""),
+                String.join("\", \"", labels));
+    }
+
+    // Send category prediction request and parse the response
+    private String sendCategoryPredictionRequest(String apiUrl, String token, String payload) throws Exception {
+        URL url = new URL(apiUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Authorization", "Bearer " + token);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
+
+        // Write payload
+        try (OutputStream os = connection.getOutputStream()) {
+            os.write(payload.getBytes(StandardCharsets.UTF_8));
+        }
+
+        // Read response
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+            String responseLine;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+        }
+
+        return parseCategoryFromResponse(response.toString());
+    }
+
+    // Parse category from API response using org.json
+    private String parseCategoryFromResponse(String response) throws Exception {
+        JSONObject jsonResponse = new JSONObject(response);
+        JSONArray labelsArray = jsonResponse.optJSONArray("labels");
+
+        if (labelsArray == null || labelsArray.length() == 0) {
+            throw new Exception("Response does not contain valid 'labels' field.");
+        }
+
+        // Return the top label
+        return labelsArray.getString(0);
+    }
+
+    // Get current timestamp in ISO 8601 format
+    private String getCurrentTimestamp() {
+        return Instant.now()
+                .atZone(ZoneId.of("UTC"))
+                .format(DateTimeFormatter.ISO_INSTANT);
+    }
+
+    // Create MongoDB document for the article
+    private Document createArticleDocument(String id, String title, String author, String publishedDate, String articleAddedTime, String description, String content, String category) {
+        return new Document("articleID", id)
+                .append("articleName", title)
+                .append("author", author)
+                .append("publishedDate", publishedDate)
+                .append("article_added_time", articleAddedTime)
+                .append("description", description)
+                .append("content", content)
+                .append("category", category);
+    }
+
+    // Show an alert dialog
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
@@ -122,7 +212,16 @@ public class add_article {
         alert.showAndWait();
     }
 
-    // Helper method to clear input fields
+    // Show an error dialog
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    // Clear input fields
     private void clearFields() {
         articleID.clear();
         articleNameField.clear();
@@ -136,26 +235,22 @@ public class add_article {
     @FXML
     public void addMainMenu() {
         try {
-            // Close the current window
             Stage stage = (Stage) articleNameField.getScene().getWindow();
             stage.close();
 
-            // Open the main menu window
             FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
             Stage mainMenuStage = new Stage();
             mainMenuStage.setScene(new Scene(loader.load()));
             mainMenuStage.setTitle("Main Menu");
             mainMenuStage.show();
         } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Error", "Failed to open the Main Menu: " + e.getMessage());
+            showError("Error", "Failed to open the Main Menu: " + e.getMessage());
         }
     }
 
     // Handle the "Exit" button action
     @FXML
     public void exitArticle() {
-        // Close the current window
         Stage stage = (Stage) articleNameField.getScene().getWindow();
         stage.close();
     }
