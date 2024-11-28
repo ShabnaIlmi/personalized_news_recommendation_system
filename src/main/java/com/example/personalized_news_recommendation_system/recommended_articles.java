@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 import org.bson.Document;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -39,23 +40,18 @@ public class recommended_articles {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-    // Set MongoClient and Database
+    // List to store session interactions
+    private List<Document> sessionInteractions = new ArrayList<>();
+
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        if (mongoClient != null) {
-            System.out.println("MongoClient successfully set in Recommended Articles.");
-        } else {
-            System.err.println("MongoClient is null in Recommended Articles.");
-        }
     }
 
     public void setDatabase(MongoDatabase database) {
+        this.database = database;
         if (database != null) {
             this.articlesCollection = database.getCollection("Articles");
-            System.out.println("Collections initialized successfully.");
             populateRecommendedTable(); // Populate table after collections are initialized
-        } else {
-            System.err.println("Database is null. Cannot initialize collections.");
         }
     }
 
@@ -64,39 +60,23 @@ public class recommended_articles {
         this.currentSessionId = sessionId;
     }
 
-    // Populate the article table
-    void populateRecommendedTable() {
-        if (articlesCollection == null) {
-            System.err.println("Articles collection not initialized.");
-            return;
-        }
+    public void setSessionInteractions(List<Document> sessionInteractions) {
+        this.sessionInteractions = sessionInteractions;
+    }
 
+    // Populate the recommended articles table
+    void populateRecommendedTable() {
         executorService.submit(() -> {
             try {
-                // Fetch all articles from the collection
                 List<Document> articles = articlesCollection.find().into(new ArrayList<>());
-                System.out.println("Articles Retrieved: " + articles.size());
-
-                if (articles.isEmpty()) {
-                    // Display placeholder message if no articles are found
-                    Platform.runLater(() -> recommendedTable.setPlaceholder(new Label("No articles available.")));
-                    return;
-                }
-
-                // Convert MongoDB documents to Article objects
                 List<Article> articleList = convertDocumentsToArticles(articles);
-
-                // Update the table on the UI thread
                 Platform.runLater(() -> recommendedTable.getItems().setAll(articleList));
             } catch (Exception e) {
-                // Handle any errors during fetching or populating
                 Platform.runLater(() -> showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR));
-                e.printStackTrace();
             }
         });
     }
 
-    // Convert database documents to Article objects
     private List<Article> convertDocumentsToArticles(List<Document> documents) {
         List<Article> articles = new ArrayList<>();
         for (Document doc : documents) {
@@ -113,7 +93,7 @@ public class recommended_articles {
         return articles;
     }
 
-    // View selected article
+    // Handle the action when viewing an article
     @FXML
     public void viewArticle(ActionEvent actionEvent) {
         Article selectedArticle = recommendedTable.getSelectionModel().getSelectedItem();
@@ -122,7 +102,7 @@ public class recommended_articles {
             return;
         }
 
-        storeViewedArticle(selectedArticle);
+        logInteraction(selectedArticle, "view");
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("view_articles.fxml"));
@@ -135,6 +115,7 @@ public class recommended_articles {
             controller.setUserDetails(currentUserId, currentSessionId);
             controller.setArticleDetails(selectedArticle);
 
+            controller.setSessionInteractions(sessionInteractions); // Pass session interactions
             currentStage.setScene(scene);
             currentStage.setTitle("View Article");
         } catch (IOException e) {
@@ -142,60 +123,18 @@ public class recommended_articles {
         }
     }
 
-    // Store viewed article to user preferences
-    private void storeViewedArticle(Article selectedArticle) {
-        try {
-            MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
-            Document userPreferencesDoc = userPreferencesCollection.find(new Document("user_id", currentUserId)).first();
-
-            List<String> viewedArticles = userPreferencesDoc != null ?
-                    userPreferencesDoc.getList("viewed_articles", String.class) : new ArrayList<>();
-
-            if (!viewedArticles.contains(selectedArticle.getId())) {
-                viewedArticles.add(selectedArticle.getId());
-                userPreferencesCollection.updateOne(
-                        new Document("user_id", currentUserId),
-                        new Document("$set", new Document("viewed_articles", viewedArticles))
-                );
-            }
-        } catch (Exception e) {
-            Platform.runLater(() -> showAlert("Error", "Failed to store viewed article: " + e.getMessage(), Alert.AlertType.ERROR));
-        }
+    // Log the user interaction with the article (view, like, etc.)
+    private void logInteraction(Article article, String interactionType) {
+        Document interaction = new Document("articleId", article.getId())
+                .append("articleName", article.getName())
+                .append("timestamp", Instant.now().toString())
+                .append("interactionType", interactionType);
+        sessionInteractions.add(interaction);  // Accumulate interactions in the session
     }
 
-    // Fetch and display recommended articles
-    @FXML
-    public void getRecommendation(ActionEvent actionEvent) {
-        executorService.submit(() -> {
-            try {
-                MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
-                Document userPreferencesDoc = userPreferencesCollection.find(new Document("user_id", currentUserId)).first();
-
-                if (userPreferencesDoc == null) {
-                    Platform.runLater(() -> showAlert("Info", "No preferences found for this user.", Alert.AlertType.INFORMATION));
-                    return;
-                }
-
-                List<String> viewedArticles = userPreferencesDoc.getList("viewed_articles", String.class);
-                List<String> preferredCategories = userPreferencesDoc.getList("preferred_categories", String.class);
-
-                MongoCollection<Document> articlesCollection = database.getCollection("Articles");
-                List<Document> recommendedDocs = articlesCollection.find(new Document("category", new Document("$in", preferredCategories))
-                                .append("_id", new Document("$nin", viewedArticles)))
-                        .into(new ArrayList<>());
-
-                List<Article> recommendedArticles = convertDocumentsToArticles(recommendedDocs);
-
-                Platform.runLater(() -> recommendedTable.getItems().setAll(recommendedArticles));
-            } catch (Exception e) {
-                Platform.runLater(() -> showAlert("Error", "Failed to fetch recommendations: " + e.getMessage(), Alert.AlertType.ERROR));
-            }
-        });
-    }
-
-    // Navigate to main menu
     @FXML
     public void recommendedMainMenu(ActionEvent actionEvent) {
+        storeSessionInteractions();  // Save session data before navigating to the main menu
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
             Scene scene = new Scene(loader.load());
@@ -213,14 +152,28 @@ public class recommended_articles {
         }
     }
 
-    // Exit the application
     @FXML
     public void recommendedExit(ActionEvent actionEvent) {
+        storeSessionInteractions();  // Save session data before exiting
         Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
         currentStage.close();
     }
 
-    // Display alert messages
+    // Store all session interactions in the database
+    private void storeSessionInteractions() {
+        if (mongoClient == null || database == null || sessionInteractions.isEmpty()) return;
+
+        MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
+
+        Document sessionDocument = new Document("userId", currentUserId)
+                .append("sessionId", currentSessionId)
+                .append("interactions", sessionInteractions)
+                .append("sessionEnd", Instant.now().toString());
+
+        userPreferencesCollection.insertOne(sessionDocument);  // Store the entire session of interactions
+        sessionInteractions.clear();  // Clear session interactions after saving
+    }
+
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -229,14 +182,8 @@ public class recommended_articles {
         alert.showAndWait();
     }
 
-    // Shutdown the executor service
-    public void shutdownExecutor() {
-        executorService.shutdown();
-    }
-
     @FXML
     private void initialize() {
-        // Bind Article properties to TableView columns
         articleNameColumn.setCellValueFactory(cellData ->
                 new SimpleStringProperty(cellData.getValue().getName())
         );
@@ -247,7 +194,11 @@ public class recommended_articles {
                 new SimpleStringProperty(cellData.getValue().getAuthor())
         );
         publishedDateColumn.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getPublishedDate().toString()));
+                new SimpleStringProperty(cellData.getValue().getPublishedDate().toString())
+        );
+    }
 
+    public void getRecommendation(ActionEvent actionEvent) {
+        // Implement recommendation logic here if needed
     }
 }
