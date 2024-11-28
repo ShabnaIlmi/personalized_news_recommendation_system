@@ -8,6 +8,7 @@ module com.example.personalized_news_recommendation_system {
     requires org.apache.opennlp.tools;
     requires java.logging;
     requires java.sql;
+    requires json;
 
 
     opens com.example.personalized_news_recommendation_system to javafx.fxml;
