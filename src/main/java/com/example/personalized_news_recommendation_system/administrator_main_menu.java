@@ -72,7 +72,7 @@ public class administrator_main_menu {
 
             manage_articles manageArticleController = loader.getController();
             manageArticleController.setMongoClient(mongoClient);
-            manageArticleController.setDatabase(database);
+            manageArticleController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
             Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             currentStage.setScene(updateArticleScene);

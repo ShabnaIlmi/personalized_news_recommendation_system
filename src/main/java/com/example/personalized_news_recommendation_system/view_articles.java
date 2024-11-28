@@ -98,9 +98,11 @@ public class view_articles {
     private void logInteraction(Article article, String interactionType) {
         Document interaction = new Document("articleId", article.getId())
                 .append("articleName", article.getName())
+                .append("category", article.getCategory())
                 .append("timestamp", Instant.now().toString())
                 .append("interactionType", interactionType);
-        sessionInteractions.add(interaction);  // Accumulate interactions in the session
+        sessionInteractions.add(interaction);
+        System.out.println("Logged interaction: " + interaction);
     }
 
     @FXML

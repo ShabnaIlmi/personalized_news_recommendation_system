@@ -11,11 +11,22 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.bson.Document;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class manage_articles {
+
     @FXML
     private Button updateButton, deleteButton, manageMainMenu, manageExit;
     @FXML
@@ -30,6 +41,7 @@ public class manage_articles {
     private DatePicker publishedDatePicker;
 
     private MongoClient mongoClient;
+    private MongoDatabase database;
     private MongoCollection<Document> articlesCollection;
     private MongoCollection<Document> updatedArticlesCollection;
     private MongoCollection<Document> deletedArticlesCollection;
@@ -90,7 +102,7 @@ public class manage_articles {
             articleTable.getItems().setAll(articles);
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to populate article table: " + e.getMessage());
+            showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -101,44 +113,47 @@ public class manage_articles {
         try {
             Document selectedArticle = articleTable.getSelectionModel().getSelectedItem();
             if (selectedArticle == null) {
-                showAlert("Error", "Please select an article to update.");
+                showAlert("Error", "Please select an article to update.", Alert.AlertType.ERROR);
                 return;
             }
 
             if (!validateInputs()) {
-                showAlert("Error", "Please fill in all required fields.");
+                showAlert("Error", "Please fill in all required fields.", Alert.AlertType.ERROR);
                 return;
             }
 
-            // Get the current time for the update
-            String currentTime = java.time.LocalDateTime.now().toString();
+            // Get the content of the article to predict the category
+            String content = manageContent.getText();
 
-            // Prepare the updated article document
+            // Predict the category using Hugging Face BART model (same logic as in add_article class)
+            String category = predictCategory(content, new String[]{"politics", "technology", "health", "business", "education"});
+
+            // Get the current time for the update
+            String currentTime = LocalDateTime.now().toString();
+
+            // Prepare the updated article document with the predicted category
             Document updatedArticle = new Document("article_name", articleNameField.getText())
-                    .append("category", categoryField.getText())
+                    .append("category", category)  // Use the predicted category
                     .append("author", authorField.getText())
                     .append("description", manageDescription.getText())
-                    .append("content", manageContent.getText())
+                    .append("content", content)
                     .append("published_date", publishedDatePicker.getValue().toString())
                     .append("article_added_time", currentTime); // Add or update the time
 
             // Perform the update in the database
             articlesCollection.updateOne(
-                    new Document("_id", selectedArticle.getObjectId("_id")),
+                    new Document("article_id", selectedArticle.getString("article_id")),
                     new Document("$set", updatedArticle)
             );
 
-            // Insert the updated article into the 'Updated_Articles' collection
+            // Insert updated record into Updated_Articles collection
             updatedArticlesCollection.insertOne(updatedArticle);
 
-            // Refresh the table and clear input fields
-            populateArticleTable();
-            clearFields();
-
-            showAlert("Success", "Article updated successfully.");
+            showAlert("Success", "Article updated successfully with predicted category: " + category, Alert.AlertType.ERROR);
+            populateArticleTable(); // Refresh table
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to update article: " + e.getMessage());
+            showAlert("Error", "Failed to update article: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -149,23 +164,74 @@ public class manage_articles {
         try {
             Document selectedArticle = articleTable.getSelectionModel().getSelectedItem();
             if (selectedArticle == null) {
-                showAlert("Error", "Please select an article to delete.");
+                showAlert("Error", "Please select an article to delete.", Alert.AlertType.ERROR);
                 return;
             }
 
-            articlesCollection.deleteOne(new Document("_id", selectedArticle.getObjectId("_id")));
+            // Perform delete operation
+            articlesCollection.deleteOne(new Document("article_id", selectedArticle.getString("article_id")));
+
+            // Add deleted article to Deleted_Articles collection
             deletedArticlesCollection.insertOne(selectedArticle);
 
-            populateArticleTable();
+            showAlert("Success", "Article deleted successfully!", Alert.AlertType.ERROR);
+            populateArticleTable(); // Refresh table
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to delete article: " + e.getMessage());
+            showAlert("Error", "Failed to delete article: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
 
-    // Show alert dialog
-    private void showAlert(String title, String content) {
+    // Handle the "Main Menu" button action
+    @FXML
+    public void manageMainMenu(ActionEvent actionEvent) {
+        try {
+            // Close the current stage
+            Stage currentStage = (Stage) articleNameField.getScene().getWindow();
+            currentStage.close();
+
+            // Load the administrator main menu FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            // Get the controller of the new FXML
+            administrator_main_menu controller = loader.getController();
+
+            // Pass the mongoClient, database, and any other required information to the new controller
+            controller.setMongoClient(mongoClient);
+            controller.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+
+            // Set up the new stage and show the main menu
+            Stage mainMenuStage = new Stage();
+            mainMenuStage.setScene(scene);
+            mainMenuStage.setTitle("Main Menu");
+            mainMenuStage.show();
+        } catch (IOException e) {
+            showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+
+    }
+
+    // Handle the "Exit" button action
+    @FXML
+    public void manageExit(ActionEvent actionEvent) {
+        Stage stage = (Stage) articleNameField.getScene().getWindow();
+        stage.close();
+    }
+
+    // Validate inputs for update operation
+    private boolean validateInputs() {
+        return !(articleNameField.getText().isEmpty() ||
+                categoryField.getText().isEmpty() ||
+                authorField.getText().isEmpty() ||
+                manageDescription.getText().isEmpty() ||
+                manageContent.getText().isEmpty() ||
+                publishedDatePicker.getValue() == null);
+    }
+
+    // Show an alert dialog
+    private void showAlert(String title, String content, Alert.AlertType error) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -173,50 +239,57 @@ public class manage_articles {
         alert.showAndWait();
     }
 
-    // Validate user inputs
-    private boolean validateInputs() {
-        return !articleNameField.getText().isEmpty() && !categoryField.getText().isEmpty() && !authorField.getText().isEmpty();
+    // BART-based categorization (Hugging Face API integration)
+    private String predictCategory(String content, String[] labels) throws Exception {
+        String apiUrl = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli";
+        String token = "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";
+
+        String payload = constructPayload(content, labels);
+
+        // Send request and parse response
+        return sendCategoryPredictionRequest(apiUrl, token, payload);
     }
 
-    // Clear input fields
-    private void clearFields() {
-        articleNameField.clear();
-        categoryField.clear();
-        authorField.clear();
-        manageDescription.clear();
-        manageContent.clear();
-        publishedDatePicker.setValue(null);
+    private String constructPayload(String content, String[] labels) {
+        return String.format("{\"inputs\": \"%s\", \"parameters\": {\"candidate_labels\": [\"%s\"]}}",
+                content.replace("\"", "\\\""),
+                String.join("\", \"", labels));
     }
 
-    // Navigate to the main menu
-    @FXML
-    public void manageMainMenu(ActionEvent actionEvent) {
-        try {
-            Stage stage = (Stage) articleNameField.getScene().getWindow();
-            stage.close();
+    private String sendCategoryPredictionRequest(String apiUrl, String token, String payload) throws Exception {
+        URL url = new URL(apiUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Authorization", "Bearer " + token);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
-            Stage mainMenuStage = new Stage();
-            mainMenuStage.setScene(new Scene(loader.load()));
-            mainMenuStage.setTitle("Main Menu");
-            mainMenuStage.show();
-
-        } catch (Exception e) {
-            showAlert("Error", "Failed to open the Main Menu: " + e.getMessage());
-            e.printStackTrace();
+        // Write payload
+        try (OutputStream os = connection.getOutputStream()) {
+            os.write(payload.getBytes(StandardCharsets.UTF_8));
         }
+
+        // Read response
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+            String responseLine;
+            while ((responseLine = br.readLine()) != null) {
+                response.append(responseLine.trim());
+            }
+        }
+
+        return parseCategoryFromResponse(response.toString());
     }
 
-    // Exit the application
-    @FXML
-    public void manageExit(ActionEvent actionEvent) {
-        Stage stage = (Stage) articleNameField.getScene().getWindow();
-        stage.close();
-    }
+    private String parseCategoryFromResponse(String response) throws Exception {
+        JSONObject jsonResponse = new JSONObject(response);
+        JSONArray labelsArray = jsonResponse.optJSONArray("labels");
 
-    // Initialize method
-    @FXML
-    public void initialize() {
-        System.out.println("Manage Articles Page Initialized.");
+        if (labelsArray == null || labelsArray.length() == 0) {
+            throw new Exception("Response does not contain valid 'labels' field.");
+        }
+
+        // Return the top label
+        return labelsArray.getString(0);
     }
 }

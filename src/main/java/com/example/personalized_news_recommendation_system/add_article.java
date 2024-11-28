@@ -4,6 +4,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -79,7 +81,7 @@ public class add_article {
 
             // Check for duplicate articleID
             if (isDuplicateArticle(id)) {
-                showAlert("Validation Error", "An article with the same Article ID already exists. Please use a unique ID.");
+                showAlert("Validation Error", "An article with the same Article ID already exists. Please use a unique ID.", Alert.AlertType.ERROR);
                 return;
             }
 
@@ -94,7 +96,7 @@ public class add_article {
             articlesCollection.insertOne(article);
 
             // Show success message
-            Platform.runLater(() -> showAlert("Success", "Article added successfully under category: " + category));
+            Platform.runLater(() -> showAlert("Success", "Article added successfully under category: " + category, Alert.AlertType.ERROR));
 
             // Clear input fields after submission
             clearFields();
@@ -204,7 +206,7 @@ public class add_article {
     }
 
     // Show an alert dialog
-    private void showAlert(String title, String content) {
+    private void showAlert(String title, String content, Alert.AlertType error) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -233,18 +235,30 @@ public class add_article {
 
     // Handle the "Main Menu" button action
     @FXML
-    public void addMainMenu() {
+    public void addMainMenu(ActionEvent actionEvent) {
         try {
-            Stage stage = (Stage) articleNameField.getScene().getWindow();
-            stage.close();
+            // Close the current stage
+            Stage currentStage = (Stage) articleNameField.getScene().getWindow();
+            currentStage.close();
 
+            // Load the administrator main menu FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            // Get the controller of the new FXML
+            administrator_main_menu controller = loader.getController();
+
+            // Pass the mongoClient, database, and any other required information to the new controller
+            controller.setMongoClient(mongoClient);
+            controller.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+
+            // Set up the new stage and show the main menu
             Stage mainMenuStage = new Stage();
-            mainMenuStage.setScene(new Scene(loader.load()));
+            mainMenuStage.setScene(scene);
             mainMenuStage.setTitle("Main Menu");
             mainMenuStage.show();
-        } catch (Exception e) {
-            showError("Error", "Failed to open the Main Menu: " + e.getMessage());
+        } catch (IOException e) {
+            showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

@@ -108,14 +108,13 @@ public class read_articles {
 
     // Log interaction with article (like/dislike)
     private void logInteraction(String interactionType, boolean liked, boolean disliked) {
-        if (article != null) {
-            Document interaction = new Document("articleId", article.getId())
-                    .append("articleName", article.getName())
-                    .append("sessionId", currentSessionId)
-                    .append("interactionType", interactionType)
-                    .append("timestamp", Instant.now().toString());
-            sessionInteractions.add(interaction);  // Add the interaction to the session list
-        }
+        Document interaction = new Document("articleId", article.getId())
+                .append("articleName", article.getName())
+                .append("category", article.getCategory())
+                .append("timestamp", Instant.now().toString())
+                .append("interactionType", interactionType);
+        sessionInteractions.add(interaction);
+        System.out.println("Logged interaction: " + interaction);
     }
 
     // Store all interactions in the session to the MongoDB
