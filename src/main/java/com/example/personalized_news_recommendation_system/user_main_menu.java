@@ -17,7 +17,7 @@ import java.io.IOException;
 public class user_main_menu {
 
     @FXML
-    private Button manageArticles;
+    private Button manageProfile;
     @FXML
     private Button recommendedArticles;
     @FXML
@@ -46,7 +46,7 @@ public class user_main_menu {
     }
 
     @FXML
-    public void manageArticles(ActionEvent event) {
+    public void manageProfile(ActionEvent event) {
         navigateToPage("manage_profile.fxml", "Manage Profile", event);
     }
 
@@ -66,10 +66,12 @@ public class user_main_menu {
     private void navigateToPage(String fxmlFileName, String pageTitle, ActionEvent event) {
         Platform.runLater(() -> {
             try {
+                System.out.println("Loading FXML: " + fxmlFileName);
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFileName));
                 Scene targetScene = new Scene(loader.load());
 
                 Object controller = loader.getController();
+                System.out.println("Loaded Controller: " + controller.getClass().getName());
 
                 // Pass userId and sessionId to target controllers
                 if (controller instanceof recommended_articles) {
@@ -77,14 +79,13 @@ public class user_main_menu {
                     recommendedController.setMongoClient(mongoClient);
                     recommendedController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
                     recommendedController.setUserDetails(userId, sessionId);
-                } else if (controller instanceof manage_articles) {
-                    //manage_profile manageProfile = (manage_profile) controller;
-                    //manageProfile.setMongoClient(mongoClient);
-                    //manageProfile.setDatabase(database);
-                    //manageProfile.setUserInfo(userId, sessionId);
+                } else if (controller instanceof manage_profile) {
+                    manage_profile manageProfile = (manage_profile) controller;
+                    manageProfile.setMongoClient(mongoClient);
+                    manageProfile.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+                    manageProfile.setUserInfo(userId, sessionId);
                 }
 
-                // Set the new scene
                 Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 currentStage.setScene(targetScene);
                 currentStage.setTitle(pageTitle + " - Personalized News Recommendation System");
@@ -92,9 +93,13 @@ public class user_main_menu {
             } catch (IOException e) {
                 showAlert("Navigation Error", "Failed to load the " + pageTitle + " page.");
                 e.printStackTrace();
+            } catch (Exception ex) {
+                showAlert("Controller Error", "Failed to initialize the controller for " + pageTitle + ".");
+                ex.printStackTrace();
             }
         });
     }
+
 
     private void showAlert(String title, String content) {
         Platform.runLater(() -> {

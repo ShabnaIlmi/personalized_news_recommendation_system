@@ -125,10 +125,10 @@ public class add_article {
 
     // Check for duplicate articles by ID
     private boolean isDuplicateArticle(String id) {
-        return articlesCollection.find(new Document("articleID", id)).first() != null;
+        return articlesCollection.find(new Document("article_id", id)).first() != null;
     }
 
-    private final String[] labels = {"politics", "technology", "health", "business", "education"};
+    private final String[] labels = {"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment"};
     // Predict the category using Hugging Face API
     private String predictCategory(String content, String[] labels) throws Exception {
         String apiUrl = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli";
@@ -195,7 +195,7 @@ public class add_article {
 
     // Create MongoDB document for the article
     private Document createArticleDocument(String id, String title, String author, String publishedDate, String articleAddedTime, String description, String content, String category) {
-        return new Document("articleID", id)
+        return new Document("article_id", id)
                 .append("articleName", title)
                 .append("author", author)
                 .append("publishedDate", publishedDate)

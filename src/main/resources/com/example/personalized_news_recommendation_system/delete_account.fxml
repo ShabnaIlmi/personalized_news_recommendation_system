@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="610.0" prefWidth="883.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.delete_account">
+   <children>
+      <AnchorPane prefHeight="610.0" prefWidth="190.0" style="-fx-background-color: grey;">
+         <children>
+            <Text layoutX="1.0" layoutY="357.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="235.946044921875">
+               <font>
+                  <Font name="System Bold Italic" size="72.0" />
+               </font>
+            </Text>
+            <ImageView fitHeight="175.0" fitWidth="252.0" layoutX="31.0" layoutY="104.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@interview_2450883.png" />
+               </image>
+            </ImageView>
+         </children>
+      </AnchorPane>
+      <Text layoutX="299.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Delete Account">
+         <font>
+            <Font name="System Bold" size="72.0" />
+         </font>
+      </Text>
+      <Label fx:id="accountInformation" layoutX="275.0" layoutY="153.0" prefHeight="338.0" prefWidth="570.0" />
+      <Button fx:id="deleteMainMenu" layoutX="362.0" layoutY="522.0" mnemonicParsing="false" onAction="#deleteMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="delete" cancelButton="true" layoutX="543.0" layoutY="522.0" mnemonicParsing="false" onAction="#delete" style="-fx-background-color: grey;" text="Delete Account">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="deleteExit" layoutX="767.0" layoutY="522.0" mnemonicParsing="false" onAction="#deleteExit" prefHeight="51.0" prefWidth="98.0" style="-fx-background-color: grey;" text="Exit">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+      <Button fx:id="back" layoutX="256.0" layoutY="522.0" mnemonicParsing="false" onAction="#back" style="-fx-background-color: grey;" text="Back">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

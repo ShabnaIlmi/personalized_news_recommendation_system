@@ -28,7 +28,7 @@
             <Font name="System Bold" size="72.0" />
          </font>
       </Text>
-      <Button fx:id="manageArticles" layoutX="394.0" layoutY="273.0" mnemonicParsing="false" onAction="#manageArticles" prefHeight="43.0" prefWidth="354.0" style="-fx-background-color: grey;" text="Manage Articles">
+      <Button fx:id="manageProfile" layoutX="394.0" layoutY="273.0" mnemonicParsing="false" onAction="#manageProfile" prefHeight="43.0" prefWidth="354.0" style="-fx-background-color: grey;" text="Manage Profile">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>

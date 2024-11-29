@@ -1,117 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="750.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.manage_articles">
+
+<AnchorPane prefHeight="610.0" prefWidth="883.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.manage_profile">
    <children>
-      <!-- Header Label for Update/Delete Article -->
-      <Label layoutX="296.0" layoutY="-10.0" text="Manage Article">
-         <font>
-            <Font name="System Bold" size="72.0" />
-         </font>
-      </Label>
-
-      <!-- Table to Display Existing Articles -->
-      <TableView fx:id="articleTable" layoutX="191.0" layoutY="96.0" prefHeight="230.0" prefWidth="682.0">
-         <columns>
-            <TableColumn fx:id="articleIDColumn" prefWidth="130.39996337890625" text="Article ID" />
-            <TableColumn fx:id="articleNameColumn" prefWidth="184.79998779296875" text="Article Name" />
-            <TableColumn fx:id="categoryColumn" prefWidth="118.40005493164062" text="Category" />
-            <TableColumn fx:id="authorColumn" prefWidth="133.60006713867188" text="Author" />
-            <TableColumn fx:id="dateColumn" prefWidth="112.0" text="Published Date" />
-         </columns>
-      </TableView>
-
-      <!-- Editable Fields for Selected Article -->
-      <Label layoutX="211.0" layoutY="345.0" text="Article Name -:">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <TextField fx:id="articleNameField" layoutX="380.0" layoutY="346.0" prefHeight="26.0" prefWidth="490.0" />
-
-      <Label layoutX="211.0" layoutY="387.0" text="Category -:">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <TextField fx:id="categoryField" layoutX="380.0" layoutY="387.0" prefHeight="27.0" prefWidth="490.0" />
-
-      <Label layoutX="211.0" layoutY="432.0" text="Author -:">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <TextField fx:id="authorField" layoutX="380.0" layoutY="433.0" prefHeight="26.0" prefWidth="490.0" />
-
-      <Label layoutX="209.0" layoutY="480.0" text="Published Date -:">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
-      <DatePicker fx:id="publishedDatePicker" layoutX="378.0" layoutY="481.0" prefWidth="200.0" />
-
-      <!-- Buttons to Update or Delete Article -->
-      <Button fx:id="updateArticleButton" layoutX="223.0" layoutY="696.0" mnemonicParsing="false" onAction="#updateArticle" style="-fx-background-color: grey;" text="Update Article">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Button>
-      <Button fx:id="deleteArticleButton" layoutX="408.0" layoutY="696.0" mnemonicParsing="false" onAction="#deleteArticle" style="-fx-background-color: grey;" text="Delete Article">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Button>
-
-      <!-- Sidebar with Logo and Branding -->
-      <AnchorPane prefHeight="750.0" prefWidth="177.0" style="-fx-background-color: grey;">
+      <AnchorPane prefHeight="610.0" prefWidth="192.0" style="-fx-background-color: grey;">
          <children>
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="14.0" layoutY="225.0" pickOnBounds="true" preserveRatio="true">
+            <Text layoutX="6.0" layoutY="360.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="238.741455078125">
+               <font>
+                  <Font name="System Bold Italic" size="72.0" />
+               </font>
+            </Text>
+            <ImageView fitHeight="179.0" fitWidth="216.0" layoutX="36.0" layoutY="110.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@interview_2450883.png" />
                </image>
             </ImageView>
-            <Text layoutX="7.0" layoutY="434.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Swiftly News" wrappingWidth="163.7000244140625">
-               <font>
-                  <Font name="System Bold Italic" size="48.0" />
-               </font>
-            </Text>
          </children>
       </AnchorPane>
-
-      <!-- Main Menu and Exit Buttons -->
-      <Button fx:id="manageMainMenu" layoutX="587.0" layoutY="696.0" mnemonicParsing="false" onAction="#manageMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+      <Text layoutX="305.0" layoutY="105.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Manage Profile">
          <font>
-            <Font name="System Bold" size="18.0" />
+            <Font name="System Bold Italic" size="72.0" />
+         </font>
+      </Text>
+      <Button fx:id="accountInformation" layoutX="285.0" layoutY="223.0" mnemonicParsing="false" onAction="#accountInformation" prefHeight="51.0" prefWidth="268.0" style="-fx-background-color: grey;" text="Account Information">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Button fx:id="manageExit" layoutX="746.0" layoutY="696.0" mnemonicParsing="false" onAction="#manageExit" prefHeight="40.0" prefWidth="94.0" style="-fx-background-color: grey;" text="Exit">
+      <Button fx:id="deleteMyAccount" layoutX="597.0" layoutY="223.0" mnemonicParsing="false" onAction="#deleteMyAccount" style="-fx-background-color: grey;" text="Delete My Account">
          <font>
-            <Font name="System Bold" size="18.0" />
+            <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <Label layoutX="209.0" layoutY="527.0" text="Description -:">
+      <Button fx:id="manageMainMenu" layoutX="284.0" layoutY="326.0" mnemonicParsing="false" onAction="#manageMainMenu" prefHeight="58.0" prefWidth="268.0" style="-fx-background-color: grey;" text="Main Menu">
          <font>
-            <Font name="System Bold" size="18.0" />
+            <Font name="System Bold Italic" size="24.0" />
          </font>
-      </Label>
-      <TextArea fx:id="manageDescription" layoutX="380.0" layoutY="527.0" prefHeight="62.0" prefWidth="490.0" />
-      <Label layoutX="209.0" layoutY="614.0" text="Content -:">
+      </Button>
+      <Button fx:id="signOut" layoutX="597.0" layoutY="329.0" mnemonicParsing="false" onAction="#signOut" prefHeight="51.0" prefWidth="242.0" style="-fx-background-color: grey;" text="Sign out">
          <font>
-            <Font name="System Bold" size="18.0" />
+            <Font name="System Bold Italic" size="24.0" />
          </font>
-      </Label>
-      <TextArea fx:id="manageContent" layoutX="380.0" layoutY="606.0" prefHeight="70.0" prefWidth="490.0" />
+      </Button>
+      <Button fx:id="manageExit" layoutX="484.0" layoutY="445.0" mnemonicParsing="false" onAction="#manageExit" prefHeight="58.0" prefWidth="167.0" style="-fx-background-color: grey;" text="Exit">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

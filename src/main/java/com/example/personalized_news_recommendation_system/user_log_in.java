@@ -84,31 +84,6 @@ public class user_log_in {
         // Set the current user and session IDs for future reference
         currentUserId = username;
         currentSessionId = sessionId;
-
-        // Update or create the User Preferences record for the session
-        createOrUpdateUserPreferences(username, sessionId);
-    }
-
-    private void createOrUpdateUserPreferences(String username, String sessionId) {
-        Document existingPreferences = userPreferencesCollection.find(new Document("user_id", username)).first();
-        if (existingPreferences == null) {
-            createUserPreferences(username, sessionId);  // Create new preferences if none exist
-        } else {
-            updateUserPreferences(username, sessionId);  // Update preferences for the current session
-        }
-    }
-
-    private void createUserPreferences(String username, String sessionId) {
-        Document preferences = new Document("user_id", username)
-                .append("session_id", sessionId)
-                .append("created_date_time", LocalDateTime.now().toString());
-        userPreferencesCollection.insertOne(preferences);
-    }
-
-    private void updateUserPreferences(String username, String sessionId) {
-        Document preferencesUpdate = new Document("$set", new Document("session_id", sessionId)
-                .append("updated_date_time", LocalDateTime.now().toString()));
-        userPreferencesCollection.updateOne(new Document("user_id", username), preferencesUpdate);
     }
 
     private String generateSessionId(String username) {

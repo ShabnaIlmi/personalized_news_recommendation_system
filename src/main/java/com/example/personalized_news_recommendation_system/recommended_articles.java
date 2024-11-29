@@ -39,8 +39,8 @@ public class recommended_articles {
     private MongoDatabase database;
 
     // Declare the MongoCollection objects for articles and user preferences
-    private MongoCollection<Document> articlesCollection;  // MongoDB collection for articles
-    private MongoCollection<Document> userCollection;      // MongoDB collection for user preferences
+    private MongoCollection<Document> articlesCollection;
+    private MongoCollection<Document> userCollection;
 
     private String currentUserId;
     private String currentSessionId;
@@ -68,7 +68,7 @@ public class recommended_articles {
     public void setUserDetails(String userId, String sessionId) {
         this.currentUserId = userId;
         this.currentSessionId = sessionId;
-        System.out.println("User details set: userId = " + userId + ", sessionId = " + sessionId);
+        System.out.println("User details set: user_id = " + userId + ", session_id = " + sessionId);
     }
 
     public void setSessionInteractions(List<Document> sessionInteractions) {
@@ -147,8 +147,8 @@ public class recommended_articles {
     }
 
     private void logInteraction(Article article, String interactionType) {
-        Document interaction = new Document("articleId", article.getId())
-                .append("articleName", article.getName())
+        Document interaction = new Document("article_id", article.getId())
+                .append("article_name", article.getName())
                 .append("category", article.getCategory())
                 .append("timestamp", Instant.now().toString())
                 .append("interactionType", interactionType);
@@ -188,8 +188,8 @@ public class recommended_articles {
 
         MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
 
-        Document sessionDocument = new Document("userId", currentUserId)
-                .append("sessionId", currentSessionId)
+        Document sessionDocument = new Document("user_id", currentUserId)
+                .append("session_id", currentSessionId)
                 .append("interactions", sessionInteractions)
                 .append("sessionEnd", Instant.now().toString());
 
@@ -201,7 +201,7 @@ public class recommended_articles {
     private List<Document> getUserPreferences(String userId) {
         MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
 
-        List<Document> sessions = userPreferencesCollection.find(new Document("userId", userId)).into(new ArrayList<>());
+        List<Document> sessions = userPreferencesCollection.find(new Document("user_id", userId)).into(new ArrayList<>());
         List<Document> allInteractions = new ArrayList<>();
         for (Document session : sessions) {
             List<Document> interactions = (List<Document>) session.get("interactions");
@@ -210,7 +210,7 @@ public class recommended_articles {
             }
         }
 
-        System.out.println("Aggregated interactions for userId " + userId + ": " + allInteractions);
+        System.out.println("Aggregated interactions for user_id " + userId + ": " + allInteractions);
         return allInteractions;
     }
 

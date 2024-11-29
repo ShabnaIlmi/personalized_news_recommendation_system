@@ -96,8 +96,8 @@ public class view_articles {
 
 
     private void logInteraction(Article article, String interactionType) {
-        Document interaction = new Document("articleId", article.getId())
-                .append("articleName", article.getName())
+        Document interaction = new Document("article_id", article.getId())
+                .append("article_name", article.getName())
                 .append("category", article.getCategory())
                 .append("timestamp", Instant.now().toString())
                 .append("interactionType", interactionType);
@@ -145,8 +145,8 @@ public class view_articles {
         MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
 
         // Create a document to store all session interactions
-        Document sessionDocument = new Document("userId", currentUserId)
-                .append("sessionId", currentSessionId)
+        Document sessionDocument = new Document("user_id", currentUserId)
+                .append("session_id", currentSessionId)
                 .append("interactions", sessionInteractions)
                 .append("sessionEnd", Instant.now().toString());
 

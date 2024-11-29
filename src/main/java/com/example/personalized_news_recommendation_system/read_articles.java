@@ -72,8 +72,8 @@ public class read_articles {
         // Check if the user has previously disliked this article in the same session
         Optional<Document> existingDislike = sessionInteractions.stream()
                 .filter(interaction -> interaction.getString("interactionType").equals("dislike") &&
-                        interaction.getString("articleId").equals(article.getId()) &&
-                        interaction.getString("sessionId").equals(currentSessionId))
+                        interaction.getString("article_id").equals(article.getId()) &&
+                        interaction.getString("session_id").equals(currentSessionId))
                 .findFirst();
 
         if (existingDislike.isPresent()) {
@@ -92,8 +92,8 @@ public class read_articles {
         // Check if the user has previously liked this article in the same session
         Optional<Document> existingLike = sessionInteractions.stream()
                 .filter(interaction -> interaction.getString("interactionType").equals("like") &&
-                        interaction.getString("articleId").equals(article.getId()) &&
-                        interaction.getString("sessionId").equals(currentSessionId))
+                        interaction.getString("article_id").equals(article.getId()) &&
+                        interaction.getString("session_id").equals(currentSessionId))
                 .findFirst();
 
         if (existingLike.isPresent()) {
@@ -108,7 +108,7 @@ public class read_articles {
 
     // Log interaction with article (like/dislike)
     private void logInteraction(String interactionType, boolean liked, boolean disliked) {
-        Document interaction = new Document("articleId", article.getId())
+        Document interaction = new Document("article_id", article.getId())
                 .append("articleName", article.getName())
                 .append("category", article.getCategory())
                 .append("timestamp", Instant.now().toString())
@@ -124,8 +124,8 @@ public class read_articles {
         MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
 
         // Create a document to store all session interactions
-        Document sessionDocument = new Document("userId", currentUserId)
-                .append("sessionId", currentSessionId)
+        Document sessionDocument = new Document("user_id", currentUserId)
+                .append("session_id", currentSessionId)
                 .append("interactions", sessionInteractions)
                 .append("sessionEnd", Instant.now().toString());
 
