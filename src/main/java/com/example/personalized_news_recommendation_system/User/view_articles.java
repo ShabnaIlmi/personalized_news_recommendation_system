@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.User;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
 import com.mongodb.client.MongoCollection;
@@ -65,7 +65,7 @@ public class view_articles {
             logInteraction(article, "read");
 
             // Load the FXML for the read_articles page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("read_articles.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/read_articles.fxml"));
 
             // Load the scene from the FXML file
             Scene scene = new Scene(loader.load());
@@ -109,7 +109,7 @@ public class view_articles {
     @FXML
     public void goBack(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("recommended_articles.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/recommended_articles.fxml"));
             Scene scene = new Scene(loader.load());
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
 

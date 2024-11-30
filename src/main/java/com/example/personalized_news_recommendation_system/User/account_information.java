@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.User;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -7,10 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.bson.Document;
 
@@ -40,6 +37,8 @@ public class account_information {
     public ChoiceBox<String> category2;
     @FXML
     public ChoiceBox<String> category3;
+    @FXML
+    public PasswordField password;
 
     private MongoClient mongoClient;
     private MongoDatabase database;
@@ -76,7 +75,7 @@ public class account_information {
     public void mainMenu(ActionEvent actionEvent) {
         try {
             // Load the administrator main menu FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_main_menu.fxml"));
             Scene scene = new Scene(loader.load());
 
             // Get the controller of the new FXML
@@ -119,7 +118,7 @@ public class account_information {
     @FXML
     public void updateDetails(ActionEvent actionEvent) {
         // Validate input fields
-        if (firstName.getText().isEmpty() || lastName.getText().isEmpty() || email.getText().isEmpty() || age.getText().isEmpty()) {
+        if (firstName.getText().isEmpty() || lastName.getText().isEmpty() || email.getText().isEmpty() || age.getText().isEmpty() || password.getText().isEmpty()) {
             showAlert("Validation Error", "All fields must be filled before updating details.", Alert.AlertType.WARNING);
             return;
         }
@@ -132,11 +131,25 @@ public class account_information {
         }
 
         try {
-            // Generate a new username
-            String newUsername = generateUsername(firstName.getText(), lastName.getText());
+            // Fetch current first name and last name from the database
+            Document userDoc = database.getCollection("User").find(new Document("username", userId)).first();
+            String previousFirstName = userDoc.getString("first_name");
+            String previousLastName = userDoc.getString("last_name");
 
-            // Generate a default password (for now, we use a hardcoded one; ideally, use a secure method)
-            String newPassword = "password123";  // Default or generated password (should be hashed in a real app)
+            // Determine if first name or last name has changed
+            String newUsername = userId; // Default to existing username
+
+            if (!firstName.getText().equals(previousFirstName) || !lastName.getText().equals(previousLastName)) {
+                // Generate a new username if first or last name has changed
+                newUsername = generateUsername(firstName.getText(), lastName.getText());
+            }
+
+            // If the username has changed, logout the user
+            if (!newUsername.equals(userId)) {
+                // Log the user out
+                logout(actionEvent);  // This will close the current window and redirect to the login screen
+                return;  // Exit the update process as the username has changed
+            }
 
             // Update user details in the Users collection with new username and password
             var usersCollection = database.getCollection("User");
@@ -144,12 +157,17 @@ public class account_information {
                     .append("last_name", lastName.getText())
                     .append("email", email.getText())
                     .append("age", Integer.parseInt(age.getText()))
-                    .append("categories", new String[]{category1.getValue(), category2.getValue(), category3.getValue()})
-                    .append("username", newUsername)  // New username
-                    .append("password", newPassword);  // New password (should be hashed)
+                    .append("categories", Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()))  // Changed to List<String>
+                    .append("password", password.getText())
+                    .append("Updated_date_time", LocalDateTime.now().toString());
+
+            // If the username has changed, add it to the update
+            if (!newUsername.equals(userId)) {
+                updatedData.append("username", newUsername);
+            }
 
             // Update user information using user_id
-            usersCollection.updateOne(new Document("user_id", userId), new Document("$set", updatedData));
+            usersCollection.updateOne(new Document("username", userId), new Document("$set", updatedData));
 
             // Log the update action in the User_Updated_Details collection
             var updatedDetailsCollection = database.getCollection("User_Manage_Profile");
@@ -161,10 +179,44 @@ public class account_information {
             updatedDetailsCollection.insertOne(updateLog);
 
             // Show a success message with the new username and password
-            showAlert("Success", "User details updated successfully.\nNew Username: " + newUsername + "\nNew Password: " + newPassword, Alert.AlertType.INFORMATION);
+            showAlert("Success", "User details updated successfully.\nUsername: " + newUsername + "\nNew Password: " + password.getText(), Alert.AlertType.INFORMATION);
+
+            // Clear the fields after successful update
+            firstName.clear();
+            lastName.clear();
+            email.clear();
+            age.clear();
+            password.clear();
+            category1.getSelectionModel().clearSelection();
+            category2.getSelectionModel().clearSelection();
+            category3.getSelectionModel().clearSelection();
+
         } catch (Exception e) {
             showAlert("Database Error", "Failed to update user details: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
+        }
+    }
+
+    // Method to logout the user by closing the current window and redirecting to login screen
+    private void logout(ActionEvent actionEvent) {
+        // Close the current session window
+        Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        currentStage.close();  // Close the current stage/window
+
+        // Optionally, open the login screen or redirect the user to the login screen
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/login.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Login");
+
+            // Close the login screen when the user closes the window
+            stage.setOnCloseRequest(event -> System.exit(0));
+
+            stage.show();  // Show the login window
+        } catch (IOException e) {
+            showAlert("Error", "Failed to load login screen: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -176,7 +228,7 @@ public class account_information {
 
     public void back(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("manage_profile.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/manage_profile.fxml"));
             Scene scene = new Scene(loader.load());
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
 

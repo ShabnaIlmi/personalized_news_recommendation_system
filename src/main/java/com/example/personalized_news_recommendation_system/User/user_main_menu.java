@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.User;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -47,12 +47,12 @@ public class user_main_menu {
 
     @FXML
     public void manageProfile(ActionEvent event) {
-        navigateToPage("manage_profile.fxml", "Manage Profile", event);
+        navigateToPage("/com/example/personalized_news_recommendation_system/manage_profile.fxml", "Manage Profile", event);
     }
 
     @FXML
     public void recommendedArticles(ActionEvent event) {
-        navigateToPage("recommended_articles.fxml", "Recommended Articles", event);
+        navigateToPage("/com/example/personalized_news_recommendation_system/recommended_articles.fxml", "Recommended Articles", event);
     }
 
     @FXML

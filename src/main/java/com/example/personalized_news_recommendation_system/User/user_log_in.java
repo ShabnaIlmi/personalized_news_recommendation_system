@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.User;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
 import com.mongodb.client.MongoClient;
@@ -110,7 +110,7 @@ public class user_log_in {
 
     private void navigateToMainMenu(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_main_menu.fxml"));
             Scene userMainMenuScene = new Scene(loader.load());
 
             user_main_menu userMainMenuController = loader.getController();
@@ -131,7 +131,7 @@ public class user_log_in {
     @FXML
     public void userSignHome(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/homePage.fxml"));
             Scene homeScene = new Scene(loader.load());
 
             homePage homeController = loader.getController();
