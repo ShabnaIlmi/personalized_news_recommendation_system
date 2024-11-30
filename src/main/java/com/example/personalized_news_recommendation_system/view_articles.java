@@ -1,5 +1,6 @@
 package com.example.personalized_news_recommendation_system;
 
+import com.example.personalized_news_recommendation_system.Model.Article;
 import com.mongodb.client.MongoCollection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

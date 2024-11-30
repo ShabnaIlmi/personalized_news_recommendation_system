@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.Driver;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -28,9 +28,10 @@ public class Main extends Application {
         MongoClient mongoClient = MongoClients.create(CONNECTION_STRING);
         MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
 
-        // Load the home page (home.fxml)
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
+        // Load the home page (homePage.fxml)
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/homePage.fxml"));
         Scene scene = new Scene(loader.load());
+
 
         // Access the home page controller and set MongoDB dependencies
         homePage homeController = loader.getController();

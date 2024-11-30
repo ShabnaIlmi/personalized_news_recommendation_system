@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.Model;
 
 import java.time.LocalDate;
 
@@ -95,4 +95,5 @@ public class Article {
 
 
 }
+
 

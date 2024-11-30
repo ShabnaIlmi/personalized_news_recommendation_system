@@ -26,18 +26,30 @@ public class delete_account {
     @FXML
     private Button deleteExit;
     @FXML
-    private Label accountInformation;
+    private Button back;
+    @FXML
+    private Label userName;
+    @FXML
+    private Label fullName;
+    @FXML
+    private Label email;
+    @FXML
+    private Label age;
+    @FXML
+    private Label categories;
 
     private MongoClient mongoClient;
     private MongoDatabase database;
     private String userId;
     private String sessionId;
 
+    // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
         System.out.println("MongoClient set successfully in Delete Account controller.");
     }
 
+    // Setter for Database
     public void setDatabase(MongoDatabase database) {
         this.database = database;
         System.out.println("Connected to database successfully.");
@@ -53,22 +65,22 @@ public class delete_account {
     // Fetch user details from the database and display them
     private void displayUserDetails() {
         try {
+            if (userId == null || userId.isEmpty()) {
+                showErrorDetails("Invalid user ID. Cannot fetch details.");
+                return;
+            }
+
             MongoCollection<Document> usersCollection = database.getCollection("User");
-            Document userDoc = usersCollection.find(new Document("user_id", userId)).first();
+            Document userDoc = usersCollection.find(new Document("username", userId)).first();
 
             if (userDoc != null) {
-                String userDetails = String.format(
-                        "User ID: %s%nName: %s %s%nEmail: %s%nAge: %d%nCategories: %s",
-                        userDoc.getString("user_id"),
-                        userDoc.getString("first_name"),
-                        userDoc.getString("last_name"),
-                        userDoc.getString("email"),
-                        userDoc.getInteger("age"),
-                        userDoc.getList("categories", String.class)
-                );
-                accountInformation.setText(userDetails);
+                userName.setText(userDoc.getString("username"));
+                fullName.setText(userDoc.getString("first_name") + " " + userDoc.getString("last_name"));
+                email.setText(userDoc.getString("email"));
+                age.setText(String.valueOf(userDoc.getInteger("age")));
+                categories.setText(String.join(", ", userDoc.getList("categories", String.class)));
             } else {
-                accountInformation.setText("No user information found.");
+                showErrorDetails("No user information found.");
             }
         } catch (Exception e) {
             showAlert("Database Error", "Failed to fetch user details: " + e.getMessage(), Alert.AlertType.ERROR);
@@ -76,46 +88,56 @@ public class delete_account {
         }
     }
 
+    private void showErrorDetails(String message) {
+        userName.setText(message);
+        fullName.setText("");
+        email.setText("");
+        age.setText("");
+        categories.setText("");
+    }
+
     @FXML
     public void deleteMainMenu(ActionEvent actionEvent) {
         try {
-            // Load the user main menu FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
             Scene scene = new Scene(loader.load());
 
-            // Get the controller of the new FXML
-            user_main_menu controller = loader.getController();
-
-            // Pass the mongoClient and database to the new controller
+            // Get the correct controller for user_main_menu
+            user_main_menu controller = loader.getController(); // Corrected to match the actual controller class
             controller.setMongoClient(mongoClient);
             controller.setDatabase(database);
+            controller.setUserInfo(userId, sessionId);
 
-            // Set up the new stage and show the main menu
-            Stage mainMenuStage = new Stage();
-            mainMenuStage.setScene(scene);
-            mainMenuStage.setTitle("Main Menu");
-            mainMenuStage.show();
+            // Reuse the current stage
+            Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Main Menu");
         } catch (IOException e) {
-            showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Error", "Failed to load Main Menu view: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
+
 
     @FXML
     public void back(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("manage_profile.fxml"));
             Scene scene = new Scene(loader.load());
-            Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
 
+            // Get the controller and pass data
             manage_profile controller = loader.getController();
             controller.setMongoClient(mongoClient);
-            controller.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+            controller.setDatabase(database);
             controller.setUserInfo(userId, sessionId);
 
+            // Reuse the current stage
+            Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             currentStage.setScene(scene);
             currentStage.setTitle("Manage Profile");
         } catch (IOException e) {
-            showAlert("Error", "Failed to load article view: " + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Error", "Failed to load Manage Profile view: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
 
@@ -125,7 +147,7 @@ public class delete_account {
             MongoCollection<Document> usersCollection = database.getCollection("User");
 
             // Perform the delete operation based on user ID
-            Document deletedUser = usersCollection.findOneAndDelete(new Document("user_id", userId));
+            Document deletedUser = usersCollection.findOneAndDelete(new Document("username", userId));
 
             if (deletedUser != null) {
                 MongoCollection<Document> userUpdatedAccountCollection = database.getCollection("User_Manage_Profile");
@@ -136,7 +158,11 @@ public class delete_account {
                 userUpdatedAccountCollection.insertOne(logEntry);
 
                 showAlert("Success", "Account deleted successfully.", Alert.AlertType.INFORMATION);
-                accountInformation.setText("User account has been deleted.");
+                showErrorDetails("User account has been deleted.");
+
+                // Call the exit method after successful deletion
+                deleteExit(actionEvent);
+
             } else {
                 showAlert("Error", "User account not found for deletion.", Alert.AlertType.WARNING);
             }
@@ -145,6 +171,7 @@ public class delete_account {
             e.printStackTrace();
         }
     }
+
 
     @FXML
     public void deleteExit(ActionEvent actionEvent) {
@@ -161,3 +188,4 @@ public class delete_account {
         alert.showAndWait();
     }
 }
+

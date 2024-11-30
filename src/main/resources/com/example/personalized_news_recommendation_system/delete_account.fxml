@@ -29,7 +29,6 @@
             <Font name="System Bold" size="72.0" />
          </font>
       </Text>
-      <Label fx:id="accountInformation" layoutX="275.0" layoutY="153.0" prefHeight="338.0" prefWidth="570.0" />
       <Button fx:id="deleteMainMenu" layoutX="362.0" layoutY="522.0" mnemonicParsing="false" onAction="#deleteMainMenu" style="-fx-background-color: grey;" text="Main Menu">
          <font>
             <Font name="System Bold Italic" size="24.0" />
@@ -50,5 +49,55 @@
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
+      <Label layoutX="259.0" layoutY="169.0" text="User Name -:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="userName" layoutX="461.0" layoutY="169.0" prefHeight="35.0" prefWidth="412.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="263.0" layoutY="216.0" text="Full Name -:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="fullName" layoutX="459.0" layoutY="216.0" prefHeight="28.0" prefWidth="412.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="265.0" layoutY="269.0" text="Email -:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="email" layoutX="452.0" layoutY="269.0" prefHeight="35.0" prefWidth="412.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="265.0" layoutY="318.0" text="Age -:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="age" layoutX="458.0" layoutY="318.0" prefHeight="22.0" prefWidth="412.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="261.0" layoutY="371.0" text="Categories -:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="categories" layoutX="457.0" layoutY="371.0" prefHeight="28.0" prefWidth="412.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

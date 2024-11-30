@@ -1,5 +1,8 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.Driver;
 
+import com.example.personalized_news_recommendation_system.administrator_log_in;
+import com.example.personalized_news_recommendation_system.user_log_in;
+import com.example.personalized_news_recommendation_system.user_sign_up;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import javafx.event.ActionEvent;
@@ -41,7 +44,7 @@ public class homePage {
     public void homeLogIn(ActionEvent actionEvent) {
         try {
             // Load the sign_in page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_log_in.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_log_in.fxml"));
             Scene signInScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
@@ -66,7 +69,7 @@ public class homePage {
     public void homeSignUp(ActionEvent actionEvent) {
         try {
             // Load the sign-up page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_sign_up.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_sign_up.fxml"));
             Scene signUpScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies
@@ -90,7 +93,7 @@ public class homePage {
     public void administerLogIn(ActionEvent actionEvent) {
         try {
             // Load the admin login page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_log_in.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/administrator_log_in.fxml"));
             Scene adminLoginScene = new Scene(loader.load());
 
             // Get the sign_in controller and set the MongoDB dependencies

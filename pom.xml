@@ -115,7 +115,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>com.example.personalized_news_recommendation_system.Main</mainClass>
+          <mainClass>com.example.personalized_news_recommendation_system.Driver.Main</mainClass>
         </configuration>
         <executions>
           <execution>
@@ -134,7 +134,7 @@
     <profile>
       <id>javafx</id>
       <properties>
-        <javafx.mainClass>com.example.personalized_news_recommendation_system.Main</javafx.mainClass>
+        <javafx.mainClass>com.example.personalized_news_recommendation_system.Driver.Main</javafx.mainClass>
       </properties>
       <build>
         <plugins>

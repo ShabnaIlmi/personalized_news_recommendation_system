@@ -13,4 +13,6 @@ module com.example.personalized_news_recommendation_system {
 
     opens com.example.personalized_news_recommendation_system to javafx.fxml;
     exports com.example.personalized_news_recommendation_system;
+    exports com.example.personalized_news_recommendation_system.Driver;
+    opens com.example.personalized_news_recommendation_system.Driver to javafx.fxml;
 }

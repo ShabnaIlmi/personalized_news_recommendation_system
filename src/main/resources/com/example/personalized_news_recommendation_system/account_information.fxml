@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -41,37 +42,37 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Text>
-      <Label layoutX="297.0" layoutY="193.0" text="First Name -:">
+      <Label layoutX="297.0" layoutY="179.0" text="First Name -:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="296.0" layoutY="234.0" text="Last Name -:">
+      <Label layoutX="296.0" layoutY="221.0" text="Last Name -:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="297.0" layoutY="280.0" text="Email -:">
+      <Label layoutX="296.0" layoutY="267.0" text="Email -:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="297.0" layoutY="329.0" text="Age -:">
+      <Label layoutX="296.0" layoutY="316.0" text="Age -:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="294.0" layoutY="374.0" text="Category 1 -:">
+      <Label layoutX="291.0" layoutY="361.0" text="Category 1 -:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="294.0" layoutY="417.0" text="Category 2 -:">
+      <Label layoutX="291.0" layoutY="404.0" text="Category 2 -:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label layoutX="294.0" layoutY="459.0" text="Category 3 -:">
+      <Label layoutX="291.0" layoutY="446.0" text="Category 3 -:">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -91,17 +92,23 @@
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
-      <TextField fx:id="firstName" layoutX="487.0" layoutY="197.0" prefHeight="26.0" prefWidth="344.0" />
-      <TextField fx:id="lastName" layoutX="487.0" layoutY="239.0" prefHeight="26.0" prefWidth="344.0" />
-      <TextField fx:id="email" layoutX="487.0" layoutY="285.0" prefHeight="26.0" prefWidth="344.0" />
-      <TextField fx:id="age" layoutX="487.0" layoutY="334.0" prefHeight="26.0" prefWidth="344.0" />
-      <ChoiceBox fx:id="category1" layoutX="487.0" layoutY="379.0" prefHeight="26.0" prefWidth="350.0" />
-      <ChoiceBox fx:id="category2" layoutX="487.0" layoutY="422.0" prefHeight="26.0" prefWidth="350.0" />
-      <ChoiceBox fx:id="category3" layoutX="487.0" layoutY="464.0" prefHeight="26.0" prefWidth="350.0" />
+      <TextField fx:id="firstName" layoutX="487.0" layoutY="183.0" prefHeight="26.0" prefWidth="344.0" />
+      <TextField fx:id="lastName" layoutX="487.0" layoutY="225.0" prefHeight="26.0" prefWidth="344.0" />
+      <TextField fx:id="email" layoutX="487.0" layoutY="271.0" prefHeight="26.0" prefWidth="344.0" />
+      <TextField fx:id="age" layoutX="487.0" layoutY="320.0" prefHeight="26.0" prefWidth="344.0" />
+      <ChoiceBox fx:id="category1" layoutX="487.0" layoutY="365.0" prefHeight="26.0" prefWidth="350.0" />
+      <ChoiceBox fx:id="category2" layoutX="487.0" layoutY="408.0" prefHeight="26.0" prefWidth="350.0" />
+      <ChoiceBox fx:id="category3" layoutX="487.0" layoutY="450.0" prefHeight="26.0" prefWidth="350.0" />
       <Button fx:id="back" layoutX="263.0" layoutY="539.0" mnemonicParsing="false" onAction="#back" style="-fx-background-color: grey;" text="Back">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font>
       </Button>
+      <PasswordField fx:id="password" layoutX="487.0" layoutY="493.0" prefHeight="26.0" prefWidth="350.0" />
+      <Label layoutX="290.0" layoutY="488.0" prefHeight="26.0" prefWidth="146.0" text="Password -:">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

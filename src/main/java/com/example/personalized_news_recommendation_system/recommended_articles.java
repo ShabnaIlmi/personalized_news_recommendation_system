@@ -1,5 +1,6 @@
 package com.example.personalized_news_recommendation_system;
 
+import com.example.personalized_news_recommendation_system.Model.Article;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -219,7 +220,7 @@ public class recommended_articles {
 
         // If no interactions are available, recommend articles based on user's preferred categories
         if (allInteractions == null || allInteractions.isEmpty()) {
-            Document userDocument = userCollection.find(eq("user_id", currentUserId)).first();
+            Document userDocument = userCollection.find(eq("username", currentUserId)).first();
             if (userDocument != null) {
                 List<String> preferredCategories = userDocument.getList("categories", String.class);
 
@@ -239,34 +240,34 @@ public class recommended_articles {
         }
 
         // Process all interactions to calculate category scores
-        for (Document preference : allInteractions) {
-            List<Document> interactions = (List<Document>) preference.get("interactions");
-            if (interactions != null) {
-                for (Document interaction : interactions) {
-                    String category = interaction.getString("category");
-                    String interactionType = interaction.getString("interactionType");
+        for (Document interaction : allInteractions) {
+            String category = interaction.getString("category");
+            String interactionType = interaction.getString("interactionType");
 
-                    // Validate data
-                    if (category == null || interactionType == null) continue;
+            // Validate data
+            if (category == null || interactionType == null) continue;
 
-                    // Assign scores based on interaction type
-                    switch (interactionType) {
-                        case "like":
-                            categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) + 3);
-                            break;
-                        case "view":
-                            categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) + 1);
-                            break;
-                        case "skip":
-                            categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) - 1);
-                            break;
-                        case "dislike":
-                            categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) - 3);
-                            break;
-                    }
-                }
+            // Assign scores based on interaction type
+            switch (interactionType) {
+                case "like":
+                    categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) + 3);
+                    break;
+                case "view":
+                    categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) + 1);
+                    break;
+                case "skip":
+                    categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) - 1);
+                    break;
+                case "dislike":
+                    categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) - 3);
+                    break;
             }
         }
+
+        // Debugging output
+        System.out.println("Category Score Map: ");
+        categoryScoreMap.forEach((key, value) -> System.out.println(key + ": " + value));
+
 
         // Output the category scores for debugging
         System.out.println("Category Score Map: ");
@@ -325,8 +326,6 @@ public class recommended_articles {
             }
         }
     }
-
-
 
     // Helper method to display alerts
     private void showAlert(String title, String message, Alert.AlertType alertType) {
