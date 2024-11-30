@@ -1,6 +1,5 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.Admin;
 
-import com.example.personalized_news_recommendation_system.Driver.Main;
 import com.example.personalized_news_recommendation_system.Driver.homePage;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -93,7 +92,7 @@ public class administrator_log_in {
 
     public void openAdminMainMenu(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/administrator_main_menu.fxml"));
             Scene adminMainMenuScene = new Scene(loader.load());
 
             administrator_main_menu adminMainMenuController = loader.getController();
@@ -113,7 +112,7 @@ public class administrator_log_in {
     @FXML
     public void adminLogInHome(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/homePage.fxml"));
             Scene homeScene = new Scene(loader.load());
 
             homePage homeController = loader.getController();

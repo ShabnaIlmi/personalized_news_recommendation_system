@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 public class Main extends Application {
 
     // MongoDB connection string and database name
-    private static final String CONNECTION_STRING = "mongodb://localhost:27017";
+    private static final String CONNECTION_STRING = "mongodb+srv://Shabna_2409661:VictoriousEstablishment%40123@cluster0.wdxej.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     private static final String DATABASE_NAME = "News_Recommendation";
 
     public static ExecutorService executorService;  // Declare ExecutorService here

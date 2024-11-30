@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.User;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -99,7 +99,7 @@ public class delete_account {
     @FXML
     public void deleteMainMenu(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_main_menu.fxml"));
             Scene scene = new Scene(loader.load());
 
             // Get the correct controller for user_main_menu
@@ -122,7 +122,7 @@ public class delete_account {
     @FXML
     public void back(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("manage_profile.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/manage_profile.fxml"));
             Scene scene = new Scene(loader.load());
 
             // Get the controller and pass data

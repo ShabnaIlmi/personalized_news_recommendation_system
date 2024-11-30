@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.User;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
 import com.mongodb.client.MongoClient;
@@ -114,15 +114,16 @@ public class user_sign_up {
             return;
         }
 
-        Document newUser = new Document("username", generatedUsername)
-                .append("password", password)
-                .append("first_name", firstNameText)
+        Document newUser = new Document("first_name", firstNameText)
                 .append("last_name", secondNameText)
                 .append("email", emailText)
-                .append("age", ageText)
+                .append("age", Integer.parseInt(age.getText()))
                 .append("categories", FXCollections.observableArrayList(category1Value, category2Value, category3Value))
+                .append("username", generatedUsername)
+                .append("password", password)
                 .append("created_date_time", LocalDateTime.now().toString());
         userCollection.insertOne(newUser);
+
 
         logUserSignUp(generatedUsername);
 
@@ -197,7 +198,7 @@ public class user_sign_up {
 
     private void navigateToMainMenu(ActionEvent actionEvent) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_main_menu.fxml"));
             Scene userMainMenuScene = new Scene(loader.load());
 
             user_main_menu userMainMenuController = loader.getController();
@@ -218,7 +219,7 @@ public class user_sign_up {
     @FXML
     public void homeSignUp(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("homePage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/homePage.fxml"));
             Scene homeScene = new Scene(loader.load());
 
             homePage homeController = loader.getController();

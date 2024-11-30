@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.User;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
 import com.mongodb.client.MongoCollection;
@@ -149,7 +149,7 @@ public class read_articles {
     public void handleBack(ActionEvent actionEvent) {
         try {
             // Ensure the correct FXML file path
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("recommended_articles.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/recommended_articles.fxml"));
 
             // Load the scene and controller for recommended articles page
             Scene scene = new Scene(loader.load());

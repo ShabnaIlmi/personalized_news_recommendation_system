@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.Admin;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -192,7 +192,7 @@ public class manage_articles {
             currentStage.close();
 
             // Load the administrator main menu FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("administrator_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/administrator_main_menu.fxml"));
             Scene scene = new Scene(loader.load());
 
             // Get the controller of the new FXML

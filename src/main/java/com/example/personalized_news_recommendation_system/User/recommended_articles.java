@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.User;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
 import com.mongodb.client.MongoClient;
@@ -129,7 +129,7 @@ public class recommended_articles {
         logInteraction(selectedArticle, "view");
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("view_articles.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/view_articles.fxml"));
             Scene scene = new Scene(loader.load());
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
 
@@ -161,7 +161,7 @@ public class recommended_articles {
     public void recommendedMainMenu(ActionEvent actionEvent) {
         storeSessionInteractions();
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_main_menu.fxml"));
             Scene scene = new Scene(loader.load());
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
 
@@ -225,9 +225,9 @@ public class recommended_articles {
                 List<String> preferredCategories = userDocument.getList("categories", String.class);
 
                 if (preferredCategories != null && !preferredCategories.isEmpty()) {
-                    // Fetch articles from the preferred categories
+                    // Fetch articles from all preferred categories
                     for (String category : preferredCategories) {
-                        // Query the articles collection for articles in the preferred category
+                        // Query the articles collection for articles in the current category
                         List<Document> articles = articlesCollection.find(eq("category", category)).into(new ArrayList<>());
                         System.out.println("Recommended articles in category '" + category + "':");
                         for (Document article : articles) {

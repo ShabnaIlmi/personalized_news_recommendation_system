@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.Admin;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -43,7 +43,7 @@ public class administrator_main_menu {
     public void addArticles(ActionEvent event) {
         try {
             // Load the Add Article page
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("add_article.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/add_article.fxml"));
             Scene addArticleScene = new Scene(loader.load());
 
             // Get the controller of the Add Article page and pass MongoDB dependencies
@@ -67,7 +67,7 @@ public class administrator_main_menu {
     @FXML
     public void updateArticles(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("manage_articles.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/manage_articles.fxml"));
             Scene updateArticleScene = new Scene(loader.load());
 
             manage_articles manageArticleController = loader.getController();

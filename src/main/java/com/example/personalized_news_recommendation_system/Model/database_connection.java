@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system;
+package com.example.personalized_news_recommendation_system.Model;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class database_connection {
     private static final Logger logger = LoggerFactory.getLogger(database_connection.class);
-    private static final String CONNECTION_STRING = "mongodb://localhost:27017";
+    private static final String CONNECTION_STRING = "mongodb+srv://Shabna_2409661:VictoriousEstablishment%40123@cluster0.wdxej.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
     private static final String DATABASE_NAME = "News_Recommendation";
 
     private MongoClient mongoClient;
