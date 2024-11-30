@@ -112,38 +112,39 @@ public class manage_profile {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFileName));
                 Scene targetScene = new Scene(loader.load());
 
+                // Get the controller of the target page
                 Object controller = loader.getController();
 
-                // Pass userId and sessionId to target controllers
-                if (controller instanceof account_information) {
-                    account_information accountInformationController = (account_information) controller;
-                    accountInformationController.setMongoClient(mongoClient);
-                    accountInformationController.setDatabase(mongoClient.getDatabase("News_Recommendation"));
-                    accountInformationController.setUserDetails(userId, sessionId);
-                } else if (controller instanceof manage_articles) {
-                    delete_account deleteAccount = (delete_account) controller;
-                    deleteAccount.setMongoClient(mongoClient);
-                    deleteAccount.setDatabase(mongoClient.getDatabase("News_Recommendation"));
-                    deleteAccount.setUserInfo(userId, sessionId);
+                // Pass MongoClient, MongoDatabase, userId, and sessionId to the target controller
+                if (controller instanceof delete_account) {
+                    delete_account deleteAccountController = (delete_account) controller;
+                    deleteAccountController.setMongoClient(mongoClient);
+                    deleteAccountController.setDatabase(database); // Use the existing database reference
+                    deleteAccountController.setUserInfo(userId, sessionId);
+                } else if (controller instanceof account_information) {
+                    account_information accountInfoController = (account_information) controller;
+                    accountInfoController.setMongoClient(mongoClient);
+                    accountInfoController.setDatabase(database);
+                    accountInfoController.setUserInfo(userId, sessionId);
                 } else if (controller instanceof user_main_menu) {
-                    user_main_menu userMainMenu = (user_main_menu) controller;
-                    userMainMenu.setMongoClient(mongoClient);
-                    userMainMenu.setDatabase(mongoClient.getDatabase("News_Recommendation"));
-                    userMainMenu.setUserInfo(userId, sessionId);
-
+                    user_main_menu userMainMenuController = (user_main_menu) controller;
+                    userMainMenuController.setMongoClient(mongoClient);
+                    userMainMenuController.setDatabase(database);
+                    userMainMenuController.setUserInfo(userId, sessionId);
                 }
 
                 // Set the new scene
                 Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 currentStage.setScene(targetScene);
-                currentStage.setTitle(pageTitle + " - Personalized News Recommendation System");
+                currentStage.setTitle(pageTitle);
                 currentStage.show();
             } catch (IOException e) {
-                showAlert("Navigation Error", "Failed to load the " + pageTitle + " page.");
+                showAlert("Navigation Error", "Failed to load the " + pageTitle + " page: " + e.getMessage());
                 e.printStackTrace();
             }
         });
     }
+
 
     private void showAlert(String title, String content) {
         Platform.runLater(() -> {

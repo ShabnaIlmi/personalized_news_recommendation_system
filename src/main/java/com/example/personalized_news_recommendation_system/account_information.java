@@ -58,7 +58,7 @@ public class account_information {
     }
 
     // Setter for User ID and Session ID
-    public void setUserDetails(String userId, String sessionId) {
+    public void setUserInfo(String userId, String sessionId) {
         this.userId = userId;
         this.sessionId = sessionId;
     }
@@ -75,7 +75,6 @@ public class account_information {
     @FXML
     public void mainMenu(ActionEvent actionEvent) {
         try {
-
             // Load the administrator main menu FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("user_main_menu.fxml"));
             Scene scene = new Scene(loader.load());
@@ -83,18 +82,38 @@ public class account_information {
             // Get the controller of the new FXML
             user_main_menu controller = loader.getController();
 
-            // Pass the mongoClient and database to the new controller
+            // Pass the MongoClient and Database to the new controller
             controller.setMongoClient(mongoClient);
             controller.setDatabase(mongoClient.getDatabase("News_Recommendation"));
+            controller.setUserInfo(userId, sessionId);
 
-            // Set up the new stage and show the main menu
-            Stage mainMenuStage = new Stage();
-            mainMenuStage.setScene(scene);
-            mainMenuStage.setTitle("Main Menu");
-            mainMenuStage.show();
+            // Reuse the current stage (instead of opening a new one)
+            Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Main Menu");
         } catch (IOException e) {
             showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    // Method to generate a new username
+    private String generateUsername(String firstName, String lastName) {
+        String lowerFirstName = firstName.toLowerCase();
+        String camelLastName = lastName.substring(0, 1).toUpperCase() + lastName.substring(1).toLowerCase();
+        String baseUsername = lowerFirstName + camelLastName;
+        String uniqueNumber = generateUniqueNumber(baseUsername);
+        return baseUsername + uniqueNumber + "@swiftly.com";
+    }
+
+    // Method to generate a unique number to ensure the username is not taken
+    private String generateUniqueNumber(String username) {
+        int count = (int) database.getCollection("User").countDocuments(new Document("username", new Document("$regex", "^" + username)));
+        return String.format("%03d", count + 1);
+    }
+
+    // Check if the username is already taken
+    private boolean isUsernameTaken(String username) {
+        return database.getCollection("User").find(new Document("username", username)).first() != null;
     }
 
     @FXML
@@ -106,21 +125,28 @@ public class account_information {
         }
 
         // Validate that three distinct categories are selected
-        HashSet<String> selectedCategories = new HashSet<>(
-                Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()));
+        HashSet<String> selectedCategories = new HashSet<>(Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()));
         if (selectedCategories.contains(null) || selectedCategories.size() != 3) {
             showAlert("Validation Error", "Please select exactly three distinct categories.", Alert.AlertType.WARNING);
             return;
         }
 
         try {
-            // Update user details in the Users collection
+            // Generate a new username
+            String newUsername = generateUsername(firstName.getText(), lastName.getText());
+
+            // Generate a default password (for now, we use a hardcoded one; ideally, use a secure method)
+            String newPassword = "password123";  // Default or generated password (should be hashed in a real app)
+
+            // Update user details in the Users collection with new username and password
             var usersCollection = database.getCollection("User");
             var updatedData = new Document("first_name", firstName.getText())
                     .append("last_name", lastName.getText())
                     .append("email", email.getText())
                     .append("age", Integer.parseInt(age.getText()))
-                    .append("categories", new String[]{category1.getValue(), category2.getValue(), category3.getValue()});
+                    .append("categories", new String[]{category1.getValue(), category2.getValue(), category3.getValue()})
+                    .append("username", newUsername)  // New username
+                    .append("password", newPassword);  // New password (should be hashed)
 
             // Update user information using user_id
             usersCollection.updateOne(new Document("user_id", userId), new Document("$set", updatedData));
@@ -134,7 +160,8 @@ public class account_information {
 
             updatedDetailsCollection.insertOne(updateLog);
 
-            showAlert("Success", "User details updated successfully.", Alert.AlertType.INFORMATION);
+            // Show a success message with the new username and password
+            showAlert("Success", "User details updated successfully.\nNew Username: " + newUsername + "\nNew Password: " + newPassword, Alert.AlertType.INFORMATION);
         } catch (Exception e) {
             showAlert("Database Error", "Failed to update user details: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
