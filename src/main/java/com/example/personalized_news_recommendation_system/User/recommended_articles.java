@@ -177,13 +177,6 @@ public class recommended_articles {
         }
     }
 
-    @FXML
-    public void recommendedExit(ActionEvent actionEvent) {
-        storeSessionInteractions();
-        Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        currentStage.close();
-    }
-
     private void storeSessionInteractions() {
         if (mongoClient == null || database == null || sessionInteractions.isEmpty()) return;
 
@@ -351,4 +344,13 @@ public class recommended_articles {
                 new SimpleStringProperty(cellData.getValue().getPublishedDate().toString())
         );
     }
+
+    // Shutdown ExecutorService during application exit
+    public void recommendedExit(ActionEvent actionEvent) {
+        storeSessionInteractions();
+        executorService.shutdown(); // Shutdown the executor service
+        Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        currentStage.close();
+    }
+
 }

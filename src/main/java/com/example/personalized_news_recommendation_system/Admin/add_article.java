@@ -27,6 +27,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class add_article {
 
@@ -45,6 +48,9 @@ public class add_article {
 
     private MongoClient mongoClient;
     private MongoCollection<Document> articlesCollection;
+
+    // ExecutorService for concurrency
+    private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     // Set the MongoClient
     public void setMongoClient(MongoClient mongoClient) {
@@ -79,14 +85,28 @@ public class add_article {
             // Validate input fields
             validateInputFields(id, title, author, publishedDate, articleDescription, content);
 
-            // Check for duplicate articleID
+            // Check for duplicate article ID
             if (isDuplicateArticle(id)) {
                 showAlert("Validation Error", "An article with the same Article ID already exists. Please use a unique ID.", Alert.AlertType.ERROR);
                 return;
             }
 
-            // Predict the category using Hugging Face
-            String category = predictCategory(content, labels);
+            // Check for duplicate content
+            if (isDuplicateContent(content)) {
+                showAlert("Validation Error", "An article with the same content already exists. Please modify the content or use a different article.", Alert.AlertType.ERROR);
+                return;
+            }
+
+            // Predict the category using Hugging Face in a separate thread
+            Future<String> categoryFuture = executorService.submit(() -> predictCategory(content, labels));
+
+            // Get the category (this will block until the result is available)
+            String category = categoryFuture.get();
+
+            // If the category is not one of the predefined ones, classify it as "General"
+            if (!isValidCategory(category)) {
+                category = "General";
+            }
 
             // Get the current timestamp in ISO 8601 format
             String articleAddedTime = getCurrentTimestamp();
@@ -96,7 +116,8 @@ public class add_article {
             articlesCollection.insertOne(article);
 
             // Show success message
-            Platform.runLater(() -> showAlert("Success", "Article added successfully under category: " + category, Alert.AlertType.ERROR));
+            String finalCategory = category;
+            Platform.runLater(() -> showAlert("Success", "Article added successfully under category: " + finalCategory, Alert.AlertType.INFORMATION));
 
             // Clear input fields after submission
             clearFields();
@@ -106,6 +127,12 @@ public class add_article {
             showError("Unexpected Error", e.getMessage());
         }
     }
+
+    // Check for duplicate articles by content
+    private boolean isDuplicateContent(String content) {
+        return articlesCollection.find(new Document("content", content)).first() != null;
+    }
+
 
     // Validate the MongoDB collection
     private void validateMongoCollection() {
@@ -128,7 +155,8 @@ public class add_article {
         return articlesCollection.find(new Document("article_id", id)).first() != null;
     }
 
-    private final String[] labels = {"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment"};
+    private final String[] labels = {"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment", "General"};
+
     // Predict the category using Hugging Face API
     private String predictCategory(String content, String[] labels) throws Exception {
         String apiUrl = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli";
@@ -186,6 +214,16 @@ public class add_article {
         return labelsArray.getString(0);
     }
 
+    // Validate if the category is one of the predefined labels
+    private boolean isValidCategory(String category) {
+        for (String label : labels) {
+            if (label.equals(category)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Get current timestamp in ISO 8601 format
     private String getCurrentTimestamp() {
         return Instant.now()
@@ -196,9 +234,9 @@ public class add_article {
     // Create MongoDB document for the article
     private Document createArticleDocument(String id, String title, String author, String publishedDate, String articleAddedTime, String description, String content, String category) {
         return new Document("article_id", id)
-                .append("articleName", title)
+                .append("article_name", title)
                 .append("author", author)
-                .append("publishedDate", publishedDate)
+                .append("published_date", publishedDate)
                 .append("article_added_time", articleAddedTime)
                 .append("description", description)
                 .append("content", content)

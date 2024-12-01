@@ -65,7 +65,7 @@ public class account_information {
     @FXML
     public void initialize() {
         // Populate categories in the ChoiceBoxes
-        String[] categories = {"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment"};
+        String[] categories = {"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment", "General"};
         category1.getItems().addAll(categories);
         category2.getItems().addAll(categories);
         category3.getItems().addAll(categories);

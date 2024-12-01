@@ -3,7 +3,9 @@ package com.example.personalized_news_recommendation_system.Admin;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class manage_articles {
 
@@ -45,6 +49,8 @@ public class manage_articles {
     private MongoCollection<Document> articlesCollection;
     private MongoCollection<Document> updatedArticlesCollection;
     private MongoCollection<Document> deletedArticlesCollection;
+
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     // Set the MongoClient
     public void setMongoClient(MongoClient mongoClient) {
@@ -107,7 +113,6 @@ public class manage_articles {
         }
     }
 
-    // Update selected article
     @FXML
     public void updateArticle(ActionEvent actionEvent) {
         try {
@@ -122,35 +127,76 @@ public class manage_articles {
                 return;
             }
 
-            // Get the content of the article to predict the category
-            String content = manageContent.getText();
+            // Create a background task for the API call and update process
+            Task<Void> updateTask = new Task<Void>() {
+                // Declare predictedCategory as a field to make it accessible in both call and succeeded
+                private String predictedCategory = "";
 
-            // Predict the category using Hugging Face BART model (same logic as in add_article class)
-            String category = predictCategory(content, new String[]{"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment"});
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        // Get the content of the article to predict the category
+                        String content = manageContent.getText();
 
-            // Get the current time for the update
-            String currentTime = LocalDateTime.now().toString();
+                        // Predict the category using Hugging Face BART model and store the result in predictedCategory
+                        predictedCategory = predictCategory(content, new String[]{"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment", "General"});
 
-            // Prepare the updated article document with the predicted category
-            Document updatedArticle = new Document("article_name", articleNameField.getText())
-                    .append("category", category)  // Use the predicted category
-                    .append("author", authorField.getText())
-                    .append("description", manageDescription.getText())
-                    .append("content", content)
-                    .append("published_date", publishedDatePicker.getValue().toString())
-                    .append("article_added_time", currentTime); // Add or update the time
+                    } catch (Exception e) {
+                        // Handle error in prediction and display the category that was predicted before failure
+                        Platform.runLater(() -> showAlert("Prediction Error", "Failed to predict category. Predicted category: " + predictedCategory, Alert.AlertType.ERROR));
+                        throw e;  // Rethrow exception after showing the error
+                    }
 
-            // Perform the update in the database
-            articlesCollection.updateOne(
-                    new Document("article_id", selectedArticle.getString("article_id")),
-                    new Document("$set", updatedArticle)
-            );
+                    // Get the current time for the update
+                    String currentTime = LocalDateTime.now().toString();
 
-            // Insert updated record into Updated_Articles collection
-            updatedArticlesCollection.insertOne(updatedArticle);
+                    // Prepare the updated article document with the predicted category
+                    Document updatedArticle = new Document("article_name", articleNameField.getText())
+                            .append("category", predictedCategory)  // Use the predicted category
+                            .append("author", authorField.getText())
+                            .append("description", manageDescription.getText())
+                            .append("content", manageContent.getText())
+                            .append("published_date", publishedDatePicker.getValue().toString())
+                            .append("article_added_time", currentTime); // Add or update the time
 
-            showAlert("Success", "Article updated successfully with predicted category: " + category, Alert.AlertType.ERROR);
-            populateArticleTable(); // Refresh table
+                    // Perform the update in the database
+                    articlesCollection.updateOne(
+                            new Document("article_id", selectedArticle.getString("article_id")),
+                            new Document("$set", updatedArticle)
+                    );
+
+                    // Insert updated record into Updated_Articles collection
+                    updatedArticlesCollection.insertOne(updatedArticle);
+
+                    return null;
+                }
+
+                @Override
+                protected void succeeded() {
+                    // Show success message and clear fields
+                    Platform.runLater(() -> {
+                        showAlert("Success", "Article updated successfully under category: " + predictedCategory, Alert.AlertType.INFORMATION);
+
+                        // Clear the fields after the successful update
+                        articleNameField.clear();
+                        authorField.clear();
+                        manageDescription.clear();
+                        manageContent.clear();
+                        publishedDatePicker.setValue(null);  // Clear the date picker
+                    });
+
+                    populateArticleTable(); // Refresh the table after update
+                }
+
+                @Override
+                protected void failed() {
+                    showAlert("Error", "Failed to update article: " + getException().getMessage(), Alert.AlertType.ERROR);
+                    getException().printStackTrace();
+                }
+            };
+
+            // Run the update task asynchronously
+            executorService.submit(updateTask);
 
         } catch (Exception e) {
             showAlert("Error", "Failed to update article: " + e.getMessage(), Alert.AlertType.ERROR);
@@ -158,7 +204,9 @@ public class manage_articles {
         }
     }
 
-    // Delete selected article
+
+
+    // Delete selected article with concurrency
     @FXML
     public void deleteArticle(ActionEvent actionEvent) {
         try {
@@ -168,14 +216,34 @@ public class manage_articles {
                 return;
             }
 
-            // Perform delete operation
-            articlesCollection.deleteOne(new Document("article_id", selectedArticle.getString("article_id")));
+            // Create a background task for the delete process
+            Task<Void> deleteTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    // Perform delete operation
+                    articlesCollection.deleteOne(new Document("article_id", selectedArticle.getString("article_id")));
 
-            // Add deleted article to Deleted_Articles collection
-            deletedArticlesCollection.insertOne(selectedArticle);
+                    // Add deleted article to Deleted_Articles collection
+                    deletedArticlesCollection.insertOne(selectedArticle);
 
-            showAlert("Success", "Article deleted successfully!", Alert.AlertType.ERROR);
-            populateArticleTable(); // Refresh table
+                    return null;
+                }
+
+                @Override
+                protected void succeeded() {
+                    showAlert("Success", "Article deleted successfully!", Alert.AlertType.INFORMATION);
+                    populateArticleTable(); // Refresh table
+                }
+
+                @Override
+                protected void failed() {
+                    showAlert("Error", "Failed to delete article: " + getException().getMessage(), Alert.AlertType.ERROR);
+                    getException().printStackTrace();
+                }
+            };
+
+            // Run the delete task asynchronously
+            executorService.submit(deleteTask);
 
         } catch (Exception e) {
             showAlert("Error", "Failed to delete article: " + e.getMessage(), Alert.AlertType.ERROR);
@@ -216,6 +284,7 @@ public class manage_articles {
     // Handle the "Exit" button action
     @FXML
     public void manageExit(ActionEvent actionEvent) {
+        shutdownExecutor();
         Stage stage = (Stage) articleNameField.getScene().getWindow();
         stage.close();
     }
@@ -223,7 +292,6 @@ public class manage_articles {
     // Validate inputs for update operation
     private boolean validateInputs() {
         return !(articleNameField.getText().isEmpty() ||
-                categoryField.getText().isEmpty() ||
                 authorField.getText().isEmpty() ||
                 manageDescription.getText().isEmpty() ||
                 manageContent.getText().isEmpty() ||
@@ -291,5 +359,11 @@ public class manage_articles {
 
         // Return the top label
         return labelsArray.getString(0);
+    }
+
+    public void shutdownExecutor() {
+        if (executorService != null) {
+            executorService.shutdown();
+        }
     }
 }

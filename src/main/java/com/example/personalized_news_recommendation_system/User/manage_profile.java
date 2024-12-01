@@ -60,7 +60,7 @@ public class manage_profile {
 
     @FXML
     public void manageMainMenu(ActionEvent actionEvent) {
-        navigateToPage("user_main_menu.fxml", "/com/example/personalized_news_recommendation_system/User Main Menu", actionEvent);
+        navigateToPage("/com/example/personalized_news_recommendation_system/user_main_menu.fxml", "User Main Menu", actionEvent);
     }
 
     @FXML

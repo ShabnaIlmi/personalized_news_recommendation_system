@@ -2,6 +2,7 @@ package com.example.personalized_news_recommendation_system.User;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
 import com.mongodb.client.MongoCollection;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +17,10 @@ import org.bson.Document;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class view_articles {
 
@@ -29,8 +33,9 @@ public class view_articles {
     private String currentUserId;
     private String currentSessionId;
 
-    // Session interactions passed from the previous view
-    private List<Document> sessionInteractions;
+    private List<Document> sessionInteractions = Collections.synchronizedList(new java.util.ArrayList<>());
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
@@ -46,7 +51,10 @@ public class view_articles {
     }
 
     public void setSessionInteractions(List<Document> sessionInteractions) {
-        this.sessionInteractions = sessionInteractions;
+        synchronized (this.sessionInteractions) {
+            this.sessionInteractions.clear();
+            this.sessionInteractions.addAll(sessionInteractions);
+        }
     }
 
     public void setArticleDetails(Article article) {
@@ -61,42 +69,27 @@ public class view_articles {
     @FXML
     private void readArticle(ActionEvent actionEvent) {
         try {
-            // Log the "read" interaction for the article
             logInteraction(article, "read");
 
-            // Load the FXML for the read_articles page
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/read_articles.fxml"));
-
-            // Load the scene from the FXML file
             Scene scene = new Scene(loader.load());
-
-            // Get the current stage (window)
             Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
 
-            // Get the controller of the read_articles page
             read_articles controller = loader.getController();
-
-            // Pass the article details to the controller of the read_articles page
-            controller.setArticleDetails(article);  // Pass the article details to the new page
-
-            // Pass other necessary data (e.g., user details, session interactions)
+            controller.setArticleDetails(article);
             controller.setMongoClient(mongoClient);
             controller.setDatabase(database);
             controller.setUserDetails(currentUserId, currentSessionId);
-            controller.setSessionInteractions(sessionInteractions);  // Pass session interactions
+            controller.setSessionInteractions(sessionInteractions);
 
-            // Set the scene to the current stage (this changes the window content)
             currentStage.setScene(scene);
             currentStage.setTitle("Read Article");
-
         } catch (IOException e) {
-            // If there was an error loading the read_articles page, show an alert
             showAlert("Error", "Failed to load read article page: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-
-    private void logInteraction(Article article, String interactionType) {
+    private synchronized void logInteraction(Article article, String interactionType) {
         Document interaction = new Document("article_id", article.getId())
                 .append("article_name", article.getName())
                 .append("category", article.getCategory())
@@ -117,7 +110,8 @@ public class view_articles {
             controller.setMongoClient(mongoClient);
             controller.setDatabase(database);
             controller.setUserDetails(currentUserId, currentSessionId);
-            controller.setSessionInteractions(sessionInteractions);  // Pass session interactions
+            controller.setSessionInteractions(sessionInteractions);
+
             currentStage.setScene(scene);
             currentStage.setTitle("Recommended Articles");
         } catch (IOException e) {
@@ -127,33 +121,43 @@ public class view_articles {
 
     @FXML
     public void exitApplication(ActionEvent actionEvent) {
-        // Store session interactions before exiting
         storeSessionInteractions();
         Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        currentStage.close();  // Close the application
+        currentStage.close();
+        shutdownExecutor();
     }
 
     @FXML
     public void skipArticle(ActionEvent actionEvent) {
-        // Log skip interaction and navigate to the recommended articles page
         logInteraction(article, "skip");
-        goBack(actionEvent);  // Go back to the recommended articles page after skipping
+        goBack(actionEvent);
     }
 
     private void storeSessionInteractions() {
         if (mongoClient == null || database == null || sessionInteractions.isEmpty()) return;
 
-        MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
+        executorService.submit(() -> {
+            try {
+                MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
 
-        // Create a document to store all session interactions
-        Document sessionDocument = new Document("user_id", currentUserId)
-                .append("session_id", currentSessionId)
-                .append("interactions", sessionInteractions)
-                .append("sessionEnd", Instant.now().toString());
+                Document sessionDocument = new Document("user_id", currentUserId)
+                        .append("session_id", currentSessionId)
+                        .append("interactions", sessionInteractions)
+                        .append("sessionEnd", Instant.now().toString());
 
-        // Insert the session document into the MongoDB collection
-        userPreferencesCollection.insertOne(sessionDocument);
-        sessionInteractions.clear();  // Clear the list after storing
+                userPreferencesCollection.insertOne(sessionDocument);
+
+                synchronized (sessionInteractions) {
+                    sessionInteractions.clear();
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> showAlert("Error", "Failed to store session interactions: " + e.getMessage(), Alert.AlertType.ERROR));
+            }
+        });
+    }
+
+    private void shutdownExecutor() {
+        executorService.shutdown();
     }
 
     private void showAlert(String title, String content, Alert.AlertType type) {

@@ -16,6 +16,9 @@ import org.bson.Document;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class read_articles {
 
@@ -34,6 +37,10 @@ public class read_articles {
     private String currentUserId;
     private String currentSessionId;
     private List<Document> sessionInteractions;
+
+    // ReentrantLock to ensure thread safety for session interactions
+    private final ReentrantLock interactionLock = new ReentrantLock();
+    private final ExecutorService executorService = Executors.newCachedThreadPool(); // Executor service for async operations
 
     // Setters for dependency injection from previous controller
     public void setMongoClient(MongoClient mongoClient) {
@@ -109,30 +116,37 @@ public class read_articles {
 
     // Log interaction with article (like/dislike)
     private void logInteraction(String interactionType, boolean liked, boolean disliked) {
-        Document interaction = new Document("article_id", article.getId())
-                .append("articleName", article.getName())
-                .append("category", article.getCategory())
-                .append("timestamp", Instant.now().toString())
-                .append("interactionType", interactionType);
-        sessionInteractions.add(interaction);
-        System.out.println("Logged interaction: " + interaction);
+        interactionLock.lock();  // Lock to ensure thread safety for sessionInteractions
+        try {
+            Document interaction = new Document("article_id", article.getId())
+                    .append("articleName", article.getName())
+                    .append("category", article.getCategory())
+                    .append("timestamp", Instant.now().toString())
+                    .append("interactionType", interactionType);
+            sessionInteractions.add(interaction);
+            System.out.println("Logged interaction: " + interaction);
+        } finally {
+            interactionLock.unlock();  // Unlock after operation
+        }
     }
 
-    // Store all interactions in the session to the MongoDB
+    // Store all interactions in the session to the MongoDB asynchronously
     private void storeSessionInteractions() {
         if (mongoClient == null || database == null || sessionInteractions.isEmpty()) return;
 
-        MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
+        executorService.submit(() -> {
+            MongoCollection<Document> userPreferencesCollection = database.getCollection("User_Preferences");
 
-        // Create a document to store all session interactions
-        Document sessionDocument = new Document("user_id", currentUserId)
-                .append("session_id", currentSessionId)
-                .append("interactions", sessionInteractions)
-                .append("sessionEnd", Instant.now().toString());
+            // Create a document to store all session interactions
+            Document sessionDocument = new Document("user_id", currentUserId)
+                    .append("session_id", currentSessionId)
+                    .append("interactions", sessionInteractions)
+                    .append("sessionEnd", Instant.now().toString());
 
-        // Insert the session document into the MongoDB collection
-        userPreferencesCollection.insertOne(sessionDocument);
-        sessionInteractions.clear();  // Clear the list after storing
+            // Insert the session document into the MongoDB collection
+            userPreferencesCollection.insertOne(sessionDocument);
+            sessionInteractions.clear();  // Clear the list after storing
+        });
     }
 
     // Display alert with a specific message
@@ -175,8 +189,8 @@ public class read_articles {
     // Handle the exit button click to close the current window
     @FXML
     public void handleExit(ActionEvent actionEvent) {
-        storeSessionInteractions();  // Save session data before exiting
+        storeSessionInteractions();
         Stage currentStage = (Stage) articleNameLabel.getScene().getWindow();
-        currentStage.close();  // Close the window
+        currentStage.close();
     }
 }
