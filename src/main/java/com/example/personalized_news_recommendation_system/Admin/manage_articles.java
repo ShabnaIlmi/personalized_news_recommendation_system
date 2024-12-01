@@ -126,7 +126,7 @@ public class manage_articles {
             String content = manageContent.getText();
 
             // Predict the category using Hugging Face BART model (same logic as in add_article class)
-            String category = predictCategory(content, new String[]{"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment"});
+            String category = predictCategory(content, new String[]{"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment"});
 
             // Get the current time for the update
             String currentTime = LocalDateTime.now().toString();

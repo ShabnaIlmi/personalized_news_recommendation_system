@@ -67,7 +67,7 @@ public class user_sign_up {
     @FXML
     public void initialize() {
         ObservableList<String> categories = FXCollections.observableArrayList(
-                "AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment"
+                "AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment"
         );
         category1.setItems(categories);
         category2.setItems(categories);

@@ -128,7 +128,7 @@ public class add_article {
         return articlesCollection.find(new Document("article_id", id)).first() != null;
     }
 
-    private final String[] labels = {"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment"};
+    private final String[] labels = {"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment"};
     // Predict the category using Hugging Face API
     private String predictCategory(String content, String[] labels) throws Exception {
         String apiUrl = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli";
