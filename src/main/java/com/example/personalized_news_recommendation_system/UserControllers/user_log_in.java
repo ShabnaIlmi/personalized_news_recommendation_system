@@ -1,6 +1,7 @@
-package com.example.personalized_news_recommendation_system.User;
+package com.example.personalized_news_recommendation_system.UserControllers;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
+import com.example.personalized_news_recommendation_system.Utils.Validator;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -15,7 +16,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.bson.Document;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -33,9 +33,8 @@ public class user_log_in {
     private MongoClient mongoClient;
     private MongoCollection<Document> userCollection;
     private MongoCollection<Document> userLogCollection;
-    private MongoCollection<Document> userPreferencesCollection;
     private String currentUserId;  // Store the user ID for the session
-    private String currentSessionId;  // Store the session ID
+    private String currentSessionId;
 
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
@@ -45,7 +44,6 @@ public class user_log_in {
         if (database != null) {
             this.userCollection = database.getCollection("User");
             this.userLogCollection = database.getCollection("User_Logs");
-            this.userPreferencesCollection = database.getCollection("User_Preferences");
         }
     }
 
@@ -54,22 +52,29 @@ public class user_log_in {
         String username = userSignUsername.getText();
         String password = userSignPassword.getText();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        // Validate input fields
+        if (!Validator.areFieldsNotEmpty(username, password)) {
             showAlert("Input Error", "Please enter both username and password.", Alert.AlertType.ERROR);
             return;
         }
 
-        if (authenticateUser(username, password)) {
+        // Validate database collections
+        if (!Validator.areCollectionsSet(userCollection, userLogCollection)) {
+            showAlert("Database Error", "Database is not properly configured.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        // Authenticate user
+        if (Validator.authenticateUser(userCollection, username, password)) {
             logUserLogin(username);  // Log the user login event
+
+            // Show success message
+            showAlert("Login Successful", "Welcome, " + username + "! You have logged in successfully.", Alert.AlertType.INFORMATION);
+
             navigateToMainMenu(event);  // Navigate to main menu after successful login
         } else {
             showAlert("Log-In Error", "Incorrect username or password.", Alert.AlertType.ERROR);
         }
-    }
-
-    private boolean authenticateUser(String username, String password) {
-        Document user = userCollection.find(new Document("username", username)).first();
-        return user != null && user.getString("password").equals(password);
     }
 
     private void logUserLogin(String username) {

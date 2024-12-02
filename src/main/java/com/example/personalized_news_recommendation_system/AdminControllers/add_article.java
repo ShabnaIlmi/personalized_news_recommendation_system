@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.Admin;
+package com.example.personalized_news_recommendation_system.AdminControllers;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -8,22 +8,18 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -45,6 +41,8 @@ public class add_article {
     private TextArea description;
     @FXML
     private TextArea contentArea;
+    @FXML
+    private Button fetchArticle;
 
     private MongoClient mongoClient;
     private MongoCollection<Document> articlesCollection;
@@ -170,12 +168,16 @@ public class add_article {
 
     // Construct JSON payload for API request
     private String constructPayload(String content, String[] labels) {
-        return String.format("{\"inputs\": \"%s\", \"parameters\": {\"candidate_labels\": [\"%s\"]}}",
+        // Convert labels array to a JSON array string format for candidate_labels
+        String candidateLabelsJson = "[\"" + String.join("\", \"", labels) + "\"]";
+
+        // Construct the JSON payload
+        return String.format("{\"inputs\": \"%s\", \"parameters\": {\"candidate_labels\": %s}}",
                 content.replace("\"", "\\\""),
-                String.join("\", \"", labels));
+                candidateLabelsJson);
     }
 
-    // Send category prediction request and parse the response
+
     private String sendCategoryPredictionRequest(String apiUrl, String token, String payload) throws Exception {
         URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -187,6 +189,20 @@ public class add_article {
         // Write payload
         try (OutputStream os = connection.getOutputStream()) {
             os.write(payload.getBytes(StandardCharsets.UTF_8));
+        }
+
+        // Check the HTTP response code
+        int responseCode = connection.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            // Read error stream
+            try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
+                StringBuilder errorResponse = new StringBuilder();
+                String line;
+                while ((line = errorReader.readLine()) != null) {
+                    errorResponse.append(line.trim());
+                }
+                throw new Exception("HTTP Error: " + responseCode + " - " + errorResponse.toString());
+            }
         }
 
         // Read response
@@ -241,6 +257,70 @@ public class add_article {
                 .append("description", description)
                 .append("content", content)
                 .append("category", category);
+    }
+
+    @FXML
+    public void fetchArticle() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+
+        // Open file chooser and get the selected file
+        File selectedFile = fileChooser.showOpenDialog(fetchArticle.getScene().getWindow());
+
+        // If no file is selected, return early
+        if (selectedFile == null) {
+            return;
+        }
+
+        try {
+            // Read the content of the file into a string
+            String content = new String(Files.readAllBytes(selectedFile.toPath()), StandardCharsets.UTF_8);
+
+            // Parse the file content as a JSONArray
+            JSONArray articlesArray = new JSONArray(content);
+
+            // Iterate over each article in the JSON array
+            for (int i = 0; i < articlesArray.length(); i++) {
+                JSONObject articleJson = articlesArray.getJSONObject(i);
+
+                String id = articleJson.getString("article_id");
+                String title = articleJson.getString("article_name");
+                String author = articleJson.getString("author");
+                String publishedDate = articleJson.optString("published_date", "");
+                String description = articleJson.getString("description");
+                String contentText = articleJson.getString("content");
+
+                // Check if the article already exists in the database
+                if (isDuplicateArticle(id)) {
+                    showAlert("Validation Error", "Article ID already exists. Skipping this article.", Alert.AlertType.WARNING);
+                    continue; // Skip this article if it's a duplicate
+                }
+
+                // Predict the category for the article content
+                String category = predictCategory(contentText, labels);
+
+                // If the predicted category is not one of the predefined ones, classify it as "General"
+                if (!isValidCategory(category)) {
+                    category = "General";
+                }
+
+                String articleAddedTime = getCurrentTimestamp();
+                Document article = createArticleDocument(id, title, author, publishedDate, articleAddedTime, description, contentText, category);
+
+                // Insert the article into the MongoDB collection
+                articlesCollection.insertOne(article);
+            }
+
+            // Notify the user after successful insertion
+            Platform.runLater(() -> showAlert("Success", "Articles fetched, categorized, and inserted successfully.", Alert.AlertType.INFORMATION));
+
+        } catch (IOException e) {
+            // Handle file read error
+            showError("File Error", "Error reading the file: " + e.getMessage());
+        } catch (Exception e) {
+            // Handle JSON parsing or other errors
+            showError("Processing Error", "Error processing the file: " + e.getMessage());
+        }
     }
 
     // Show an alert dialog

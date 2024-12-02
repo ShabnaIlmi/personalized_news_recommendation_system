@@ -1,5 +1,6 @@
-package com.example.personalized_news_recommendation_system.User;
+package com.example.personalized_news_recommendation_system.UserControllers;
 
+import com.example.personalized_news_recommendation_system.Utils.Validator;
 import com.example.personalized_news_recommendation_system.Driver.homePage;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -12,7 +13,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.bson.Document;
 
@@ -48,7 +48,6 @@ public class user_sign_up {
     private MongoDatabase database;
     private MongoCollection<Document> userCollection;
     private MongoCollection<Document> userLogCollection;
-    private MongoCollection<Document> userPreferencesCollection;
     private String currentUserId;  // Store the user ID for the session
     private String currentSessionId;  // Store the session ID
 
@@ -60,7 +59,6 @@ public class user_sign_up {
         if (database != null) {
             this.userCollection = database.getCollection("User");
             this.userLogCollection = database.getCollection("User_Logs");
-            this.userPreferencesCollection = database.getCollection("User_Preferences");
         }
     }
 
@@ -88,8 +86,18 @@ public class user_sign_up {
             return;
         }
 
-        if (!password.equals(verifyPasswordText)) {
-            showAlert("Password Error", "Passwords do not match. Please try again.", Alert.AlertType.ERROR);
+        if (!Validator.isValidEmail(emailText)) {
+            showAlert("Email Error", "Please enter a valid email address.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        if (!Validator.isValidAge(ageText)) {
+            showAlert("Age Error", "Please enter a valid age (a positive number).", Alert.AlertType.ERROR);
+            return;
+        }
+
+        if (!Validator.isValidPassword(password)) {
+            showAlert("Password Error", "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, and a number.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -102,7 +110,8 @@ public class user_sign_up {
             return;
         }
 
-        if (category1Value.equals(category2Value) || category1Value.equals(category3Value) || category2Value.equals(category3Value)) {
+        // Validate distinct categories
+        if (!Validator.areCategoriesDistinct(category1Value, category2Value, category3Value)) {
             showAlert("Category Error", "The categories must be distinct. Please select different categories.", Alert.AlertType.ERROR);
             return;
         }
@@ -124,28 +133,21 @@ public class user_sign_up {
                 .append("created_date_time", LocalDateTime.now().toString());
         userCollection.insertOne(newUser);
 
-
         logUserSignUp(generatedUsername);
 
         String sessionId = generateSessionId(generatedUsername);
-        createOrUpdateUserPreferences(generatedUsername, sessionId, category1Value, category2Value, category3Value);
 
-        currentUserId = generatedUsername;  // Set the current user ID
-        currentSessionId = sessionId;  // Set the current session ID
+        currentUserId = generatedUsername;
+        currentSessionId = sessionId;
 
-        showAlert("Sign-Up Success",
-                "Account created successfully!\nUsername: " + generatedUsername + "\nPassword: " + password,
-                Alert.AlertType.INFORMATION);
+        // Welcome Message
+        String welcomeMessage = "Welcome, " + firstNameText + " " + secondNameText + "!\n" +
+                "You have successfully signed up.\n" +
+                "Your username is: " + generatedUsername + "\n" +
+                "Enjoy personalized news recommendations!";
+        showAlert("Welcome", welcomeMessage, Alert.AlertType.INFORMATION);
 
         navigateToMainMenu(event);
-    }
-
-    private void createOrUpdateUserPreferences(String username, String sessionId, String category1, String category2, String category3) {
-        Document preferences = new Document("user_id", username)
-                .append("session_id", sessionId)
-                .append("categories", FXCollections.observableArrayList(category1, category2, category3))
-                .append("created_date_time", LocalDateTime.now().toString());
-        userPreferencesCollection.insertOne(preferences);
     }
 
     private String generateUsername(String firstName, String lastName) {
@@ -236,15 +238,4 @@ public class user_sign_up {
         }
     }
 
-    public void category1(MouseEvent mouseEvent) {
-
-    }
-
-    public void category2(MouseEvent mouseEvent) {
-
-    }
-
-    public void category3(MouseEvent mouseEvent) {
-
-    }
 }

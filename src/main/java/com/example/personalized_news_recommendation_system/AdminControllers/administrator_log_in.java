@@ -1,6 +1,7 @@
-package com.example.personalized_news_recommendation_system.Admin;
+package com.example.personalized_news_recommendation_system.AdminControllers;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
+import com.example.personalized_news_recommendation_system.Utils.Validator;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -53,28 +54,27 @@ public class administrator_log_in {
         String username = administratorUsername.getText();
         String password = administratorPassword.getText();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        // Validate fields are not empty
+        if (!Validator.areFieldsNotEmpty(username, password)) {
             showAlert("Input Error", "Please enter both username and password.", Alert.AlertType.ERROR);
             return;
         }
 
-        if (authenticateAdmin(username, password)) {
-            logAdminLogin(username); // Log the admin login event
+        // Validate collections are set
+        if (!Validator.areCollectionsSet(adminCollection, adminLogCollection)) {
+            showAlert("Configuration Error", "Database collections are not properly configured.", Alert.AlertType.ERROR);
+            return;
+        }
+
+        // Authenticate admin
+        if (Validator.authenticateAdmin(adminCollection, username, password)) {
+            logAdminLogin(username);
             showAlert("Sign-In Success", "Welcome, Administrator!", Alert.AlertType.INFORMATION);
             openAdminMainMenu(event);
         } else {
             showAlert("Sign-In Failed", "Invalid credentials.", Alert.AlertType.ERROR);
             administratorPassword.clear();
         }
-    }
-
-    private Boolean authenticateAdmin(String username, String password) {
-        Document adminDoc = adminCollection.find(new Document("username", username)).first();
-        if (adminDoc != null) {
-            String storedPassword = adminDoc.getString("password");
-            return storedPassword != null && storedPassword.equals(password);
-        }
-        return false;
     }
 
     private void logAdminLogin(String username) {
