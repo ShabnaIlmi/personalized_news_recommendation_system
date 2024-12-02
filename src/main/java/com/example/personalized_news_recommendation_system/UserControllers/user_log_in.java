@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.User;
+package com.example.personalized_news_recommendation_system.UserControllers;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
 import com.mongodb.client.MongoClient;
@@ -33,9 +33,8 @@ public class user_log_in {
     private MongoClient mongoClient;
     private MongoCollection<Document> userCollection;
     private MongoCollection<Document> userLogCollection;
-    private MongoCollection<Document> userPreferencesCollection;
     private String currentUserId;  // Store the user ID for the session
-    private String currentSessionId;  // Store the session ID
+    private String currentSessionId;
 
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
@@ -45,7 +44,6 @@ public class user_log_in {
         if (database != null) {
             this.userCollection = database.getCollection("User");
             this.userLogCollection = database.getCollection("User_Logs");
-            this.userPreferencesCollection = database.getCollection("User_Preferences");
         }
     }
 
@@ -61,11 +59,16 @@ public class user_log_in {
 
         if (authenticateUser(username, password)) {
             logUserLogin(username);  // Log the user login event
+
+            // Show success message
+            showAlert("Login Successful", "Welcome, " + username + "! You have logged in successfully.", Alert.AlertType.INFORMATION);
+
             navigateToMainMenu(event);  // Navigate to main menu after successful login
         } else {
             showAlert("Log-In Error", "Incorrect username or password.", Alert.AlertType.ERROR);
         }
     }
+
 
     private boolean authenticateUser(String username, String password) {
         Document user = userCollection.find(new Document("username", username)).first();

@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="822.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.Admin.manage_articles">
+<AnchorPane prefHeight="822.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.AdminControllers.manage_articles">
     <children>
         <!-- Header Label for Manage Articles -->
         <Label layoutX="281.0" text="Manage Articles">
@@ -71,7 +71,7 @@
         <TextArea fx:id="manageContent" layoutX="380.0" layoutY="621.0" prefHeight="114.0" prefWidth="490.0" wrapText="true" />
 
         <!-- Buttons for Actions -->
-        <Button fx:id="updateButton" layoutX="383.0" layoutY="756.0" mnemonicParsing="false" onAction="#updateArticle" style="-fx-background-color: grey;" text="Update Article">
+        <Button fx:id="updateButton" layoutX="395.0" layoutY="756.0" mnemonicParsing="false" onAction="#updateArticle" style="-fx-background-color: grey;" text="Update Article">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font></Button>
@@ -81,7 +81,7 @@
          </font></Button>
 
         <!-- Navigation Buttons -->
-        <Button fx:id="manageMainMenu" layoutX="196.0" layoutY="756.0" mnemonicParsing="false" onAction="#manageMainMenu" style="-fx-background-color: grey;" text="Main Menu">
+        <Button fx:id="manageMainMenu" layoutX="218.0" layoutY="756.0" mnemonicParsing="false" onAction="#manageMainMenu" style="-fx-background-color: grey;" text="Main Menu">
          <font>
             <Font name="System Bold Italic" size="24.0" />
          </font></Button>

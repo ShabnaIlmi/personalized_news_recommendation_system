@@ -1,8 +1,8 @@
 package com.example.personalized_news_recommendation_system.Driver;
 
-import com.example.personalized_news_recommendation_system.Admin.administrator_log_in;
-import com.example.personalized_news_recommendation_system.User.user_log_in;
-import com.example.personalized_news_recommendation_system.User.user_sign_up;
+import com.example.personalized_news_recommendation_system.AdminControllers.administrator_log_in;
+import com.example.personalized_news_recommendation_system.UserControllers.user_log_in;
+import com.example.personalized_news_recommendation_system.UserControllers.user_sign_up;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import javafx.event.ActionEvent;

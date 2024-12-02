@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.User;
+package com.example.personalized_news_recommendation_system.UserControllers;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
 import com.mongodb.client.MongoClient;

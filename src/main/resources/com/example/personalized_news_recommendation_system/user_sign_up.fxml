@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.User.user_sign_up">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="610.0" prefWidth="884.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personalized_news_recommendation_system.UserControllers.user_sign_up">
    <children>
       <AnchorPane prefHeight="610.0" prefWidth="211.0" style="-fx-background-color: grey;">
          <children>
@@ -72,7 +72,7 @@
       <TextField fx:id="email" layoutX="532.0" layoutY="278.0" prefHeight="26.0" prefWidth="247.0" />
       <TextField fx:id="secondName" layoutX="532.0" layoutY="195.0" prefHeight="26.0" prefWidth="247.0" />
       <TextField fx:id="firstName" layoutX="532.0" layoutY="156.0" prefHeight="26.0" prefWidth="247.0" />
-      <ChoiceBox fx:id="category1" layoutX="532.0" layoutY="396.0" onDragDetected="#category1" prefHeight="26.0" prefWidth="247.0" />
+      <ChoiceBox fx:id="category1" layoutX="532.0" layoutY="396.0" prefHeight="26.0" prefWidth="247.0" />
       <Label layoutX="314.0" layoutY="395.0" text="Category 1 -:">
          <font>
             <Font name="System Bold" size="18.0" />
@@ -83,7 +83,7 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="category2" layoutX="532.0" layoutY="436.0" onDragDetected="#category2" prefHeight="26.0" prefWidth="247.0" />
+      <ChoiceBox fx:id="category2" layoutX="532.0" layoutY="436.0" prefHeight="26.0" prefWidth="247.0" />
       <Label layoutX="314.0" layoutY="230.0" text="Age -:">
          <font>
             <Font name="System Bold" size="18.0" />
@@ -95,6 +95,6 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="category3" layoutX="532.0" layoutY="474.0" onDragDetected="#category3" prefHeight="26.0" prefWidth="247.0" />
+      <ChoiceBox fx:id="category3" layoutX="532.0" layoutY="474.0" prefHeight="26.0" prefWidth="247.0" />
    </children>
 </AnchorPane>

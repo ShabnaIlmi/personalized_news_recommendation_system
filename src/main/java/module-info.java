@@ -17,13 +17,15 @@ module com.example.personalized_news_recommendation_system {
 
     // Allow reflective access to specific packages (for JavaFX)
     opens com.example.personalized_news_recommendation_system.Driver to javafx.fxml;
-    opens com.example.personalized_news_recommendation_system.Admin to javafx.fxml;
-    opens com.example.personalized_news_recommendation_system.User to javafx.fxml;
+    opens com.example.personalized_news_recommendation_system.AdminControllers to javafx.fxml;
+    opens com.example.personalized_news_recommendation_system.UserControllers to javafx.fxml;
     opens com.example.personalized_news_recommendation_system.Model to javafx.fxml;
 
     // Export packages for external usage
     exports com.example.personalized_news_recommendation_system.Driver;
-    exports com.example.personalized_news_recommendation_system.Admin;
-    exports com.example.personalized_news_recommendation_system.User;
+    exports com.example.personalized_news_recommendation_system.AdminControllers;
+    exports com.example.personalized_news_recommendation_system.UserControllers;
     exports com.example.personalized_news_recommendation_system.Model;
+    exports com.example.personalized_news_recommendation_system.Database;
+    opens com.example.personalized_news_recommendation_system.Database to javafx.fxml;
 }

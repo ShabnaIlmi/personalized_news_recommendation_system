@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.User;
+package com.example.personalized_news_recommendation_system.UserControllers;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -105,9 +105,12 @@ public class account_information {
     }
 
     // Method to generate a unique number to ensure the username is not taken
-    private String generateUniqueNumber(String username) {
-        int count = (int) database.getCollection("User").countDocuments(new Document("username", new Document("$regex", "^" + username)));
-        return String.format("%03d", count + 1);
+    private String generateUniqueNumber(String baseUsername) {
+        int count = 1;
+        while (isUsernameTaken(baseUsername + String.format("%03d", count))) {
+            count++;
+        }
+        return String.format("%03d", count);
     }
 
     // Check if the username is already taken
@@ -133,55 +136,65 @@ public class account_information {
         try {
             // Fetch current first name and last name from the database
             Document userDoc = database.getCollection("User").find(new Document("username", userId)).first();
+            if (userDoc == null) {
+                showAlert("Error", "User not found in the database.", Alert.AlertType.ERROR);
+                return;
+            }
+
             String previousFirstName = userDoc.getString("first_name");
             String previousLastName = userDoc.getString("last_name");
 
-            // Determine if first name or last name has changed
+            // Check if the first name or last name has changed
+            boolean nameChanged = !firstName.getText().equals(previousFirstName) || !lastName.getText().equals(previousLastName);
             String newUsername = userId; // Default to existing username
 
-            if (!firstName.getText().equals(previousFirstName) || !lastName.getText().equals(previousLastName)) {
-                // Generate a new username if first or last name has changed
-                newUsername = generateUsername(firstName.getText(), lastName.getText());
+            if (nameChanged) {
+                // Ask the user if they want to change their username
+                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmation.setTitle("Username Update");
+                confirmation.setHeaderText("Change Detected");
+                confirmation.setContentText("Your first name or last name has changed. Do you want to update your username?");
+
+                if (confirmation.showAndWait().get() == ButtonType.OK) {
+                    // Generate a new username
+                    newUsername = generateUsername(firstName.getText(), lastName.getText());
+                }
             }
 
-            // If the username has changed, logout the user
-            if (!newUsername.equals(userId)) {
-                // Log the user out
-                logout(actionEvent);  // This will close the current window and redirect to the login screen
-                return;  // Exit the update process as the username has changed
-            }
-
-            // Update user details in the Users collection with new username and password
-            var usersCollection = database.getCollection("User");
+            // Prepare updated data
             var updatedData = new Document("first_name", firstName.getText())
                     .append("last_name", lastName.getText())
                     .append("email", email.getText())
                     .append("age", Integer.parseInt(age.getText()))
-                    .append("categories", Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()))  // Changed to List<String>
+                    .append("categories", Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()))
                     .append("password", password.getText())
                     .append("Updated_date_time", LocalDateTime.now().toString());
 
-            // If the username has changed, add it to the update
+            // Add new username to the update if it has changed
             if (!newUsername.equals(userId)) {
                 updatedData.append("username", newUsername);
             }
 
-            // Update user information using user_id
-            usersCollection.updateOne(new Document("username", userId), new Document("$set", updatedData));
+            // Update user details in the database
+            database.getCollection("User").updateOne(new Document("username", userId), new Document("$set", updatedData));
 
-            // Log the update action in the User_Updated_Details collection
-            var updatedDetailsCollection = database.getCollection("User_Manage_Profile");
-            var updateLog = new Document("user_id", userId)
+            // Log the update action
+            database.getCollection("User_Manage_Profile").insertOne(new Document("user_id", userId)
                     .append("session_id", sessionId)
                     .append("action", "Updated Information")
-                    .append("updated_date_time", LocalDateTime.now().toString());
+                    .append("updated_date_time", LocalDateTime.now().toString()));
 
-            updatedDetailsCollection.insertOne(updateLog);
+            // Notify the user and log them out if the username changed
+            if (!newUsername.equals(userId)) {
+                userId = newUsername; // Update the in-memory userId
+                logout(actionEvent, newUsername); // Redirect to login with a new username
+                return; // Prevent further processing
+            }
 
-            // Show a success message with the new username and password
-            showAlert("Success", "User details updated successfully.\nUsername: " + newUsername + "\nNew Password: " + password.getText(), Alert.AlertType.INFORMATION);
+            // Show success message
+            showAlert("Success", "User details updated successfully.", Alert.AlertType.INFORMATION);
 
-            // Clear the fields after successful update
+            // Clear fields after update
             firstName.clear();
             lastName.clear();
             email.clear();
@@ -197,28 +210,40 @@ public class account_information {
         }
     }
 
-    // Method to logout the user by closing the current window and redirecting to login screen
-    private void logout(ActionEvent actionEvent) {
-        // Close the current session window
-        Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        currentStage.close();  // Close the current stage/window
-
-        // Optionally, open the login screen or redirect the user to the login screen
+    private void logout(ActionEvent actionEvent, String newUsername) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_log_in.fxml"));
             Scene scene = new Scene(loader.load());
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Login");
 
-            // Close the login screen when the user closes the window
-            stage.setOnCloseRequest(event -> System.exit(0));
+            // Set MongoDB connection in the login controller
+            user_log_in controller = loader.getController();
+            controller.setMongoClient(mongoClient);
+            controller.setDatabase(mongoClient.getDatabase("News_Recommendation"));
 
-            stage.show();  // Show the login window
+            // Reuse the current stage for the login scene
+            Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+            currentStage.setScene(scene);
+            currentStage.setTitle("Login Page");
+
+            // Notify the user about username change
+            Alert noticeAlert = new Alert(Alert.AlertType.INFORMATION);
+            noticeAlert.setTitle("Notice");
+            noticeAlert.setHeaderText("Username Updated");
+            noticeAlert.setContentText(
+                    "Your username has been updated successfully!\n" +
+                            "New Username: " + newUsername + "\n" +
+                            "Updated Password: " + password.getText() + "\n" +
+                            "Please log in with your new credentials."
+            );
+            noticeAlert.showAndWait();
+
+
         } catch (IOException e) {
             showAlert("Error", "Failed to load login screen: " + e.getMessage(), Alert.AlertType.ERROR);
+            e.printStackTrace();
         }
     }
+
 
     @FXML
     public void exit(ActionEvent actionEvent) {

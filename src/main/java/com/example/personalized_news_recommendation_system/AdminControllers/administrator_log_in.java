@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.Admin;
+package com.example.personalized_news_recommendation_system.AdminControllers;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
 import com.mongodb.client.MongoClient;
