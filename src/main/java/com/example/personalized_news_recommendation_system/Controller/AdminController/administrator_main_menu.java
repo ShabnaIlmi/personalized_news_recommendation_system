@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.AdminControllers;
+package com.example.personalized_news_recommendation_system.Controller.AdminController;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;

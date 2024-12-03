@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.AdminControllers;
+package com.example.personalized_news_recommendation_system.Controller.AdminController;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
 import com.example.personalized_news_recommendation_system.Utils.Validator;
