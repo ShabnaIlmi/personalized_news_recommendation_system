@@ -64,12 +64,24 @@ public class user_log_in {
             return;
         }
 
+        Document userDoc = userCollection.find(new Document("username", username)).first();
+        if (userDoc == null) {
+            showAlert("Database Error", "User record not found.", Alert.AlertType.ERROR);
+            return;
+        }
+
         // Authenticate user
         if (Validator.authenticateUser(userCollection, username, password)) {
             logUserLogin(username);  // Log the user login event
 
-            // Show success message
-            showAlert("Login Successful", "Welcome, " + username + "! You have logged in successfully.", Alert.AlertType.INFORMATION);
+            String firstName = userDoc.getString("first_name");
+            String lastName = userDoc.getString("last_name");
+
+            logUserLogin(username);  // Log the user login event
+
+            // Show success message with first and last name
+            showAlert("Login Successful", "Welcome, " + firstName + " " + lastName + "! You have logged in successfully.", Alert.AlertType.INFORMATION);
+
 
             navigateToMainMenu(event);  // Navigate to main menu after successful login
         } else {
