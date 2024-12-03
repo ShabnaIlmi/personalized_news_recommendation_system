@@ -63,4 +63,66 @@ public class Validator {
         return false;
     }
 
+    // Validation for MongoDB collection (articles collection)
+    public static boolean isArticleCollectionValid(MongoCollection<Document> articlesCollection) {
+        return articlesCollection != null;
+    }
+
+    // Validate if article fields are not empty
+    public static boolean areArticleFieldsNotEmpty(String id, String title, String author, String publishedDate, String articleDescription, String content) {
+        return !(id == null || id.isEmpty() ||
+                title == null || title.isEmpty() ||
+                author == null || author.isEmpty() ||
+                publishedDate == null || publishedDate.isEmpty() ||
+                articleDescription == null || articleDescription.isEmpty() ||
+                content == null || content.isEmpty());
+    }
+
+    // Validate if the article ID is unique
+    public static boolean isUniqueArticleID(MongoCollection<Document> articlesCollection, String articleID) {
+        return articlesCollection.find(new Document("article_id", articleID)).first() == null;
+    }
+
+    // Validate if the article content is unique
+    public static boolean isUniqueArticleContent(MongoCollection<Document> articlesCollection, String content) {
+        return articlesCollection.find(new Document("content", content)).first() == null;
+    }
+
+    // Validate if the category is valid (it matches a predefined set of categories)
+    public static boolean isValidCategory(String category, String[] validCategories) {
+        for (String validCategory : validCategories) {
+            if (validCategory.equals(category)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Validate input fields
+    public static void validateInputFields(String... fields) {
+        for (String field : fields) {
+            if (field == null || field.isEmpty()) {
+                throw new IllegalArgumentException("All fields must be filled before submitting.");
+            }
+        }
+    }
+
+    // Validate MongoDB collection
+    public static void validateMongoCollection(MongoCollection<Document> collection) {
+        if (collection == null) {
+            throw new IllegalStateException("MongoDB collection not initialized.");
+        }
+    }
+
+    // Check for duplicate articles by ID
+    public static boolean isDuplicateArticle(String id, MongoCollection<Document> collection) {
+        return collection.find(new Document("article_id", id)).first() != null;
+    }
+
+    // Check for duplicate articles by content
+    public static boolean isDuplicateContent(String content, MongoCollection<Document> collection) {
+        return collection.find(new Document("content", content)).first() != null;
+    }
 }
+
+

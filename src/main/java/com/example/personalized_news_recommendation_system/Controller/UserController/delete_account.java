@@ -1,5 +1,6 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -46,13 +47,11 @@ public class delete_account {
     // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        System.out.println("MongoClient set successfully in Delete Account controller.");
     }
 
     // Setter for Database
     public void setDatabase(MongoDatabase database) {
         this.database = database;
-        System.out.println("Connected to database successfully.");
     }
 
     // Setter for User ID and Session ID
@@ -83,7 +82,7 @@ public class delete_account {
                 showErrorDetails("No user information found.");
             }
         } catch (Exception e) {
-            showAlert("Database Error", "Failed to fetch user details: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Database Error", "Failed to fetch user details: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -113,7 +112,7 @@ public class delete_account {
             currentStage.setScene(scene);
             currentStage.setTitle("Main Menu");
         } catch (IOException e) {
-            showAlert("Error", "Failed to load Main Menu view: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to load Main Menu view: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -136,7 +135,7 @@ public class delete_account {
             currentStage.setScene(scene);
             currentStage.setTitle("Manage Profile");
         } catch (IOException e) {
-            showAlert("Error", "Failed to load Manage Profile view: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to load Manage Profile view: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -157,17 +156,17 @@ public class delete_account {
                         .append("deleted_date_time", LocalDateTime.now().toString());
                 userUpdatedAccountCollection.insertOne(logEntry);
 
-                showAlert("Success", "Account deleted successfully.", Alert.AlertType.INFORMATION);
+                ShowAlerts.showAlert("Success", "Account deleted successfully.", Alert.AlertType.INFORMATION);
                 showErrorDetails("User account has been deleted.");
 
                 // Call the exit method after successful deletion
                 deleteExit(actionEvent);
 
             } else {
-                showAlert("Error", "User account not found for deletion.", Alert.AlertType.WARNING);
+                ShowAlerts.showAlert("Error", "User account not found for deletion.", Alert.AlertType.WARNING);
             }
         } catch (Exception e) {
-            showAlert("Database Error", "Failed to delete user account: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Database Error", "Failed to delete user account: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -179,13 +178,5 @@ public class delete_account {
         currentStage.close();
     }
 
-    // Utility method for showing alert messages
-    private void showAlert(String title, String content, Alert.AlertType alertType) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 }
 

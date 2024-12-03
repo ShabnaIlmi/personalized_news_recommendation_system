@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -91,7 +91,6 @@ public class manage_profile {
                         .append("logged_date_time", currentDateTime);
 
                 userLogCollection.insertOne(logEntry);
-                System.out.println("Sign-out action recorded in User_Log collection.");
             } catch (Exception e) {
                 showAlert("Database Error", "Failed to record the sign-out action in the database.");
                 e.printStackTrace();

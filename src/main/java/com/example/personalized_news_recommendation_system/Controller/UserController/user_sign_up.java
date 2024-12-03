@@ -1,5 +1,6 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.example.personalized_news_recommendation_system.Utils.Validator;
 import com.example.personalized_news_recommendation_system.Driver.homePage;
 import com.mongodb.client.MongoClient;
@@ -48,8 +49,8 @@ public class user_sign_up {
     private MongoDatabase database;
     private MongoCollection<Document> userCollection;
     private MongoCollection<Document> userLogCollection;
-    private String currentUserId;  // Store the user ID for the session
-    private String currentSessionId;  // Store the session ID
+    private String currentUserId;
+    private String currentSessionId;
 
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
@@ -82,22 +83,22 @@ public class user_sign_up {
         String verifyPasswordText = verifyPassword.getText().trim();
 
         if (firstNameText.isEmpty() || secondNameText.isEmpty() || emailText.isEmpty() || ageText.isEmpty() || password.isEmpty() || verifyPasswordText.isEmpty()) {
-            showAlert("Input Error", "Please fill in all the fields.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Input Error", "Please fill in all the fields.", Alert.AlertType.ERROR);
             return;
         }
 
         if (!Validator.isValidEmail(emailText)) {
-            showAlert("Email Error", "Please enter a valid email address.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Email Error", "Please enter a valid email address.", Alert.AlertType.ERROR);
             return;
         }
 
         if (!Validator.isValidAge(ageText)) {
-            showAlert("Age Error", "Please enter a valid age (a positive number).", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Age Error", "Please enter a valid age (a positive number).", Alert.AlertType.ERROR);
             return;
         }
 
         if (!Validator.isValidPassword(password)) {
-            showAlert("Password Error", "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, and a number.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Password Error", "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, and a number.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -106,20 +107,20 @@ public class user_sign_up {
         String category3Value = category3.getValue();
 
         if (category1Value == null || category2Value == null || category3Value == null) {
-            showAlert("Category Error", "Please select all three categories.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Category Error", "Please select all three categories.", Alert.AlertType.ERROR);
             return;
         }
 
         // Validate distinct categories
         if (!Validator.areCategoriesDistinct(category1Value, category2Value, category3Value)) {
-            showAlert("Category Error", "The categories must be distinct. Please select different categories.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Category Error", "The categories must be distinct. Please select different categories.", Alert.AlertType.ERROR);
             return;
         }
 
         String generatedUsername = generateUsername(firstNameText, secondNameText);
 
         if (isUsernameTaken(generatedUsername)) {
-            showAlert("Sign-Up Error", "Username already exists. Please try again.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Sign-Up Error", "Username already exists. Please try again.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -145,7 +146,7 @@ public class user_sign_up {
                 "You have successfully signed up.\n" +
                 "Your username is: " + generatedUsername + "\n" +
                 "Enjoy personalized news recommendations!";
-        showAlert("Welcome", welcomeMessage, Alert.AlertType.INFORMATION);
+        ShowAlerts.showAlert("Welcome", welcomeMessage, Alert.AlertType.INFORMATION);
 
         navigateToMainMenu(event);
     }
@@ -190,14 +191,6 @@ public class user_sign_up {
         return String.format("%03d", lastSessionNumber + 1);
     }
 
-    private void showAlert(String title, String content, Alert.AlertType alertType) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
     private void navigateToMainMenu(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_main_menu.fxml"));
@@ -213,7 +206,7 @@ public class user_sign_up {
             currentStage.setTitle("User Main Menu");
             currentStage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the main menu.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Navigation Error", "Failed to load the main menu.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -233,7 +226,7 @@ public class user_sign_up {
             currentStage.setTitle("Home");
             currentStage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }

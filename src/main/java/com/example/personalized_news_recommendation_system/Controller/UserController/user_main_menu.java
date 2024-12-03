@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -31,12 +31,10 @@ public class user_main_menu {
     // Setters for MongoClient and MongoDatabase
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        System.out.println("MongoClient set successfully in UserMainMenu controller.");
     }
 
     public void setDatabase(MongoDatabase database) {
         this.database = database;
-        System.out.println("Connected to database successfully.");
     }
 
     // New setter for User ID and Session ID
@@ -66,12 +64,10 @@ public class user_main_menu {
     private void navigateToPage(String fxmlFileName, String pageTitle, ActionEvent event) {
         Platform.runLater(() -> {
             try {
-                System.out.println("Loading FXML: " + fxmlFileName);
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFileName));
                 Scene targetScene = new Scene(loader.load());
 
                 Object controller = loader.getController();
-                System.out.println("Loaded Controller: " + controller.getClass().getName());
 
                 // Pass userId and sessionId to target controllers
                 if (controller instanceof recommended_articles) {
@@ -99,7 +95,6 @@ public class user_main_menu {
             }
         });
     }
-
 
     private void showAlert(String title, String content) {
         Platform.runLater(() -> {

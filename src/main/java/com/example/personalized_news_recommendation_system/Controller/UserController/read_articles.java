@@ -1,6 +1,7 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.mongodb.client.MongoCollection;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -70,7 +71,7 @@ public class read_articles {
             articleAuthorLabel.setText("Author: " + article.getAuthor());
             articleContentLabel.setText(article.getContent());
         } else {
-            showAlert("Error", "Article details are not available.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Article details are not available.", Alert.AlertType.ERROR);
         }
     }
 
@@ -91,7 +92,7 @@ public class read_articles {
 
         logInteraction("like", true, false);  // Log the "like" interaction
         storeSessionInteractions();  // Save interaction immediately
-        showAlert("Liked", "You liked this article!", Alert.AlertType.INFORMATION);
+        ShowAlerts.showAlert("Liked", "You liked this article!", Alert.AlertType.INFORMATION);
     }
 
     // Handle the dislike button click
@@ -109,9 +110,9 @@ public class read_articles {
             sessionInteractions.remove(existingLike.get());
         }
 
-        logInteraction("dislike", false, true);  // Log the "dislike" interaction
-        storeSessionInteractions();  // Save interaction immediately
-        showAlert("Disliked", "You disliked this article.", Alert.AlertType.INFORMATION);
+        logInteraction("dislike", false, true);
+        storeSessionInteractions();
+        ShowAlerts.showAlert("Disliked", "You disliked this article.", Alert.AlertType.INFORMATION);
     }
 
     // Log interaction with article (like/dislike)
@@ -126,7 +127,7 @@ public class read_articles {
             sessionInteractions.add(interaction);
             System.out.println("Logged interaction: " + interaction);
         } finally {
-            interactionLock.unlock();  // Unlock after operation
+            interactionLock.unlock();
         }
     }
 
@@ -145,18 +146,10 @@ public class read_articles {
 
             // Insert the session document into the MongoDB collection
             userPreferencesCollection.insertOne(sessionDocument);
-            sessionInteractions.clear();  // Clear the list after storing
+            sessionInteractions.clear();
         });
     }
 
-    // Display alert with a specific message
-    private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 
     // Handle the back button click to return to recommended articles
     @FXML
@@ -182,7 +175,7 @@ public class read_articles {
 
         } catch (Exception e) {
             // Handle any errors related to loading the scene
-            showAlert("Error", "Failed to go back to recommended articles: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to go back to recommended articles: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

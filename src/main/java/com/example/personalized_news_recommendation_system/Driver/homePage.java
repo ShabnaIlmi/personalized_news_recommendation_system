@@ -1,8 +1,8 @@
 package com.example.personalized_news_recommendation_system.Driver;
 
-import com.example.personalized_news_recommendation_system.AdminControllers.administrator_log_in;
-import com.example.personalized_news_recommendation_system.UserControllers.user_log_in;
-import com.example.personalized_news_recommendation_system.UserControllers.user_sign_up;
+import com.example.personalized_news_recommendation_system.Controller.AdminController.administrator_log_in;
+import com.example.personalized_news_recommendation_system.Controller.UserController.user_log_in;
+import com.example.personalized_news_recommendation_system.Controller.UserController.user_sign_up;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import javafx.event.ActionEvent;
@@ -31,12 +31,10 @@ public class homePage {
     // Setter for MongoClient and MongoDatabase
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        System.out.println("MongoClient set successfully.");
     }
 
     public void setDatabase(MongoDatabase database) {
         this.database = database;
-        System.out.println("Connected to database: " + database.getName());
     }
 
     // Method to handle the Log In button click and navigate to user_log_in.fxml

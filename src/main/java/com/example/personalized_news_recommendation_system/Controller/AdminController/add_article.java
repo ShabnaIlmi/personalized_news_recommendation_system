@@ -1,5 +1,7 @@
-package com.example.personalized_news_recommendation_system.AdminControllers;
+package com.example.personalized_news_recommendation_system.Controller.AdminController;
 
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
+import com.example.personalized_news_recommendation_system.Utils.ShowErrors;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -50,23 +52,21 @@ public class add_article {
     // ExecutorService for concurrency
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-    // Set the MongoClient
+    // Setting the MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        System.out.println("MongoClient set successfully in Add Article.");
     }
 
-    // Set the MongoDatabase and initialize the articles collection
+    // Setting the MongoDatabase and initializing the articles collection
     public void setDatabase(MongoDatabase database) {
         if (database != null) {
             this.articlesCollection = database.getCollection("Articles");
-            System.out.println("Articles collection initialized: " + articlesCollection.getNamespace());
         } else {
-            showError("Database Initialization Error", "Database is null. Cannot initialize articles collection.");
+            ShowErrors.showError("Database Initialization Error", "Database is null. Cannot initialize articles collection.");
         }
     }
 
-    // Handle the submit button action
+    //Submitting the articles manually
     @FXML
     public void submitArticle() {
         try {
@@ -85,13 +85,13 @@ public class add_article {
 
             // Check for duplicate article ID
             if (isDuplicateArticle(id)) {
-                showAlert("Validation Error", "An article with the same Article ID already exists. Please use a unique ID.", Alert.AlertType.ERROR);
+                ShowAlerts.showAlert("Validation Error", "An article with the same Article ID already exists. Please use a unique ID.", Alert.AlertType.ERROR);
                 return;
             }
 
             // Check for duplicate content
             if (isDuplicateContent(content)) {
-                showAlert("Validation Error", "An article with the same content already exists. Please modify the content or use a different article.", Alert.AlertType.ERROR);
+                ShowAlerts.showAlert("Validation Error", "An article with the same content already exists. Please modify the content or use a different article.", Alert.AlertType.ERROR);
                 return;
             }
 
@@ -115,14 +115,14 @@ public class add_article {
 
             // Show success message
             String finalCategory = category;
-            Platform.runLater(() -> showAlert("Success", "Article added successfully under category: " + finalCategory, Alert.AlertType.INFORMATION));
+            Platform.runLater(() -> ShowAlerts.showAlert("Success", "Article added successfully under category: " + finalCategory, Alert.AlertType.INFORMATION));
 
             // Clear input fields after submission
             clearFields();
         } catch (IllegalStateException e) {
-            showError("Database Error", e.getMessage());
+            ShowErrors.showError("Database Error", e.getMessage());
         } catch (Exception e) {
-            showError("Unexpected Error", e.getMessage());
+            ShowErrors.showError("Unexpected Error", e.getMessage());
         }
     }
 
@@ -132,14 +132,14 @@ public class add_article {
     }
 
 
-    // Validate the MongoDB collection
+    // Validation for the MongoDB collection
     private void validateMongoCollection() {
         if (articlesCollection == null) {
             throw new IllegalStateException("Articles collection not initialized.");
         }
     }
 
-    // Validate input fields
+    // Validating input fields
     private void validateInputFields(String... fields) {
         for (String field : fields) {
             if (field == null || field.isEmpty()) {
@@ -155,7 +155,7 @@ public class add_article {
 
     private final String[] labels = {"AI", "Technology", "Education", "Health", "Sports", "Fashion", "Entertainment", "Environment", "General"};
 
-    // Predict the category using Hugging Face API
+    // Category Prediction using Hugging Face API
     private String predictCategory(String content, String[] labels) throws Exception {
         String apiUrl = "https://api-inference.huggingface.co/models/facebook/bart-large-mnli";
         String token = "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";
@@ -292,7 +292,7 @@ public class add_article {
 
                 // Check if the article already exists in the database
                 if (isDuplicateArticle(id)) {
-                    showAlert("Validation Error", "Article ID already exists. Skipping this article.", Alert.AlertType.WARNING);
+                    ShowAlerts.showAlert("Validation Error", "Article ID already exists. Skipping this article.", Alert.AlertType.WARNING);
                     continue; // Skip this article if it's a duplicate
                 }
 
@@ -312,33 +312,15 @@ public class add_article {
             }
 
             // Notify the user after successful insertion
-            Platform.runLater(() -> showAlert("Success", "Articles fetched, categorized, and inserted successfully.", Alert.AlertType.INFORMATION));
+            Platform.runLater(() -> ShowAlerts.showAlert("Success", "Articles fetched, categorized, and inserted successfully.", Alert.AlertType.INFORMATION));
 
         } catch (IOException e) {
             // Handle file read error
-            showError("File Error", "Error reading the file: " + e.getMessage());
+            ShowErrors.showError("File Error", "Error reading the file: " + e.getMessage());
         } catch (Exception e) {
             // Handle JSON parsing or other errors
-            showError("Processing Error", "Error processing the file: " + e.getMessage());
+            ShowErrors.showError("Processing Error", "Error processing the file: " + e.getMessage());
         }
-    }
-
-    // Show an alert dialog
-    private void showAlert(String title, String content, Alert.AlertType error) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    // Show an error dialog
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     // Clear input fields
@@ -376,7 +358,7 @@ public class add_article {
             mainMenuStage.setTitle("Main Menu");
             mainMenuStage.show();
         } catch (IOException e) {
-            showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 

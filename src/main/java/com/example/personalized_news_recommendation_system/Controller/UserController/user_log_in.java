@@ -1,6 +1,7 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.example.personalized_news_recommendation_system.Utils.Validator;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -33,7 +34,7 @@ public class user_log_in {
     private MongoClient mongoClient;
     private MongoCollection<Document> userCollection;
     private MongoCollection<Document> userLogCollection;
-    private String currentUserId;  // Store the user ID for the session
+    private String currentUserId;
     private String currentSessionId;
 
     public void setMongoClient(MongoClient mongoClient) {
@@ -54,19 +55,19 @@ public class user_log_in {
 
         // Validate input fields
         if (!Validator.areFieldsNotEmpty(username, password)) {
-            showAlert("Input Error", "Please enter both username and password.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Input Error", "Please enter both username and password.", Alert.AlertType.ERROR);
             return;
         }
 
         // Validate database collections
         if (!Validator.areCollectionsSet(userCollection, userLogCollection)) {
-            showAlert("Database Error", "Database is not properly configured.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Database Error", "Database is not properly configured.", Alert.AlertType.ERROR);
             return;
         }
 
         Document userDoc = userCollection.find(new Document("username", username)).first();
         if (userDoc == null) {
-            showAlert("Database Error", "User record not found.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Database Error", "User record not found.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -80,12 +81,12 @@ public class user_log_in {
             logUserLogin(username);  // Log the user login event
 
             // Show success message with first and last name
-            showAlert("Login Successful", "Welcome, " + firstName + " " + lastName + "! You have logged in successfully.", Alert.AlertType.INFORMATION);
+            ShowAlerts.showAlert("Login Successful", "Welcome, " + firstName + " " + lastName + "! You have logged in successfully.", Alert.AlertType.INFORMATION);
 
 
             navigateToMainMenu(event);  // Navigate to main menu after successful login
         } else {
-            showAlert("Log-In Error", "Incorrect username or password.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Log-In Error", "Incorrect username or password.", Alert.AlertType.ERROR);
         }
     }
 
@@ -117,14 +118,6 @@ public class user_log_in {
         return String.format("%03d", lastSessionNumber + 1);  // Increment session number
     }
 
-    private void showAlert(String title, String content, Alert.AlertType alertType) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
     private void navigateToMainMenu(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/personalized_news_recommendation_system/user_main_menu.fxml"));
@@ -140,7 +133,7 @@ public class user_log_in {
             currentStage.setTitle("User Main Menu");
             currentStage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the main menu.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Navigation Error", "Failed to load the main menu.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -160,7 +153,7 @@ public class user_log_in {
             currentStage.setTitle("Home");
             currentStage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }

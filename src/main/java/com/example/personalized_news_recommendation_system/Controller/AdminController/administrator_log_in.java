@@ -1,6 +1,7 @@
-package com.example.personalized_news_recommendation_system.AdminControllers;
+package com.example.personalized_news_recommendation_system.Controller.AdminController;
 
 import com.example.personalized_news_recommendation_system.Driver.homePage;
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.example.personalized_news_recommendation_system.Utils.Validator;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -56,36 +57,34 @@ public class administrator_log_in {
 
         // Validate fields are not empty
         if (!Validator.areFieldsNotEmpty(username, password)) {
-            showAlert("Input Error", "Please enter both username and password.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Input Error", "Please enter both username and password.", Alert.AlertType.ERROR);
             return;
         }
 
         // Validate collections are set
         if (!Validator.areCollectionsSet(adminCollection, adminLogCollection)) {
-            showAlert("Configuration Error", "Database collections are not properly configured.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Configuration Error", "Database collections are not properly configured.", Alert.AlertType.ERROR);
             return;
         }
 
         // Authenticate admin
         if (Validator.authenticateAdmin(adminCollection, username, password)) {
-            // Retrieve admin's first and last name from the database
             Document adminDoc = adminCollection.find(new Document("username", username)).first();
             if (adminDoc == null) {
-                showAlert("Database Error", "Admin record not found.", Alert.AlertType.ERROR);
+                ShowAlerts.showAlert("Database Error", "Admin record not found.", Alert.AlertType.ERROR);
                 return;
             }
 
             String firstName = adminDoc.containsKey("first_name") ? adminDoc.getString("first_name") : "Administrator";
             String lastName = adminDoc.containsKey("last_name") ? adminDoc.getString("last_name") : "";
 
-            logAdminLogin(username);  // Log the admin login event
+            logAdminLogin(username);
 
-            // Show success message with admin's name
-            showAlert("Sign-In Success", "Welcome, " + firstName + " " + lastName + "!", Alert.AlertType.INFORMATION);
+            ShowAlerts.showAlert("Sign-In Success", "Welcome, " + firstName + " " + lastName + "!", Alert.AlertType.INFORMATION);
 
-            openAdminMainMenu(event);  // Open admin main menu after successful login
+            openAdminMainMenu(event);
         } else {
-            showAlert("Sign-In Failed", "Invalid credentials.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Sign-In Failed", "Invalid credentials.", Alert.AlertType.ERROR);
             administratorPassword.clear();
         }
     }
@@ -96,12 +95,6 @@ public class administrator_log_in {
         adminLogCollection.insertOne(log);
     }
 
-    private void showAlert(String title, String content, Alert.AlertType alertType) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 
     public void openAdminMainMenu(ActionEvent actionEvent) {
         try {
@@ -117,7 +110,7 @@ public class administrator_log_in {
             currentStage.setTitle("Administrator Main Menu");
             currentStage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the Admin Main Menu page.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Navigation Error", "Failed to load the Admin Main Menu page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -137,7 +130,7 @@ public class administrator_log_in {
             currentStage.setTitle("Home");
             currentStage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Navigation Error", "Failed to load the home page.", Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }

@@ -1,5 +1,6 @@
-package com.example.personalized_news_recommendation_system.AdminControllers;
+package com.example.personalized_news_recommendation_system.Controller.AdminController;
 
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -55,11 +56,6 @@ public class manage_articles {
     // Set the MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        if (mongoClient != null) {
-            System.out.println("MongoClient successfully set in Manage Articles.");
-        } else {
-            System.err.println("MongoClient is null in Manage Articles.");
-        }
     }
 
     // Set the MongoDatabase and initialize collections
@@ -68,10 +64,7 @@ public class manage_articles {
             this.articlesCollection = database.getCollection("Articles");
             this.updatedArticlesCollection = database.getCollection("Updated_Articles");
             this.deletedArticlesCollection = database.getCollection("Deleted_Articles");
-            System.out.println("Collections initialized successfully.");
-            populateArticleTable(); // Populate table after collections are initialized
-        } else {
-            System.err.println("Database is null. Cannot initialize collections.");
+            populateArticleTable();
         }
     }
 
@@ -108,7 +101,7 @@ public class manage_articles {
             articleTable.getItems().setAll(articles);
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -118,12 +111,12 @@ public class manage_articles {
         try {
             Document selectedArticle = articleTable.getSelectionModel().getSelectedItem();
             if (selectedArticle == null) {
-                showAlert("Error", "Please select an article to update.", Alert.AlertType.ERROR);
+                ShowAlerts.showAlert("Error", "Please select an article to update.", Alert.AlertType.ERROR);
                 return;
             }
 
             if (!validateInputs()) {
-                showAlert("Error", "Please fill in all required fields.", Alert.AlertType.ERROR);
+                ShowAlerts.showAlert("Error", "Please fill in all required fields.", Alert.AlertType.ERROR);
                 return;
             }
 
@@ -143,7 +136,7 @@ public class manage_articles {
 
                     } catch (Exception e) {
                         // Handle error in prediction and display the category that was predicted before failure
-                        Platform.runLater(() -> showAlert("Prediction Error", "Failed to predict category. Predicted category: " + predictedCategory, Alert.AlertType.ERROR));
+                        Platform.runLater(() -> ShowAlerts.showAlert("Prediction Error", "Failed to predict category. Predicted category: " + predictedCategory, Alert.AlertType.ERROR));
                         throw e;  // Rethrow exception after showing the error
                     }
 
@@ -175,7 +168,7 @@ public class manage_articles {
                 protected void succeeded() {
                     // Show success message and clear fields
                     Platform.runLater(() -> {
-                        showAlert("Success", "Article updated successfully under category: " + predictedCategory, Alert.AlertType.INFORMATION);
+                        ShowAlerts.showAlert("Success", "Article updated successfully under category: " + predictedCategory, Alert.AlertType.INFORMATION);
 
                         // Clear the fields after the successful update
                         articleNameField.clear();
@@ -190,7 +183,7 @@ public class manage_articles {
 
                 @Override
                 protected void failed() {
-                    showAlert("Error", "Failed to update article: " + getException().getMessage(), Alert.AlertType.ERROR);
+                    ShowAlerts.showAlert("Error", "Failed to update article: " + getException().getMessage(), Alert.AlertType.ERROR);
                     getException().printStackTrace();
                 }
             };
@@ -199,7 +192,7 @@ public class manage_articles {
             executorService.submit(updateTask);
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to update article: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to update article: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -212,7 +205,7 @@ public class manage_articles {
         try {
             Document selectedArticle = articleTable.getSelectionModel().getSelectedItem();
             if (selectedArticle == null) {
-                showAlert("Error", "Please select an article to delete.", Alert.AlertType.ERROR);
+                ShowAlerts.showAlert("Error", "Please select an article to delete.", Alert.AlertType.ERROR);
                 return;
             }
 
@@ -231,13 +224,13 @@ public class manage_articles {
 
                 @Override
                 protected void succeeded() {
-                    showAlert("Success", "Article deleted successfully!", Alert.AlertType.INFORMATION);
+                    ShowAlerts.showAlert("Success", "Article deleted successfully!", Alert.AlertType.INFORMATION);
                     populateArticleTable(); // Refresh table
                 }
 
                 @Override
                 protected void failed() {
-                    showAlert("Error", "Failed to delete article: " + getException().getMessage(), Alert.AlertType.ERROR);
+                    ShowAlerts.showAlert("Error", "Failed to delete article: " + getException().getMessage(), Alert.AlertType.ERROR);
                     getException().printStackTrace();
                 }
             };
@@ -246,7 +239,7 @@ public class manage_articles {
             executorService.submit(deleteTask);
 
         } catch (Exception e) {
-            showAlert("Error", "Failed to delete article: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to delete article: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -276,7 +269,7 @@ public class manage_articles {
             mainMenuStage.setTitle("Main Menu");
             mainMenuStage.show();
         } catch (IOException e) {
-            showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
         }
 
     }
@@ -296,15 +289,6 @@ public class manage_articles {
                 manageDescription.getText().isEmpty() ||
                 manageContent.getText().isEmpty() ||
                 publishedDatePicker.getValue() == null);
-    }
-
-    // Show an alert dialog
-    private void showAlert(String title, String content, Alert.AlertType error) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     // BART-based categorization (Hugging Face API integration)

@@ -1,4 +1,4 @@
-package com.example.personalized_news_recommendation_system.AdminControllers;
+package com.example.personalized_news_recommendation_system.Controller.AdminController;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
@@ -29,13 +29,11 @@ public class administrator_main_menu {
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
         this.database = mongoClient.getDatabase("News_Recommendation");
-        System.out.println("MongoClient set successfully in AdministratorMainMenu controller.");
     }
 
     // Setter for MongoDatabase
     public void setDatabase(MongoDatabase database) {
         this.database = database;
-        System.out.println("Connected to database successfully.");
     }
 
     // Handle Add Articles Button Action
@@ -86,7 +84,7 @@ public class administrator_main_menu {
     }
 
 
-    // Handle Exit Button Action
+    // Exiting the application
     @FXML
     public void Exit(ActionEvent event) {
         // Close the application
@@ -94,7 +92,7 @@ public class administrator_main_menu {
         currentStage.close();
     }
 
-    // Method to show a simple alert with a message
+    // Method to show the alert message
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);

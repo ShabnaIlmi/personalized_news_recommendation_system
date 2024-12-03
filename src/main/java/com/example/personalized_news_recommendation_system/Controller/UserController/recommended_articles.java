@@ -1,6 +1,7 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -80,13 +81,13 @@ public class recommended_articles {
         executorService.submit(() -> {
             try {
                 if (articlesCollection == null) {
-                    Platform.runLater(() -> showAlert("Error", "Articles collection is null.", Alert.AlertType.ERROR));
+                    Platform.runLater(() -> ShowAlerts.showAlert("Error", "Articles collection is null.", Alert.AlertType.ERROR));
                     return;
                 }
 
                 List<Document> articles = articlesCollection.find().into(new ArrayList<>());
                 if (articles.isEmpty()) {
-                    Platform.runLater(() -> showAlert("Error", "No articles found in the database.", Alert.AlertType.ERROR));
+                    Platform.runLater(() -> ShowAlerts.showAlert("Error", "No articles found in the database.", Alert.AlertType.ERROR));
                     return;
                 }
 
@@ -94,7 +95,7 @@ public class recommended_articles {
 
                 Platform.runLater(() -> recommendedTable.getItems().setAll(articleList));
             } catch (Exception e) {
-                Platform.runLater(() -> showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR));
+                Platform.runLater(() -> ShowAlerts.showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR));
             }
         });
     }
@@ -122,7 +123,7 @@ public class recommended_articles {
     public void viewArticle(ActionEvent actionEvent) {
         Article selectedArticle = recommendedTable.getSelectionModel().getSelectedItem();
         if (selectedArticle == null) {
-            showAlert("Error", "No article selected.", Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "No article selected.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -143,7 +144,7 @@ public class recommended_articles {
             currentStage.setScene(scene);
             currentStage.setTitle("View Article");
         } catch (IOException e) {
-            showAlert("Error", "Failed to load article view: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to load article view: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -154,7 +155,6 @@ public class recommended_articles {
                 .append("timestamp", Instant.now().toString())
                 .append("interactionType", interactionType);
         sessionInteractions.add(interaction);
-        System.out.println("Logged interaction: " + interaction);
     }
 
     @FXML
@@ -173,7 +173,7 @@ public class recommended_articles {
             currentStage.setScene(scene);
             currentStage.setTitle("User Main Menu");
         } catch (IOException e) {
-            showAlert("Error", "Failed to navigate: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to navigate: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -188,7 +188,6 @@ public class recommended_articles {
                 .append("sessionEnd", Instant.now().toString());
 
         userPreferencesCollection.insertOne(sessionDocument);
-        System.out.println("Stored session interactions: " + sessionDocument);
         sessionInteractions.clear();
     }
 
@@ -222,12 +221,11 @@ public class recommended_articles {
                     for (String category : preferredCategories) {
                         // Query the articles collection for articles in the current category
                         List<Document> articles = articlesCollection.find(eq("category", category)).into(new ArrayList<>());
-                        System.out.println("Recommended articles in category '" + category + "':");
                         for (Document article : articles) {
                             System.out.println(article.getString("article_name"));
                         }
                     }
-                    return categoryScoreMap; // Early return if we are recommending articles
+                    return categoryScoreMap;
                 }
             }
         }
@@ -258,12 +256,10 @@ public class recommended_articles {
         }
 
         // Debugging output
-        System.out.println("Category Score Map: ");
         categoryScoreMap.forEach((key, value) -> System.out.println(key + ": " + value));
 
 
         // Output the category scores for debugging
-        System.out.println("Category Score Map: ");
         categoryScoreMap.forEach((key, value) -> System.out.println(key + ": " + value));
 
         return categoryScoreMap;
@@ -299,11 +295,11 @@ public class recommended_articles {
             }
 
             if (recommendedArticles.isEmpty()) {
-                showAlert("Recommendation", "No recommendations available based on your preferences.", Alert.AlertType.INFORMATION);
+                ShowAlerts.showAlert("Recommendation", "No recommendations available based on your preferences.", Alert.AlertType.INFORMATION);
             } else {
                 List<Article> articleList = convertDocumentsToArticles(recommendedArticles);
                 recommendedTable.getItems().setAll(articleList); // Display articles in the table
-                showAlert("Recommendation", "Articles recommended based on your preferred categories.", Alert.AlertType.INFORMATION);
+                ShowAlerts.showAlert("Recommendation", "Articles recommended based on your preferred categories.", Alert.AlertType.INFORMATION);
             }
         } else {
             // If there are interactions, fetch articles from the recommended categories
@@ -311,22 +307,13 @@ public class recommended_articles {
                     .into(new ArrayList<>());
 
             if (recommendedArticles.isEmpty()) {
-                showAlert("Recommendation", "No recommendations available.", Alert.AlertType.INFORMATION);
+                ShowAlerts.showAlert("Recommendation", "No recommendations available.", Alert.AlertType.INFORMATION);
             } else {
                 List<Article> articleList = convertDocumentsToArticles(recommendedArticles);
                 recommendedTable.getItems().setAll(articleList); // Display in the table
-                showAlert("Recommendation", "Articles recommended based on your interactions.", Alert.AlertType.INFORMATION);
+                ShowAlerts.showAlert("Recommendation", "Articles recommended based on your interactions.", Alert.AlertType.INFORMATION);
             }
         }
-    }
-
-    // Helper method to display alerts
-    private void showAlert(String title, String message, Alert.AlertType alertType) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     @FXML

@@ -1,5 +1,6 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import javafx.event.ActionEvent;
@@ -48,12 +49,10 @@ public class account_information {
     // Setters for MongoDB connection
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        System.out.println("MongoClient set successfully in Account Information controller.");
     }
 
     public void setDatabase(MongoDatabase database) {
         this.database = database;
-        System.out.println("Connected to database successfully.");
     }
 
     // Setter for User ID and Session ID
@@ -91,7 +90,7 @@ public class account_information {
             currentStage.setScene(scene);
             currentStage.setTitle("Main Menu");
         } catch (IOException e) {
-            showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to open Main Menu: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -122,14 +121,14 @@ public class account_information {
     public void updateDetails(ActionEvent actionEvent) {
         // Validate input fields
         if (firstName.getText().isEmpty() || lastName.getText().isEmpty() || email.getText().isEmpty() || age.getText().isEmpty() || password.getText().isEmpty()) {
-            showAlert("Validation Error", "All fields must be filled before updating details.", Alert.AlertType.WARNING);
+            ShowAlerts.showAlert("Validation Error", "All fields must be filled before updating details.", Alert.AlertType.WARNING);
             return;
         }
 
         // Validate that three distinct categories are selected
         HashSet<String> selectedCategories = new HashSet<>(Arrays.asList(category1.getValue(), category2.getValue(), category3.getValue()));
         if (selectedCategories.contains(null) || selectedCategories.size() != 3) {
-            showAlert("Validation Error", "Please select exactly three distinct categories.", Alert.AlertType.WARNING);
+            ShowAlerts.showAlert("Validation Error", "Please select exactly three distinct categories.", Alert.AlertType.WARNING);
             return;
         }
 
@@ -137,7 +136,7 @@ public class account_information {
             // Fetch current first name and last name from the database
             Document userDoc = database.getCollection("User").find(new Document("username", userId)).first();
             if (userDoc == null) {
-                showAlert("Error", "User not found in the database.", Alert.AlertType.ERROR);
+                ShowAlerts.showAlert("Error", "User not found in the database.", Alert.AlertType.ERROR);
                 return;
             }
 
@@ -186,13 +185,13 @@ public class account_information {
 
             // Notify the user and log them out if the username changed
             if (!newUsername.equals(userId)) {
-                userId = newUsername; // Update the in-memory userId
-                logout(actionEvent, newUsername); // Redirect to login with a new username
-                return; // Prevent further processing
+                userId = newUsername;
+                logout(actionEvent, newUsername);
+                return;
             }
 
             // Show success message
-            showAlert("Success", "User details updated successfully.", Alert.AlertType.INFORMATION);
+            ShowAlerts.showAlert("Success", "User details updated successfully.", Alert.AlertType.INFORMATION);
 
             // Clear fields after update
             firstName.clear();
@@ -205,7 +204,7 @@ public class account_information {
             category3.getSelectionModel().clearSelection();
 
         } catch (Exception e) {
-            showAlert("Database Error", "Failed to update user details: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Database Error", "Failed to update user details: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -239,7 +238,7 @@ public class account_information {
 
 
         } catch (IOException e) {
-            showAlert("Error", "Failed to load login screen: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to load login screen: " + e.getMessage(), Alert.AlertType.ERROR);
             e.printStackTrace();
         }
     }
@@ -265,15 +264,8 @@ public class account_information {
             currentStage.setScene(scene);
             currentStage.setTitle("Manage Profile");
         } catch (IOException e) {
-            showAlert("Error", "Failed to load article view: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to load article view: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
-    private void showAlert(String title, String content, Alert.AlertType alertType) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 }

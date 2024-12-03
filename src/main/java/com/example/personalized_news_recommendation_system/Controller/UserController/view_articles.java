@@ -1,6 +1,7 @@
-package com.example.personalized_news_recommendation_system.UserControllers;
+package com.example.personalized_news_recommendation_system.Controller.UserController;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
+import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.mongodb.client.MongoCollection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -85,7 +86,7 @@ public class view_articles {
             currentStage.setScene(scene);
             currentStage.setTitle("Read Article");
         } catch (IOException e) {
-            showAlert("Error", "Failed to load read article page: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to load read article page: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -115,7 +116,7 @@ public class view_articles {
             currentStage.setScene(scene);
             currentStage.setTitle("Recommended Articles");
         } catch (IOException e) {
-            showAlert("Error", "Failed to load recommended articles: " + e.getMessage(), Alert.AlertType.ERROR);
+            ShowAlerts.showAlert("Error", "Failed to load recommended articles: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -151,7 +152,7 @@ public class view_articles {
                     sessionInteractions.clear();
                 }
             } catch (Exception e) {
-                Platform.runLater(() -> showAlert("Error", "Failed to store session interactions: " + e.getMessage(), Alert.AlertType.ERROR));
+                Platform.runLater(() -> ShowAlerts.showAlert("Error", "Failed to store session interactions: " + e.getMessage(), Alert.AlertType.ERROR));
             }
         });
     }
@@ -160,11 +161,4 @@ public class view_articles {
         executorService.shutdown();
     }
 
-    private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 }
