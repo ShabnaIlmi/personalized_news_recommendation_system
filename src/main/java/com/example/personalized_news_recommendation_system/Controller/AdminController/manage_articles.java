@@ -76,7 +76,6 @@ public class manage_articles {
             }
 
             List<Document> articles = articlesCollection.find().into(new ArrayList<>());
-            System.out.println("Articles Retrieved: " + articles.size());
 
             if (articles.isEmpty()) {
                 articleTable.setPlaceholder(new Label("No articles available."));

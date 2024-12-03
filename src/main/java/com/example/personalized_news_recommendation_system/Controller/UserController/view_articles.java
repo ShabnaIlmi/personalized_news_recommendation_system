@@ -97,7 +97,6 @@ public class view_articles {
                 .append("timestamp", Instant.now().toString())
                 .append("interactionType", interactionType);
         sessionInteractions.add(interaction);
-        System.out.println("Logged interaction: " + interaction);
     }
 
     @FXML

@@ -34,12 +34,10 @@ public class manage_profile {
     // Setters for MongoClient and MongoDatabase
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
-        System.out.println("MongoClient set successfully in Manage Profile controller.");
     }
 
     public void setDatabase(MongoDatabase database) {
         this.database = database;
-        System.out.println("Connected to database successfully.");
     }
 
     // New setter for User ID and Session ID

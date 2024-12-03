@@ -11,12 +11,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -45,6 +45,12 @@ public class add_article {
     private TextArea contentArea;
     @FXML
     private Button fetchArticle;
+    @FXML
+    private StackPane progressContainer;
+    @FXML
+    private ProgressIndicator progressIndicator;
+    @FXML
+    private Label progressMessage;
 
     private MongoClient mongoClient;
     private MongoCollection<Document> articlesCollection;
@@ -261,6 +267,7 @@ public class add_article {
 
     @FXML
     public void fetchArticle() {
+        // Configure file chooser
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
 
@@ -272,55 +279,83 @@ public class add_article {
             return;
         }
 
-        try {
-            // Read the content of the file into a string
-            String content = new String(Files.readAllBytes(selectedFile.toPath()), StandardCharsets.UTF_8);
+        // Show progress indicator and message
+        Platform.runLater(() -> {
+            progressMessage.setText("Loading articles... Please wait.");
+            progressContainer.setVisible(true);
+        });
 
-            // Parse the file content as a JSONArray
-            JSONArray articlesArray = new JSONArray(content);
+        // Process file in a separate thread
+        executorService.submit(() -> {
+            try {
+                // Read the content of the file into a string
+                String content = new String(Files.readAllBytes(selectedFile.toPath()), StandardCharsets.UTF_8);
 
-            // Iterate over each article in the JSON array
-            for (int i = 0; i < articlesArray.length(); i++) {
-                JSONObject articleJson = articlesArray.getJSONObject(i);
+                // Parse the file content as a JSONArray
+                JSONArray articlesArray = new JSONArray(content);
 
-                String id = articleJson.getString("article_id");
-                String title = articleJson.getString("article_name");
-                String author = articleJson.getString("author");
-                String publishedDate = articleJson.optString("published_date", "");
-                String description = articleJson.getString("description");
-                String contentText = articleJson.getString("content");
+                for (int i = 0; i < articlesArray.length(); i++) {
+                    JSONObject articleJson = articlesArray.getJSONObject(i);
 
-                // Check if the article already exists in the database
-                if (isDuplicateArticle(id)) {
-                    ShowAlerts.showAlert("Validation Error", "Article ID already exists. Skipping this article.", Alert.AlertType.WARNING);
-                    continue; // Skip this article if it's a duplicate
+                    // Extract fields from JSON
+                    String id = articleJson.getString("article_id");
+                    String title = articleJson.getString("article_name");
+                    String author = articleJson.getString("author");
+                    String publishedDate = articleJson.optString("published_date", "");
+                    String description = articleJson.getString("description");
+                    String contentText = articleJson.getString("content");
+
+                    // Check for duplicate article ID
+                    if (isDuplicateArticle(id)) {
+                        int currentIndex = i + 1;
+                        Platform.runLater(() -> ShowAlerts.showAlert(
+                                "Validation Error",
+                                "Article ID already exists. Skipping article #" + currentIndex + ": " + title,
+                                Alert.AlertType.WARNING
+                        ));
+                        continue;
+                    }
+
+                    // Predict category
+                    String category = predictCategory(contentText, labels);
+
+                    // Default to "General" if category is not valid
+                    if (!isValidCategory(category)) {
+                        category = "General";
+                    }
+
+                    // Generate timestamp and create article document
+                    String articleAddedTime = getCurrentTimestamp();
+                    Document article = createArticleDocument(id, title, author, publishedDate, articleAddedTime, description, contentText, category);
+
+                    // Insert into MongoDB
+                    articlesCollection.insertOne(article);
                 }
 
-                // Predict the category for the article content
-                String category = predictCategory(contentText, labels);
+                // Notify success
+                Platform.runLater(() -> ShowAlerts.showAlert(
+                        "Success",
+                        "All valid articles were fetched, categorized, and inserted successfully.",
+                        Alert.AlertType.INFORMATION
+                ));
 
-                // If the predicted category is not one of the predefined ones, classify it as "General"
-                if (!isValidCategory(category)) {
-                    category = "General";
-                }
-
-                String articleAddedTime = getCurrentTimestamp();
-                Document article = createArticleDocument(id, title, author, publishedDate, articleAddedTime, description, contentText, category);
-
-                // Insert the article into the MongoDB collection
-                articlesCollection.insertOne(article);
+            } catch (IOException e) {
+                // Handle file read errors
+                Platform.runLater(() -> ShowErrors.showError(
+                        "File Error",
+                        "Error reading the file: " + e.getMessage()
+                ));
+            } catch (Exception e) {
+                // Handle other errors
+                Platform.runLater(() -> ShowErrors.showError(
+                        "Processing Error",
+                        "Error processing the file: " + e.getMessage()
+                ));
+            } finally {
+                // Hide progress indicator
+                Platform.runLater(() -> progressContainer.setVisible(false));
             }
-
-            // Notify the user after successful insertion
-            Platform.runLater(() -> ShowAlerts.showAlert("Success", "Articles fetched, categorized, and inserted successfully.", Alert.AlertType.INFORMATION));
-
-        } catch (IOException e) {
-            // Handle file read error
-            ShowErrors.showError("File Error", "Error reading the file: " + e.getMessage());
-        } catch (Exception e) {
-            // Handle JSON parsing or other errors
-            ShowErrors.showError("Processing Error", "Error processing the file: " + e.getMessage());
-        }
+        });
     }
 
     // Clear input fields

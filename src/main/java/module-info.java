@@ -10,7 +10,6 @@ module com.example.personalized_news_recommendation_system {
 
     // Other dependencies
     requires org.slf4j;
-    requires org.apache.opennlp.tools;
     requires java.logging;
     requires java.sql;
     requires json;

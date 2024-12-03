@@ -70,7 +70,6 @@ public class recommended_articles {
     public void setUserDetails(String userId, String sessionId) {
         this.currentUserId = userId;
         this.currentSessionId = sessionId;
-        System.out.println("User details set: user_id = " + userId + ", session_id = " + sessionId);
     }
 
     public void setSessionInteractions(List<Document> sessionInteractions) {
@@ -203,7 +202,6 @@ public class recommended_articles {
             }
         }
 
-        System.out.println("Aggregated interactions for user_id " + userId + ": " + allInteractions);
         return allInteractions;
     }
 
@@ -221,9 +219,7 @@ public class recommended_articles {
                     for (String category : preferredCategories) {
                         // Query the articles collection for articles in the current category
                         List<Document> articles = articlesCollection.find(eq("category", category)).into(new ArrayList<>());
-                        for (Document article : articles) {
-                            System.out.println(article.getString("article_name"));
-                        }
+                        // No System.out.println here
                     }
                     return categoryScoreMap;
                 }
@@ -255,65 +251,64 @@ public class recommended_articles {
             }
         }
 
-        // Debugging output
-        categoryScoreMap.forEach((key, value) -> System.out.println(key + ": " + value));
+        // Check if recommendations are only from one category
+        if (categoryScoreMap.size() == 1) {
+            String singleCategory = categoryScoreMap.keySet().iterator().next();
+            Document userDocument = userCollection.find(eq("username", currentUserId)).first();
 
+            if (userDocument != null) {
+                List<String> preferredCategories = userDocument.getList("categories", String.class);
 
-        // Output the category scores for debugging
-        categoryScoreMap.forEach((key, value) -> System.out.println(key + ": " + value));
-
+                if (preferredCategories != null && !preferredCategories.isEmpty()) {
+                    preferredCategories.remove(singleCategory);
+                    // Fetch articles from remaining preferred categories
+                    for (String category : preferredCategories) {
+                        List<Document> articles = articlesCollection.find(eq("category", category)).into(new ArrayList<>());
+                    }
+                }
+            }
+        }
         return categoryScoreMap;
     }
 
     @FXML
     public void getRecommendation(ActionEvent actionEvent) {
-        // Fetch user preferences and interactions
-        List<Document> allInteractions = getUserPreferences(currentUserId);
+        executorService.submit(() -> {
+            try {
+                List<Document> allInteractions = getUserPreferences(currentUserId);
 
-        // Analyze interactions to get category scores
-        Map<String, Integer> categoryScores = analyzeInteractions(allInteractions);
-
-        // Get top categories for recommendations (only if interactions exist)
-        List<String> recommendedCategories = categoryScores.entrySet().stream()
-                .sorted((entry1, entry2) -> entry2.getValue() - entry1.getValue()) // Sort by score (descending)
-                .limit(3) // Get top 3 categories
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-
-        List<Document> recommendedArticles = new ArrayList<>();
-
-        if (allInteractions.isEmpty()) {
-            // If there are no interactions, fetch articles based on the user's preferred categories
-            Document userDocument = userCollection.find(eq("username", currentUserId)).first();
-            if (userDocument != null) {
-                List<String> preferredCategories = userDocument.getList("categories", String.class);
-
-                // Fetch articles for the user's preferred categories
-                if (preferredCategories != null && !preferredCategories.isEmpty()) {
-                    recommendedArticles = articlesCollection.find(in("category", preferredCategories)).into(new ArrayList<>());
+                if (allInteractions.isEmpty()) {
+                    Platform.runLater(() -> ShowAlerts.showAlert("Info", "No interactions found. Please view articles first.", Alert.AlertType.INFORMATION));
+                    return;
                 }
-            }
 
-            if (recommendedArticles.isEmpty()) {
-                ShowAlerts.showAlert("Recommendation", "No recommendations available based on your preferences.", Alert.AlertType.INFORMATION);
-            } else {
-                List<Article> articleList = convertDocumentsToArticles(recommendedArticles);
-                recommendedTable.getItems().setAll(articleList); // Display articles in the table
-                ShowAlerts.showAlert("Recommendation", "Articles recommended based on your preferred categories.", Alert.AlertType.INFORMATION);
-            }
-        } else {
-            // If there are interactions, fetch articles from the recommended categories
-            recommendedArticles = articlesCollection.find(in("category", recommendedCategories))
-                    .into(new ArrayList<>());
+                Map<String, Integer> categoryScoreMap = analyzeInteractions(allInteractions);
 
-            if (recommendedArticles.isEmpty()) {
-                ShowAlerts.showAlert("Recommendation", "No recommendations available.", Alert.AlertType.INFORMATION);
-            } else {
+                if (categoryScoreMap.isEmpty()) {
+                    Platform.runLater(() -> ShowAlerts.showAlert("Info", "No category preferences found.", Alert.AlertType.INFORMATION));
+                    return;
+                }
+
+                List<String> recommendedCategories = categoryScoreMap.entrySet().stream()
+                        .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))  // Sort categories by score
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList());
+
+                // Fetch articles from recommended categories
+                List<Document> recommendedArticles = articlesCollection.find(in("category", recommendedCategories)).into(new ArrayList<>());
+
+                if (recommendedArticles.isEmpty()) {
+                    Platform.runLater(() -> ShowAlerts.showAlert("Info", "No recommended articles found for the selected categories.", Alert.AlertType.INFORMATION));
+                    return;
+                }
+
                 List<Article> articleList = convertDocumentsToArticles(recommendedArticles);
-                recommendedTable.getItems().setAll(articleList); // Display in the table
-                ShowAlerts.showAlert("Recommendation", "Articles recommended based on your interactions.", Alert.AlertType.INFORMATION);
+
+                Platform.runLater(() -> recommendedTable.getItems().setAll(articleList));
+            } catch (Exception e) {
+                Platform.runLater(() -> ShowAlerts.showAlert("Error", "Failed to get recommendations: " + e.getMessage(), Alert.AlertType.ERROR));
             }
-        }
+        });
     }
 
     @FXML
