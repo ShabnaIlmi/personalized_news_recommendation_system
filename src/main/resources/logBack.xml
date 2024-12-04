@@ -1,11 +1,20 @@
 <configuration>
+    <!-- Console Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <root level="debug">
+    <!-- Root Logger: Set to INFO to minimize unnecessary output -->
+    <root level="info">
         <appender-ref ref="CONSOLE" />
     </root>
+
+    <!-- MongoDB Logger: Suppress debug/trace logs -->
+    <logger name="org.mongodb.driver" level="warn" />
+    <logger name="com.mongodb" level="warn" />
+
+    <!-- Application Logger: Example for your package -->
+    <logger name="com.example.personalized_news_recommendation_system" level="debug" />
 </configuration>

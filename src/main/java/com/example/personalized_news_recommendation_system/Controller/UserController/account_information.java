@@ -193,7 +193,14 @@ public class account_information {
             // Show success message
             ShowAlerts.showAlert("Success", "User details updated successfully.", Alert.AlertType.INFORMATION);
 
-            // Clear fields after update
+           //Check if the username was updated and log the user out if necessary
+            if (!newUsername.equals(userId)) {
+                userId = newUsername;
+                logout(actionEvent, newUsername);
+                return;
+            }
+
+// Clear fields after update
             firstName.clear();
             lastName.clear();
             email.clear();
@@ -202,6 +209,7 @@ public class account_information {
             category1.getSelectionModel().clearSelection();
             category2.getSelectionModel().clearSelection();
             category3.getSelectionModel().clearSelection();
+
 
         } catch (Exception e) {
             ShowAlerts.showAlert("Database Error", "Failed to update user details: " + e.getMessage(), Alert.AlertType.ERROR);
