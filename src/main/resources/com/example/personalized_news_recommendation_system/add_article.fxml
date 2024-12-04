@@ -30,7 +30,10 @@
                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <VBox alignment="CENTER" spacing="10">
                 <ProgressIndicator fx:id="progressIndicator" />
-                <Label fx:id="progressMessage" textFill="black" style="-fx-font-size: 16px;" />
+                <Label fx:id="progressMessage"
+                       textFill="black"
+                       style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-wrap-text: true;"
+                       maxWidth="400" />
             </VBox>
         </StackPane>
 

@@ -1,7 +1,6 @@
 package com.example.personalized_news_recommendation_system.Controller.UserController;
 
 import com.example.personalized_news_recommendation_system.Model.Article;
-import com.example.personalized_news_recommendation_system.Utils.ShowAlerts;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -40,7 +39,6 @@ public class recommended_articles {
     private MongoClient mongoClient;
     private MongoDatabase database;
 
-    // Declare the MongoCollection objects for articles and user preferences
     private MongoCollection<Document> articlesCollection;
     private MongoCollection<Document> userCollection;
 
@@ -51,18 +49,15 @@ public class recommended_articles {
 
     private List<Document> sessionInteractions = new ArrayList<>();
 
-    // Setter for MongoClient
     public void setMongoClient(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
     }
 
-    // Setter for MongoDatabase and initializing collections
     public void setDatabase(MongoDatabase database) {
         this.database = database;
         if (database != null) {
-            // Initialize the collections
-            this.articlesCollection = database.getCollection("Articles"); // Collection for articles
-            this.userCollection = database.getCollection("User");     // Collection for user preferences (ensure this collection exists in your DB)
+            this.articlesCollection = database.getCollection("Articles");
+            this.userCollection = database.getCollection("User");
             populateRecommendedTable();
         }
     }
@@ -80,13 +75,13 @@ public class recommended_articles {
         executorService.submit(() -> {
             try {
                 if (articlesCollection == null) {
-                    Platform.runLater(() -> ShowAlerts.showAlert("Error", "Articles collection is null.", Alert.AlertType.ERROR));
+                    Platform.runLater(() -> showAlert("Error", "Articles collection is null.", Alert.AlertType.ERROR));
                     return;
                 }
 
                 List<Document> articles = articlesCollection.find().into(new ArrayList<>());
                 if (articles.isEmpty()) {
-                    Platform.runLater(() -> ShowAlerts.showAlert("Error", "No articles found in the database.", Alert.AlertType.ERROR));
+                    Platform.runLater(() -> showAlert("Error", "No articles found in the database.", Alert.AlertType.ERROR));
                     return;
                 }
 
@@ -94,7 +89,7 @@ public class recommended_articles {
 
                 Platform.runLater(() -> recommendedTable.getItems().setAll(articleList));
             } catch (Exception e) {
-                Platform.runLater(() -> ShowAlerts.showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR));
+                Platform.runLater(() -> showAlert("Error", "Failed to populate article table: " + e.getMessage(), Alert.AlertType.ERROR));
             }
         });
     }
@@ -122,7 +117,7 @@ public class recommended_articles {
     public void viewArticle(ActionEvent actionEvent) {
         Article selectedArticle = recommendedTable.getSelectionModel().getSelectedItem();
         if (selectedArticle == null) {
-            ShowAlerts.showAlert("Error", "No article selected.", Alert.AlertType.ERROR);
+            showAlert("Error", "No article selected.", Alert.AlertType.ERROR);
             return;
         }
 
@@ -143,7 +138,7 @@ public class recommended_articles {
             currentStage.setScene(scene);
             currentStage.setTitle("View Article");
         } catch (IOException e) {
-            ShowAlerts.showAlert("Error", "Failed to load article view: " + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Error", "Failed to load article view: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -172,7 +167,7 @@ public class recommended_articles {
             currentStage.setScene(scene);
             currentStage.setTitle("User Main Menu");
         } catch (IOException e) {
-            ShowAlerts.showAlert("Error", "Failed to navigate: " + e.getMessage(), Alert.AlertType.ERROR);
+            showAlert("Error", "Failed to navigate: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
@@ -208,33 +203,23 @@ public class recommended_articles {
     private Map<String, Integer> analyzeInteractions(List<Document> allInteractions) {
         Map<String, Integer> categoryScoreMap = new HashMap<>();
 
-        // If no interactions are available, recommend articles based on user's preferred categories
         if (allInteractions == null || allInteractions.isEmpty()) {
             Document userDocument = userCollection.find(eq("username", currentUserId)).first();
             if (userDocument != null) {
                 List<String> preferredCategories = userDocument.getList("categories", String.class);
 
                 if (preferredCategories != null && !preferredCategories.isEmpty()) {
-                    // Fetch articles from all preferred categories
-                    for (String category : preferredCategories) {
-                        // Query the articles collection for articles in the current category
-                        List<Document> articles = articlesCollection.find(eq("category", category)).into(new ArrayList<>());
-                        // No System.out.println here
-                    }
                     return categoryScoreMap;
                 }
             }
         }
 
-        // Process all interactions to calculate category scores
         for (Document interaction : allInteractions) {
             String category = interaction.getString("category");
             String interactionType = interaction.getString("interactionType");
 
-            // Validate data
             if (category == null || interactionType == null) continue;
 
-            // Assign scores based on interaction type
             switch (interactionType) {
                 case "like":
                     categoryScoreMap.put(category, categoryScoreMap.getOrDefault(category, 0) + 3);
@@ -251,64 +236,65 @@ public class recommended_articles {
             }
         }
 
-        // Check if recommendations are only from one category
-        if (categoryScoreMap.size() == 1) {
-            String singleCategory = categoryScoreMap.keySet().iterator().next();
-            Document userDocument = userCollection.find(eq("username", currentUserId)).first();
-
-            if (userDocument != null) {
-                List<String> preferredCategories = userDocument.getList("categories", String.class);
-
-                if (preferredCategories != null && !preferredCategories.isEmpty()) {
-                    preferredCategories.remove(singleCategory);
-                    // Fetch articles from remaining preferred categories
-                    for (String category : preferredCategories) {
-                        List<Document> articles = articlesCollection.find(eq("category", category)).into(new ArrayList<>());
-                    }
-                }
-            }
-        }
         return categoryScoreMap;
     }
 
     @FXML
     public void getRecommendation(ActionEvent actionEvent) {
-        executorService.submit(() -> {
-            try {
-                List<Document> allInteractions = getUserPreferences(currentUserId);
+        List<Document> allInteractions = getUserPreferences(currentUserId);
 
-                if (allInteractions.isEmpty()) {
-                    Platform.runLater(() -> ShowAlerts.showAlert("Info", "No interactions found. Please view articles first.", Alert.AlertType.INFORMATION));
-                    return;
+        Map<String, Integer> categoryScores = analyzeInteractions(allInteractions);
+
+        List<String> recommendedCategories = categoryScores.entrySet().stream()
+                .sorted((entry1, entry2) -> entry2.getValue() - entry1.getValue())
+                .limit(3)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        List<Document> recommendedArticles = new ArrayList<>();
+
+        if (allInteractions.isEmpty()) {
+            Document userDocument = userCollection.find(eq("username", currentUserId)).first();
+            if (userDocument != null) {
+                List<String> preferredCategories = userDocument.getList("categories", String.class);
+
+                if (preferredCategories != null && !preferredCategories.isEmpty()) {
+                    recommendedArticles = articlesCollection.find(in("category", preferredCategories)).into(new ArrayList<>());
                 }
-
-                Map<String, Integer> categoryScoreMap = analyzeInteractions(allInteractions);
-
-                if (categoryScoreMap.isEmpty()) {
-                    Platform.runLater(() -> ShowAlerts.showAlert("Info", "No category preferences found.", Alert.AlertType.INFORMATION));
-                    return;
-                }
-
-                List<String> recommendedCategories = categoryScoreMap.entrySet().stream()
-                        .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))  // Sort categories by score
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toList());
-
-                // Fetch articles from recommended categories
-                List<Document> recommendedArticles = articlesCollection.find(in("category", recommendedCategories)).into(new ArrayList<>());
-
-                if (recommendedArticles.isEmpty()) {
-                    Platform.runLater(() -> ShowAlerts.showAlert("Info", "No recommended articles found for the selected categories.", Alert.AlertType.INFORMATION));
-                    return;
-                }
-
-                List<Article> articleList = convertDocumentsToArticles(recommendedArticles);
-
-                Platform.runLater(() -> recommendedTable.getItems().setAll(articleList));
-            } catch (Exception e) {
-                Platform.runLater(() -> ShowAlerts.showAlert("Error", "Failed to get recommendations: " + e.getMessage(), Alert.AlertType.ERROR));
             }
-        });
+
+            if (recommendedArticles.isEmpty()) {
+                showAlert("Recommendation", "No recommendations available based on your preferences.", Alert.AlertType.INFORMATION);
+            } else {
+                List<Article> articleList = convertDocumentsToArticles(recommendedArticles);
+                recommendedTable.getItems().setAll(articleList);
+                showAlert("Recommendation", "Recommendations generated based on your user preferences.", Alert.AlertType.INFORMATION);
+            }
+        } else {
+            recommendedArticles = articlesCollection.find(in("category", recommendedCategories)).into(new ArrayList<>());
+
+            if (recommendedArticles.isEmpty()) {
+                showAlert("Recommendation", "No recommendations available based on your recent interactions.", Alert.AlertType.INFORMATION);
+            } else {
+                List<Article> articleList = convertDocumentsToArticles(recommendedArticles);
+                recommendedTable.getItems().setAll(articleList);
+                showAlert("Recommendation", "Recommendations generated based on your recent interactions.", Alert.AlertType.INFORMATION);
+            }
+        }
+    }
+
+    @FXML
+    public void recommendedExit(ActionEvent actionEvent) {
+        storeSessionInteractions();
+        executorService.shutdown();
+        Platform.exit();
+    }
+
+    private void showAlert(String title, String content, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML
@@ -326,13 +312,5 @@ public class recommended_articles {
                 new SimpleStringProperty(cellData.getValue().getPublishedDate().toString())
         );
     }
-
-    // Shutdown ExecutorService during application exit
-    public void recommendedExit(ActionEvent actionEvent) {
-        storeSessionInteractions();
-        executorService.shutdown(); // Shutdown the executor service
-        Stage currentStage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        currentStage.close();
-    }
-
 }
+

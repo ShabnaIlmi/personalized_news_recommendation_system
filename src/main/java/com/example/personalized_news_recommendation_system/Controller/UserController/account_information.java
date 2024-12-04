@@ -183,8 +183,13 @@ public class account_information {
                     .append("action", "Updated Information")
                     .append("updated_date_time", LocalDateTime.now().toString()));
 
-            // Notify the user and log them out if the username changed
             if (!newUsername.equals(userId)) {
+                Alert logoutAlert = new Alert(Alert.AlertType.INFORMATION);
+                logoutAlert.setTitle("Username Changed");
+                logoutAlert.setHeaderText("Logout Required");
+                logoutAlert.setContentText("Your username has been updated. You will be logged out to apply the changes.");
+                logoutAlert.showAndWait();
+
                 userId = newUsername;
                 logout(actionEvent, newUsername);
                 return;
@@ -202,6 +207,7 @@ public class account_information {
             category1.getSelectionModel().clearSelection();
             category2.getSelectionModel().clearSelection();
             category3.getSelectionModel().clearSelection();
+
 
         } catch (Exception e) {
             ShowAlerts.showAlert("Database Error", "Failed to update user details: " + e.getMessage(), Alert.AlertType.ERROR);
